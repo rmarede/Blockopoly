@@ -85,7 +85,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name:
+  name: ca-bank1
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -128,7 +128,7 @@ registry:
 
   # Contains identity information which is used when LDAP is disabled
   identities:
-     - name: admin
+     - name: ca-b1-admin
        pass: adminpw
        type: client
        affiliation: ""
@@ -225,6 +225,8 @@ ldap:
 # Affiliations section. Fabric CA server can be bootstrapped with the
 # affiliations specified in this section. Affiliations are specified as maps.
 # For example:
+#
+# affiliations:
 #   businessunit1:
 #     department1:
 #       - team1
@@ -242,11 +244,6 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   org1:
-      - department1
-      - department2
-   org2:
-      - department1
 
 #############################################################################
 #  Signing section
@@ -308,16 +305,16 @@ signing:
 #  if the server creates a self-signed TLS certificate.
 ###########################################################################
 csr:
-   cn: fabric-ca-server
+   cn: bank1-ca-server
    keyrequest:
      algo: ecdsa
      size: 256
    names:
-      - C: US
-        ST: "North Carolina"
+      - C: PT
+        ST: "Lisbon"
         L:
-        O: Hyperledger
-        OU: Fabric
+        O: FCT-UNL
+        OU: Blockopoly
    hosts:
      - miguel-arede
      - localhost
