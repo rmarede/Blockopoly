@@ -40,7 +40,7 @@
 version: v1.5.7
 
 # Server's listening port (default: 7054)
-port: 7054
+port: 7057
 
 # Cross-Origin Resource Sharing (CORS)
 cors:

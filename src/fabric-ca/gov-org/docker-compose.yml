@@ -1,0 +1,12 @@
+services:
+  ca-gov:
+    container_name: ca-gov
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-gov-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - .:/tmp/hyperledger/fabric-ca-server
+    ports:
+      - 7056:7056
