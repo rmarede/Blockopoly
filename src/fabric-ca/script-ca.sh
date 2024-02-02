@@ -1,18 +1,21 @@
 #!/bin/bash
 
+declare -a orgs
+declare -A abrevs
+declare -A ports
+
 # delete docker containers and clean directories
 clean() {
+    init
+
     # stop and remove all containers
     docker stop $(docker ps -a -q)
 
     docker rm $(docker ps -a -f status=exited -q)
 
-    # clean directories
-    declare -a dirs=("user-registry" "land-registry" "gov-org" "bank1")
-
-    for dir in "${dirs[@]}"; do
-        cd "$dir"
-        sudo rm -r clients
+    for org in "${orgs[@]}"; do
+        cd "$org"
+        sudo rm -r clients/ca-admin clients/admin clients/peer1/msp clients/peer1/fabric-ca-client-config.yaml clients/orderer1/msp clients/orderer1/fabric-ca-client-config.yaml
         cd ca
         sudo rm -r msp IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
         cd ../..
@@ -21,10 +24,10 @@ clean() {
 
 # start CA containers (generates crypto material if absent)
 up() {
-    declare -a dirs=("user-registry" "land-registry" "gov-org" "bank1")
+    init
 
-    for dir in "${dirs[@]}"; do
-        cd "$dir/ca"
+    for org in "${orgs[@]}"; do
+        cd "$org/ca"
         docker compose up -d
         cd ../..
     done
@@ -35,45 +38,84 @@ stop() {
     docker stop $(docker ps -a -q)
 }
 
-enroll-ex() {
+# enroll ca-admin for each CA and register an admin, a peer and an orderer for each organization 
+register() {
+    init
 
-    mkdir user-registry/clients
-    mkdir user-registry/clients/admin
+    # register an admin, a peer and an orderer for everyone
+    for org in "${orgs[@]}"; do
+        mkdir $org/clients/ca-admin
 
-    export FABRIC_CA_CLIENT_HOME=$PWD/user-registry/clients/admin/
-    fabric-ca-client enroll -u http://ca-ur-admin:adminpw@0.0.0.0:7054
-    fabric-ca-client register --id.name admin-ur --id.secret adminpw --id.type admin -u http://0.0.0.0:7054
-    fabric-ca-client register --id.name orderer1-ur --id.secret ordererpw --id.type orderer -u http://0.0.0.0:7054
-    fabric-ca-client register --id.name peer1-ur --id.secret peerpw --id.type peer -u http://0.0.0.0:7054
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
+
+        fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
+        fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
+        fabric-ca-client register --id.name "peer1-${abrevs[$org]}" --id.secret peerpw --id.type peer -u "http://0.0.0.0:${ports[$org]}"
+        fabric-ca-client register --id.name "orderer1-${abrevs[$org]}" --id.secret ordererpw --id.type orderer -u "http://0.0.0.0:${ports[$org]}"
+    done
+
+    # register users on the user registry
+    export FABRIC_CA_CLIENT_HOME=$PWD/user-registry/clients/ca-admin/
     fabric-ca-client register --id.name user1-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
     fabric-ca-client register --id.name user2-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
-
-    mkdir land-registry/clients
-    mkdir land-registry/clients/admin
-
-    export FABRIC_CA_CLIENT_HOME=$PWD/land-registry/clients/admin/
-    fabric-ca-client enroll -u http://ca-lr-admin:adminpw@0.0.0.0:7055
-    fabric-ca-client register --id.name admin-lr --id.secret adminpw --id.type admin -u http://0.0.0.0:7055
-    fabric-ca-client register --id.name orderer1-lr --id.secret ordererpw --id.type orderer -u http://0.0.0.0:7055
-    fabric-ca-client register --id.name peer1-lr --id.secret peerpw --id.type peer -u http://0.0.0.0:7055
-
-    mkdir gov-org/clients
-    mkdir gov-org/clients/admin
-
-    export FABRIC_CA_CLIENT_HOME=$PWD/gov-org/clients/admin/
-    fabric-ca-client enroll -u http://ca-gov-admin:adminpw@0.0.0.0:7056
-    fabric-ca-client register --id.name admin-gov --id.secret adminpw --id.type admin -u http://0.0.0.0:7056
-    fabric-ca-client register --id.name orderer1-gov --id.secret ordererpw --id.type orderer -u http://0.0.0.0:7056
-    fabric-ca-client register --id.name peer1-gov --id.secret peerpw --id.type peer -u http://0.0.0.0:7056
-
-    mkdir bank1/clients
-    mkdir bank1/clients/admin
-
-    export FABRIC_CA_CLIENT_HOME=$PWD/bank1/clients/admin/
-    fabric-ca-client enroll -u http://ca-b1-admin:adminpw@0.0.0.0:7057
-    fabric-ca-client register --id.name admin-b1 --id.secret adminpw --id.type admin -u http://0.0.0.0:7057
-    fabric-ca-client register --id.name peer1-b1 --id.secret peerpw --id.type peer -u http://0.0.0.0:7057
 }
+
+# enrolls peers, generating their crypto material
+enroll() {
+    init
+
+    for org in "${orgs[@]}"; do
+        # enroll peer1
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/peer1/
+        export FABRIC_CA_CLIENT_MSPDIR=msp
+        fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
+
+        # enroll org's admin, responsible for activities such as installing and instantiating chaincode
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin
+        export FABRIC_CA_CLIENT_MSPDIR=msp
+        fabric-ca-client enroll -u "http://admin-${abrevs[$org]}:adminpw@0.0.0.0:${ports[$org]}"
+
+        mkdir $org/clients/peer1/msp/admincerts
+        cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/peer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+    done
+}
+
+launch() {
+    init
+
+    for org in "${orgs[@]}"; do
+        cd $org/clients/peer1/
+        docker compose up -d
+        cd ../../..
+    done
+}
+
+# list every registered identity for each CA
+list() {
+    init
+
+    for org in "${orgs[@]}"; do
+        echo "------------------------------------ REGISTERED IDENTITIES IN $org CA"
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
+        fabric-ca-client identity list
+        echo " "
+    done
+}
+
+init() {
+    orgs=("user-registry" "land-registry" "gov-org" "bank1")
+
+    abrevs[user-registry]="ur"
+    abrevs[land-registry]="lr"
+    abrevs[gov-org]="gov"
+    abrevs[bank1]="b1"
+
+    # the ports specified for each CA in the respective fabric-ca-server-config.yaml and docker-compose.yml
+    ports[user-registry]=7054
+    ports[land-registry]=7055
+    ports[gov-org]=7056
+    ports[bank1]=7057
+} 
 
 # first argument determines function to call
 case "$1" in
@@ -86,10 +128,19 @@ case "$1" in
     stop)
         stop
         ;;
-    enroll-ex)
-        enroll-ex
+    register)
+        register
+        ;;
+    enroll)
+        enroll
+        ;;
+    launch)
+        launch
+        ;;
+    list)
+        list
         ;;
     *)
-        echo "Usage: $0 {clean|up|stop|enroll-ex}"
+        echo "Usage: $0 {clean|up|stop|register|enroll|launch|list}"
         exit 1
 esac

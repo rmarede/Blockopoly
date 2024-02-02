@@ -8,5 +8,10 @@ services:
       - FABRIC_CA_SERVER_DEBUG=true
     volumes:
       - .:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
     ports:
       - 7057:7057
+
+networks:
+  fabric-ca:
