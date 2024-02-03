@@ -1,6 +1,8 @@
 #!/bin/bash
 
 declare -a orgs
+declare -a peers
+declare -a orderers
 declare -A abrevs
 declare -A ports
 
@@ -17,7 +19,7 @@ clean() {
         cd "$org"
         sudo rm -r msp IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
         cd clients
-        sudo rm -r ca-admin admin peer1/msp peer1/fabric-ca-client-config.yaml orderer1/msp orderer1/fabric-ca-client-config.yaml
+        sudo rm -r ca-admin admin peer1/msp peer1/fabric-ca-client-config.yaml # orderer1/msp orderer1/fabric-ca-client-config.yaml
         cd ../..
     done
 }
@@ -51,7 +53,7 @@ register() {
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "peer1-${abrevs[$org]}" --id.secret peerpw --id.type peer -u "http://0.0.0.0:${ports[$org]}"
-        fabric-ca-client register --id.name "orderer1-${abrevs[$org]}" --id.secret ordererpw --id.type orderer -u "http://0.0.0.0:${ports[$org]}"
+        # fabric-ca-client register --id.name "orderer1-${abrevs[$org]}" --id.secret ordererpw --id.type orderer -u "http://0.0.0.0:${ports[$org]}"
     done
 
     # register users on the user registry
@@ -70,8 +72,8 @@ enroll() {
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
 
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1/
-        fabric-ca-client enroll -u "https://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
+        #export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1/
+        #fabric-ca-client enroll -u "https://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
 
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin
@@ -80,8 +82,8 @@ enroll() {
 
         mkdir $org/clients/peer1/msp/admincerts
         cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/peer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
-        mkdir $org/clients/orderer1/msp/admincerts
-        cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/orderer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+        #mkdir $org/clients/orderer1/msp/admincerts
+        #cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/orderer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
 
     done
 }
@@ -109,18 +111,25 @@ list() {
 }
 
 init() {
-    orgs=("user-registry" "land-registry" "gov-org" "bank1")
+    orgs=("user-registry" "land-registry" "gov-org" "bank1") # "ord-org1" "ord-org2")
+    peers=("user-registry" "land-registry" "gov-org" "bank1")
+    orderers=("ord-org1" "ord-org2")
 
     abrevs[user-registry]="ur"
     abrevs[land-registry]="lr"
     abrevs[gov-org]="gov"
     abrevs[bank1]="b1"
+    abrevs[ord-org1]="oo1"
+    abrevs[ord-org2]="oo2"
+    
 
     # the ports specified for each CA in the respective fabric-ca-server-config.yaml and docker-compose.yml
     ports[user-registry]=7054
     ports[land-registry]=7055
     ports[gov-org]=7056
     ports[bank1]=7057
+    ports[ord-org1]=7058
+    ports[ord-org2]=7059
 } 
 
 # first argument determines function to call
