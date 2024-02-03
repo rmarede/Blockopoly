@@ -1,0 +1,18 @@
+services:
+  orderer1-os1:
+  container_name: orderer1-os1
+  image: hyperledger/fabric-orderer
+  environment:
+    - ORDERER_HOME=/tmp/hyperledger/orderer
+    - ORDERER_HOST=orderer1-os1
+    - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+    - ORDERER_GENERAL_GENESISMETHOD=file
+    - ORDERER_GENERAL_GENESISFILE=/tmp/hyperledger/os1/orderer/genesis.block
+    - ORDERER_GENERAL_LOCALMSPID=os1MSP
+    - ORDERER_GENERAL_LOCALMSPDIR=/tmp/hyperledger/os1/orderer/msp
+    - ORDERER_GENERAL_LOGLEVEL=debug
+    - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+  volumes:
+    - .:/tmp/hyperledger/os1/orderer/
+  networks:
+    - fabric-ca

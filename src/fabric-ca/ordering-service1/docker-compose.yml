@@ -1,0 +1,17 @@
+services:
+  ca-os1:
+    container_name: ca-os1
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-os1-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - .:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7058:7058
+
+networks:
+  fabric-ca:
