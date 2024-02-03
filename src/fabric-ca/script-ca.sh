@@ -15,9 +15,9 @@ clean() {
 
     for org in "${orgs[@]}"; do
         cd "$org"
-        sudo rm -r clients/ca-admin clients/admin clients/peer1/msp clients/peer1/fabric-ca-client-config.yaml clients/orderer1/msp clients/orderer1/fabric-ca-client-config.yaml
-        cd ca
         sudo rm -r msp IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
+        cd clients
+        sudo rm -r ca-admin admin peer1/msp peer1/fabric-ca-client-config.yaml orderer1/msp orderer1/fabric-ca-client-config.yaml
         cd ../..
     done
 }
@@ -27,9 +27,9 @@ up() {
     init
 
     for org in "${orgs[@]}"; do
-        cd "$org/ca"
+        cd "$org"
         docker compose up -d
-        cd ../..
+        cd ..
     done
 }
 
@@ -60,7 +60,7 @@ register() {
     fabric-ca-client register --id.name user2-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
 }
 
-# enrolls peers, generating their crypto material
+# enrolls peers and orderers, generating their crypto material
 enroll() {
     init
 
@@ -70,6 +70,9 @@ enroll() {
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
 
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1/
+        fabric-ca-client enroll -u "https://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
+
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin
         export FABRIC_CA_CLIENT_MSPDIR=msp
@@ -77,6 +80,9 @@ enroll() {
 
         mkdir $org/clients/peer1/msp/admincerts
         cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/peer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+        mkdir $org/clients/orderer1/msp/admincerts
+        cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/orderer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+
     done
 }
 
