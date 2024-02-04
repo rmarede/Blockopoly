@@ -12,6 +12,7 @@ peer:
 
     # The peer id provides a name for this peer instance and is used when
     # naming docker resources.
+    # OVERRIDEN IN EACH PEER'S DOCKER-COMPOSE.YML
     id: jdoe
 
     # The networkId allows for logical separation of networks and is used when
@@ -25,7 +26,7 @@ peer:
     # The endpoint this peer uses to listen for inbound chaincode connections.
     # If this is commented-out, the listen address is selected to be
     # the peer's address (see below) with port 7052
-    # chaincodeListenAddress: 0.0.0.0:7052
+    chaincodeListenAddress: 0.0.0.0:7052
 
     # The endpoint the chaincode for this peer uses to connect to the peer.
     # If this is not specified, the chaincodeListenAddress address is selected.
@@ -39,6 +40,7 @@ peer:
     # in the same organization. For peers in other organization, see
     # gossip.externalEndpoint for more info.
     # When used as CLI config, this means the peer's endpoint to interact with
+    # OVERRIDEN IN EACH PEER'S DOCKER-COMPOSE.YML
     address: 0.0.0.0:7051
 
     # Whether the Peer should programmatically determine its address
@@ -101,6 +103,7 @@ peer:
         # Important: The endpoints here have to be endpoints of peers in the same
         # organization, because the peer would refuse connecting to these endpoints
         # unless they are in the same organization as the peer.
+        # separated by commas, no spaces
         bootstrap: 127.0.0.1:7051
 
         # NOTE: orgLeader and useLeaderElection parameters are mutual exclusive.
@@ -316,6 +319,7 @@ peer:
     # Path on the file system where peer will store data (eg ledger). This
     # location must be access control protected to prevent unintended
     # modification that might corrupt the peer operations.
+    # The user running the peer needs to own and have write access to this directory.
     # The path may be relative to FABRIC_CFG_PATH or an absolute path.
     fileSystemPath: /var/hyperledger/production
 
@@ -360,6 +364,7 @@ peer:
     # to match the name of one of the MSPs in each of the channel
     # that this peer is a member of. Otherwise this peer's messages
     # will not be identified as valid by other nodes.
+    # OVERRIDEN IN EACH PEER'S DOCKER-COMPOSE.YML
     localMspId: SampleOrg
 
     # CLI common client config options
@@ -750,6 +755,7 @@ ledger:
 ###############################################################################
 operations:
     # host and port for the operations server
+    # two peers are running on the same node, you need to modify the addresses for the second peer to use a different port
     listenAddress: 127.0.0.1:9443
 
     # TLS configuration for the operations endpoint

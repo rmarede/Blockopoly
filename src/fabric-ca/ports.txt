@@ -1,0 +1,21 @@
+PORTS:
+	7054 ca-ur
+	7055 ca-lr
+	7056 ca-gov
+	7057 ca-b1
+	7058 ca-os1
+	7059 ca-os2
+
+
+	5401 peer1-ur
+
+
+	5411 peer1-ur-chaincode-listen
+
+
+	5421 peer1-ur-operations
+
+
+note: ca operations not set (maybe operations not needed)
+
+

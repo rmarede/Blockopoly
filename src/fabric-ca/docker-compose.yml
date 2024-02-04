@@ -1,0 +1,48 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '3.7'
+
+networks:
+  fabric-ca:
+    name: fabric-ca
+
+services:
+
+  peer1-ur:
+    container_name: peer1-ur
+    image: hyperledger/fabric-peer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO # DEBUG
+      # Generic peer variables
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric-ca
+      # Peer specific variables
+      - CORE_PEER_ID=peer1-ur
+      - CORE_PEER_ADDRESS=peer1-ur:5401
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:5401
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:5411
+      # - CORE_PEER_CHAINCODEADDRESS=peer1-ur:5411
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-ur:5401 # if more peers on this org, add here (comma separated, no spaces)
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-ur:5401
+      - CORE_PEER_LOCALMSPID=urMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer1-ur:5421
+      # - CORE_METRICS_PROVIDER=prometheus
+      # - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org1"}
+    volumes:
+      - user-registry/clients/peer1:/etc/hyperledger/fabric # parent of mspConfigPath
+      - user-registry/clients/peer1/production:/var/hyperledger/production # fileSystemPath and snapshots on the core.yaml
+      - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
+      - /var/run:/host/var/run # no idea
+    working_dir: /root
+    command: peer node start
+    ports: 
+      - 5401:5401
+      - 5421:5421
+    networks:
+      - test
+

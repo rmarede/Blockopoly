@@ -17,18 +17,14 @@ clean() {
 
     for org in "${peers[@]}"; do
         cd "$org"
-        sudo rm -r msp IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
-        cd clients
-        sudo rm -r ca-admin admin peer1/msp peer1/fabric-ca-client-config.yaml 
-        cd ../..
+        sudo rm -r msp clients IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
+        cd ..
     done
 
     for org in "${orderers[@]}"; do
         cd "$org"
-        sudo rm -r msp IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
-        cd clients
-        sudo rm -r ca-admin admin orderer1/msp orderer1/fabric-ca-client-config.yaml
-        cd ../..
+        sudo rm -r msp clients IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
+        cd ..
     done
 }
 
@@ -54,7 +50,6 @@ register() {
 
     # register an admin, and a peer for every endorser
     for org in "${peers[@]}"; do
-        mkdir $org/clients/ca-admin
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
@@ -68,7 +63,6 @@ register() {
 
     # register orderers for each ordering service organization
     for org in "${orderers[@]}"; do
-        mkdir $org/clients/ca-admin
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
