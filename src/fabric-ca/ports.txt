@@ -6,15 +6,23 @@ PORTS:
 	7058 ca-os1
 	7059 ca-os2
 
-
 	5401 peer1-ur
+	5501 peer1-lr
+	5601 peer1-gov
+	5701 peer1-b1
+
+	5801 orderer1-os1
+	5901 orderer1-os2
 
 
 	5411 peer1-ur-chaincode-listen
 
+	5811 orderer1-os1-osnadmin
+
 
 	5421 peer1-ur-operations
 
+	5821 orderer1-os1-operations
 
 note: ca operations not set (maybe operations not needed)
 

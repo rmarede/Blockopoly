@@ -34,8 +34,8 @@ services:
       # - CORE_METRICS_PROVIDER=prometheus
       # - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org1"}
     volumes:
-      - user-registry/clients/peer1:/etc/hyperledger/fabric # parent of mspConfigPath
-      - user-registry/clients/peer1/production:/var/hyperledger/production # fileSystemPath and snapshots on the core.yaml
+      - ./user-registry/clients/peer1-ur:/etc/hyperledger/fabric # parent of mspConfigPath
+      - ./user-registry/clients/peer1-ur/production:/var/hyperledger/production # fileSystemPath and snapshots on the core.yaml
       - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
       - /var/run:/host/var/run # no idea
     working_dir: /root
@@ -44,5 +44,148 @@ services:
       - 5401:5401
       - 5421:5421
     networks:
-      - test
+      - fabric-ca
 
+  peer1-lr:
+    container_name: peer1-lr
+    image: hyperledger/fabric-peer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric-ca
+      - CORE_PEER_ID=peer1-lr
+      - CORE_PEER_ADDRESS=peer1-lr:5501
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:5501
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:5511
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-lr:5501
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-lr:5501
+      - CORE_PEER_LOCALMSPID=lrMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer1-lr:5521
+    volumes:
+      - ./land-registry/clients/peer1-lr:/etc/hyperledger/fabric
+      - ./land-registry/clients/peer1-lr/production:/var/hyperledger/production
+      - ../config:/etc/hyperledger/config
+      - /var/run:/host/var/run
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 5501:5501
+      - 5521:5521
+    networks:
+      - fabric-ca
+
+  peer1-gov:
+    container_name: peer1-gov
+    image: hyperledger/fabric-peer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric-ca
+      - CORE_PEER_ID=peer1-gov
+      - CORE_PEER_ADDRESS=peer1-gov:5601
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:5601
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:5611
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-gov:5601
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-gov:5601
+      - CORE_PEER_LOCALMSPID=govMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer1-gov:5621
+    volumes:
+      - ./gov-org/clients/peer1-gov:/etc/hyperledger/fabric
+      - ./gov-org/clients/peer1-gov/production:/var/hyperledger/production
+      - ../config:/etc/hyperledger/config
+      - /var/run:/host/var/run
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 5601:5601
+      - 5621:5621
+    networks:
+      - fabric-ca
+
+  peer1-b1:
+    container_name: peer1-b1
+    image: hyperledger/fabric-peer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric-ca
+      - CORE_PEER_ID=peer1-b1
+      - CORE_PEER_ADDRESS=peer1-b1:5701
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:5701
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:5711
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-b1:5701
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1-b1:5701
+      - CORE_PEER_LOCALMSPID=b1MSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer1-b1:5721
+    volumes:
+      - ./bank1/clients/peer1-b1:/etc/hyperledger/fabric
+      - ./bank1/clients/peer1-b1/production:/var/hyperledger/production
+      - ../config:/etc/hyperledger/config
+      - /var/run:/host/var/run
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 5701:5701
+      - 5721:5721
+    networks:
+      - fabric-ca
+
+  orderer1-os1:
+    container_name: orderer1-os1
+    image: hyperledger/fabric-orderer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO
+      # Peer specific variables
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=5801
+      - ORDERER_GENERAL_LOCALMSPID=os1MSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:5811
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer1-os1:5821
+      # - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+        - ./ordering-service1/clients/orderer1-os1/msp:/var/hyperledger/orderer/msp
+        - ./ordering-service1/clients/orderer1-os1/production:/var/hyperledger/production/orderer
+        - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
+    ports:
+      - 5801:5801
+      - 5811:5811
+      - 5821:5821
+    networks:
+      - fabric-ca
+
+  orderer1-os2:
+    container_name: orderer1-os2
+    image: hyperledger/fabric-orderer:latest
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      - FABRIC_LOGGING_SPEC=INFO
+      # Peer specific variables
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=5901
+      - ORDERER_GENERAL_LOCALMSPID=os2MSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:5911
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer1-os2:5921
+      # - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+        - ./ordering-service2/clients/orderer1-os2/msp:/var/hyperledger/orderer/msp
+        - ./ordering-service2/clients/orderer1-os2/production:/var/hyperledger/production/orderer
+        - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
+    ports:
+      - 5901:5901
+      - 5911:5911
+      - 5921:5921
+    networks:
+      - fabric-ca

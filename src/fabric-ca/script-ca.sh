@@ -50,20 +50,20 @@ register() {
 
     # register an admin, and a peer for every endorser
     for org in "${peers[@]}"; do
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "peer1-${abrevs[$org]}" --id.secret peerpw --id.type peer -u "http://0.0.0.0:${ports[$org]}"
     done
 
     # register users on the user registry
-    export FABRIC_CA_CLIENT_HOME=$PWD/user-registry/clients/ca-admin/
+    export FABRIC_CA_CLIENT_HOME=$PWD/user-registry/clients/ca-admin-ur/
     fabric-ca-client register --id.name user1-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
     fabric-ca-client register --id.name user2-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
 
     # register orderers for each ordering service organization
     for org in "${orderers[@]}"; do
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "orderer1-${abrevs[$org]}" --id.secret ordererpw --id.type orderer -u "http://0.0.0.0:${ports[$org]}"
@@ -76,45 +76,40 @@ enroll() {
 
     for org in "${peers[@]}"; do
         # enroll peer1
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/peer1/
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/peer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
 
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://admin-${abrevs[$org]}:adminpw@0.0.0.0:${ports[$org]}"
 
-        mkdir $org/clients/peer1/msp/admincerts
-        cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/peer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+        mkdir $org/clients/peer1-${abrevs[$org]}/msp/admincerts
+        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/peer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
 
     done
 
     for org in "${orderers[@]}"; do
         # enroll orderer1
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1/
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
-        fabric-ca-client enroll -u "https://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
+        fabric-ca-client enroll -u "http://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
 
         # enroll org's admin
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://admin-${abrevs[$org]}:adminpw@0.0.0.0:${ports[$org]}"
 
-        mkdir $org/clients/orderer1/msp/admincerts
-        cp $org/clients/admin/msp/signcerts/cert.pem "$org/clients/orderer1/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+        mkdir $org/clients/orderer1-${abrevs[$org]}/msp/admincerts
+        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/orderer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
 
     done
 }
 
 launch-peers() {
     init
-
-    for org in "${peers[@]}"; do
-        cd $org/clients/peer1/
-        docker compose up -d
-        cd ../../..
-    done
+    docker compose up -d peer1-ur peer1-lr peer1-gov peer1-b1
 }
 
 # list every registered identity for each CA

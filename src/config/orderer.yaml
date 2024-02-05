@@ -13,9 +13,10 @@
 ################################################################################
 General:
     # Listen address: The IP on which to bind to listen.
-    ListenAddress: 127.0.0.1
+    ListenAddress: 0.0.0.0
 
     # Listen port: The port on which to bind to listen.
+    # OVERRIDEN IN EACH PEER'S DOCKER-COMPOSE.YML
     ListenPort: 7050
 
     # TLS: TLS settings for the GRPC server.
@@ -94,7 +95,7 @@ General:
     # system channel is specified. The option can be one of:
     #   "file" - path to a file containing the genesis block or config block of system channel
     #   "none" - allows an orderer to start without a system channel configuration
-    BootstrapMethod: file
+    BootstrapMethod: none
 
     # Bootstrap file: The file containing the bootstrap block to use when
     # initializing the orderer system channel and BootstrapMethod is set to
@@ -113,8 +114,8 @@ General:
     # LocalMSPID is the identity to register the local MSP material with the MSP
     # manager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
     # ID of one of the organizations defined in the orderer system channel's
-    # /Channel/Orderer configuration. The sample organization defined in the
-    # sample configuration provided has an MSP ID of "SampleOrg".
+    # /Channel/Orderer configuration.
+    # OVERRIDEN IN EACH PEER'S DOCKER-COMPOSE.YML
     LocalMSPID: SampleOrg
 
     # Enable an HTTP service for Go "pprof" profiling as documented at:
@@ -365,7 +366,7 @@ Metrics:
 ################################################################################
 Admin:
     # host and port for the admin server
-    ListenAddress: 127.0.0.1:9443
+    ListenAddress: 0.0.0.0:9443
 
     # TLS configuration for the admin endpoint
     TLS:
@@ -400,7 +401,7 @@ Admin:
 ################################################################################
 ChannelParticipation:
     # Channel participation API is enabled.
-    Enabled: false
+    Enabled: true
 
     # The maximum size of the request body when joining a channel.
     MaxRequestBodySize: 1 MB
