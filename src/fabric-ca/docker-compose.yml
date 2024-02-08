@@ -11,6 +11,106 @@ networks:
 
 services:
 
+# ---------------------------------------------------------------------------
+#                                   CAs
+# ---------------------------------------------------------------------------
+
+  ca-ur:
+    container_name: ca-ur
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-ur-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./user-registry:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7054:7054
+
+  ca-lr:
+    container_name: ca-lr
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-lr-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./land-registry:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7055:7055
+
+  ca-gov:
+    container_name: ca-gov
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-gov-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./gov-org:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7056:7056
+
+  ca-b1:
+    container_name: ca-b1
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-b1-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./bank1:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7057:7057
+
+  ca-os1:
+    container_name: ca-os1
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-os1-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./ordering-service1:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7058:7058
+
+  ca-os2:
+    container_name: ca-os2
+    image: hyperledger/fabric-ca
+    command: /bin/bash -c 'fabric-ca-server start -d -b ca-os2-admin:adminpw'
+    environment:
+      - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_DEBUG=true
+    volumes:
+      - ./ordering-service2:/tmp/hyperledger/fabric-ca-server
+    networks:
+      - fabric-ca
+    ports:
+      - 7059:7059
+
+
+
+
+
+
+
+
+
+# ---------------------------------------------------------------------------
+#                                   Peers
+# ---------------------------------------------------------------------------
+
   peer1-ur:
     container_name: peer1-ur
     image: hyperledger/fabric-peer:latest
@@ -136,6 +236,16 @@ services:
     networks:
       - fabric-ca
 
+
+
+
+
+
+
+# ---------------------------------------------------------------------------
+#                                 Orderers
+# ---------------------------------------------------------------------------
+
   orderer1-os1:
     container_name: orderer1-os1
     image: hyperledger/fabric-orderer:latest
@@ -178,7 +288,7 @@ services:
       - ORDERER_OPERATIONS_LISTENADDRESS=orderer1-os2:5921
       # - ORDERER_METRICS_PROVIDER=prometheus
     working_dir: /root
-    command: orderer
+    command: orderer # orderer start?
     volumes:
         - ./ordering-service2/clients/orderer1-os2/msp:/var/hyperledger/orderer/msp
         - ./ordering-service2/clients/orderer1-os2/production:/var/hyperledger/production/orderer

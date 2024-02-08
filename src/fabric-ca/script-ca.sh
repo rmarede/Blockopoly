@@ -31,11 +31,8 @@ clean() {
 # start CA containers (generates crypto material if absent)
 up() {
     init
-
     for org in "${orgs[@]}"; do
-        cd "$org"
-        docker compose up -d
-        cd ..
+        docker compose up -d "ca-${abrevs[$org]}"
     done
 }
 
@@ -118,7 +115,7 @@ list() {
 
     for org in "${orgs[@]}"; do
         echo "------------------------------------ REGISTERED IDENTITIES IN $org CA"
-        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin/
+        export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client identity list
         echo " "
     done

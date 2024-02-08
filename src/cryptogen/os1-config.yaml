@@ -1,0 +1,13 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+OrdererOrgs:
+  - Name: OrderingService1
+    Domain: ordering-service1
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer1-os1
+        SANS:
+          - localhost
