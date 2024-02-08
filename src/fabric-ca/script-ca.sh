@@ -15,6 +15,8 @@ clean() {
 
     docker rm $(docker ps -a -f status=exited -q)
 
+    sudo rm -r ../organizations
+
     for org in "${peers[@]}"; do
         cd "$org"
         sudo rm -r msp clients IssuerPublicKey IssuerRevocationPublicKey ca-cert.pem fabric-ca-server.db
@@ -31,8 +33,13 @@ clean() {
 # start CA containers (generates crypto material if absent)
 up() {
     init
+    mkdir ../organizations
     for org in "${orgs[@]}"; do
         docker compose up -d "ca-${abrevs[$org]}"
+
+        mkdir ../organizations/$org ; mkdir ../organizations/$org/msp ; mkdir ../organizations/$org/msp/cacerts
+        
+
     done
 }
 
@@ -106,7 +113,16 @@ enroll() {
 
 launch-peers() {
     init
-    docker compose up -d peer1-ur peer1-lr peer1-gov peer1-b1
+    for org in "${peers[@]}"; do
+        docker compose up -d "peer1-${abrevs[$org]}"
+    done
+}
+
+launch-orderers() {
+    init
+    for org in "${orderers[@]}"; do
+        docker compose up -d "orderer1-${abrevs[$org]}"
+    done
 }
 
 # list every registered identity for each CA
