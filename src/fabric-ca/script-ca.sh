@@ -38,8 +38,8 @@ up() {
         docker compose up -d "ca-${abrevs[$org]}"
 
         mkdir ../organizations/$org ; mkdir ../organizations/$org/msp ; mkdir ../organizations/$org/msp/cacerts
-        
-
+        cp "../cryptogen/${abrevs[$org]}-config.yaml" ../organizations/$org/msp/config.yaml
+        # cp "../cryptogen/${abrevs[$org]}-config.yaml" ./$org/msp TODO ??
     done
 }
 
@@ -54,6 +54,7 @@ register() {
 
     # register an admin, and a peer for every endorser
     for org in "${peers[@]}"; do
+        cp $org/ca-cert.pem ../organizations/$org/msp/cacerts/ca-cert.pem
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
@@ -67,6 +68,7 @@ register() {
 
     # register orderers for each ordering service organization
     for org in "${orderers[@]}"; do
+        cp $org/ca-cert.pem ../organizations/$org/msp/cacerts/ca-cert.pem
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
         fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
@@ -83,6 +85,7 @@ enroll() {
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/peer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
+        cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/peer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
 
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
@@ -99,6 +102,7 @@ enroll() {
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
+        cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/orderer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
 
         # enroll org's admin
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
