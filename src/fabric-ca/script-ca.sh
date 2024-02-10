@@ -15,7 +15,7 @@ clean() {
 
     docker rm $(docker ps -a -f status=exited -q)
 
-    sudo rm -r ../organizations
+    sudo rm -r ../organizations ../config/genesisblock
 
     for org in "${peers[@]}"; do
         cd "$org"
@@ -38,7 +38,8 @@ up() {
         docker compose up -d "ca-${abrevs[$org]}"
 
         mkdir ../organizations/$org ; mkdir ../organizations/$org/msp ; mkdir ../organizations/$org/msp/cacerts
-        cp "../cryptogen/${abrevs[$org]}-config.yaml" ../organizations/$org/msp/config.yaml
+        cp ../config.yaml ../organizations/$org/msp/config.yaml
+        # cp "../cryptogen/${abrevs[$org]}-config.yaml" ../organizations/$org/msp/config.yaml
         # cp "../cryptogen/${abrevs[$org]}-config.yaml" ./$org/msp TODO ??
     done
 }
@@ -85,7 +86,10 @@ enroll() {
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/peer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
-        cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/peer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
+        # cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/peer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
+        cp ../config.yaml ./$org/clients/peer1-${abrevs[$org]}/msp/config.yaml
+        mv ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
+
 
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
@@ -102,7 +106,9 @@ enroll() {
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/orderer1-${abrevs[$org]}/
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
-        cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/orderer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
+        # cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/orderer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
+        cp ../config.yaml ./$org/clients/orderer1-${abrevs[$org]}/msp/config.yaml
+        mv ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
         # enroll org's admin
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
@@ -141,10 +147,22 @@ list() {
     done
 }
 
+genesis() {
+    init 
+    configtxgen -profile SampleAppChannel -outputBlock ../config/genesisblock -channelID channel1
+}
+
+ss() {
+    clean
+    up
+    register
+    enroll
+}
+
 init() {
-    orgs=("user-registry" "land-registry" "gov-org" "bank1" "ordering-service1" "ordering-service2")
+    orgs=("user-registry" "land-registry" "gov-org" "bank1" "ordering-service1") # "ordering-service2")
     peers=("user-registry" "land-registry" "gov-org" "bank1")
-    orderers=("ordering-service1" "ordering-service2")
+    orderers=("ordering-service1") # "ordering-service2")
 
     abrevs[user-registry]="ur"
     abrevs[land-registry]="lr"
@@ -183,10 +201,19 @@ case "$1" in
     launch-peers)
         launch-peers
         ;;
+    launch-orderers)
+        launch-orderers
+        ;;
     list)
         list
         ;;
+    genesis)
+        genesis
+        ;;
+    ss)
+        ss
+        ;;
     *)
-        echo "Usage: $0 {clean|up|stop|register|enroll|launch-peers|list}"
+        echo "Usage: $0 {clean|up|stop|register|enroll|launch-peers|launch-orderers|list|genesis}"
         exit 1
 esac

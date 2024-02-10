@@ -369,7 +369,7 @@ Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start.
     # Available types are "solo", "kafka" and "etcdraft".
-    OrdererType: etcdraft
+    OrdererType: solo # TODO etcdraft
 
     # Addresses used to be the list of orderer addresses that clients and peers
     # could connect to.  However, this does not allow clients to associate orderer
@@ -379,7 +379,7 @@ Orderer: &OrdererDefaults
     Addresses:
         # - 127.0.0.1:7050 TODO
         - "orderer1-os1:5801"
-        - "orderer1-os2:5901"
+        #- "orderer1-os2:5901"
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -478,7 +478,7 @@ Orderer: &OrdererDefaults
     # network.
     Organizations:
         - *OrderingService1 # TODO com ou sem *
-        - *OrderingService2
+        # - *OrderingService2 # TODO
 
     # Policies defines the set of policies at this level of the config tree
     # For Orderer policies, their canonical path is
@@ -557,7 +557,7 @@ Profiles:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
-            OrdererType: etcdraft
+            OrdererType: solo # TODO etcdraft
             Organizations:
                 - <<: *OrderingService1
                   Policies:
@@ -565,12 +565,6 @@ Profiles:
                       Admins:
                           Type: Signature
                           Rule: "OR('OrderingService1.member')"
-                - <<: *OrderingService2
-                  Policies:
-                      <<: *OrderingService2Policies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('OrderingService2.member')"
         Application:
             <<: *ApplicationDefaults
             Organizations:
