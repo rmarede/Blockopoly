@@ -552,43 +552,29 @@ Channel: &ChannelDefaults
 ################################################################################
 Profiles:
 
-    # SampleAppChannel defines an application channel configuration that uses the etcd/raft-based orderer.
-    SampleAppChannel:
+    OrgsOrdererGenesis:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
-            OrdererType: solo # TODO etcdraft
+            OrdererType: solo
             Organizations:
                 - <<: *OrderingService1
-                  Policies:
-                      <<: *OrderingService1Policies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('OrderingService1.member')"
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - <<: *UserRegistry
+                    - <<: *LandRegistry
+                    - <<: *Gov
+                    - <<: *Bank1
+
+    OrgsChannel:
+        <<: *ChannelDefaults
+        Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
                 - <<: *UserRegistry
-                  Policies:
-                      <<: *UserRegistryPolicies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('UserRegistry.member')"
                 - <<: *LandRegistry
-                  Policies:
-                      <<: *LandRegistryPolicies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('LandRegistry.member')"
                 - <<: *Gov
-                  Policies:
-                      <<: *GovPolicies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('Gov.member')"
                 - <<: *Bank1
-                  Policies:
-                      <<: *Bank1Policies
-                      Admins:
-                          Type: Signature
-                          Rule: "OR('Bank1.member')"
+

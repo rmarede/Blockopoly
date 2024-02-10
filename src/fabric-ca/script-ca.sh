@@ -15,7 +15,7 @@ clean() {
 
     docker rm $(docker ps -a -f status=exited -q)
 
-    sudo rm -r ../organizations ../config/genesisblock
+    sudo rm -r ../organizations ../config/genesisblock ../config/channel.tx
 
     for org in "${peers[@]}"; do
         cd "$org"
@@ -149,7 +149,8 @@ list() {
 
 genesis() {
     init 
-    configtxgen -profile SampleAppChannel -outputBlock ../config/genesisblock -channelID channel1
+    configtxgen -profile OrgsOrdererGenesis -outputBlock ../config/genesisblock -channelID channel1
+    configtxgen -profile OrgsChannel -outputCreateChannelTx ../config/channel.tx -channelID channel1
 }
 
 ss() {
