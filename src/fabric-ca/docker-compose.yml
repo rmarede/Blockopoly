@@ -299,3 +299,34 @@ services:
       - 5921:5921
     networks:
       - fabric-ca
+
+
+
+# ---------------------------------------------------------------------------
+#                                   CLI
+# ---------------------------------------------------------------------------
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/etc/hyperledger/config
+      # the values to be overwritten when usin commands in the CLI
+      #- CORE_PEER_ID=cli-ur
+      #- CORE_PEER_ADDRESS=peer1-ur:5401 # address of the peer to interact with
+      #- CORE_PEER_LOCALMSPID=urMSP
+      #- CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/ur/peer1/msp
+    working_dir: /opt/gopath/src/hyperledger/fabric/
+    command: sh
+    volumes:
+      - ../config:/etc/hyperledger/config
+      - .:/opt/gopath/src/hyperledger/fabric/organizations
+      - ../scripts:/opt/gopath/src/hyperledger/fabric/scripts # scripts accessible through the repository 'scripts' folder
+    networks:
+      - fabric-ca
+

@@ -135,6 +135,11 @@ launch-orderers() {
     done
 }
 
+launch-cli() {
+    init
+    docker compose up -d cli
+}
+
 # list every registered identity for each CA
 list() {
     init
@@ -153,11 +158,15 @@ genesis() {
     configtxgen -profile OrgsChannel -outputCreateChannelTx ../config/channel.tx -channelID channel1
 }
 
-ss() {
+boot() {
     clean
     up
     register
     enroll
+    genesis
+    launch-peers
+    launch-orderers
+    launch-cli
 }
 
 init() {
@@ -205,16 +214,19 @@ case "$1" in
     launch-orderers)
         launch-orderers
         ;;
+    launch-cli)
+        launch-cli
+        ;;
     list)
         list
         ;;
     genesis)
         genesis
         ;;
-    ss)
-        ss
+    boot)
+        boot
         ;;
     *)
-        echo "Usage: $0 {clean|up|stop|register|enroll|launch-peers|launch-orderers|list|genesis}"
+        echo "Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis}"
         exit 1
 esac
