@@ -15,17 +15,23 @@ declare -A ports
 # 
 peer1() {
     # TODO apenas permitir orgs que temos como parametro
+    init
     export CORE_PEER_ID=peer1-$1
-    export CORE_PEER_MSPCONFIGPATH=../organizations/${directories[$1]}/peer1-$1/msp
+    export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/hyperledger/fabric/organizations/${directories[$1]}/clients/peer1-$1/msp
     export CORE_PEER_ADDRESS=peer1-$1:${ports[peer1-$1]} 
     export CORE_PEER_LOCALMSPID=${1}MSP
 }
 
 admin() {
+    init
     export CORE_PEER_ID=admin-$1
-    export CORE_PEER_MSPCONFIGPATH=../organizations/${directories[$1]}/admin-$1/msp
+    export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/hyperledger/fabric/organizations/${directories[$1]}/clients/admin-$1/msp
     export CORE_PEER_ADDRESS=admin-$1:${ports[admin-$1]} 
     export CORE_PEER_LOCALMSPID=${1}MSP
+}
+
+create-channel() {
+    peer channel create -c channel1 -f ../channels/channel.tx -o orderer1-os1:5801 --outputBlock ../blocks/channel1.block
 }
 
 
@@ -67,6 +73,9 @@ case "$1" in
         ;;
     admin)
         admin $2
+        ;;
+    create-channel)
+        create-channel
         ;;
     *)
         echo "Usage: $0 {peer1 <org> | admin <org>}"

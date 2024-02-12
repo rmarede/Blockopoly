@@ -15,7 +15,7 @@ clean() {
 
     docker rm $(docker ps -a -f status=exited -q)
 
-    sudo rm -r ../organizations ../config/genesisblock ../config/channel.tx
+    sudo rm -r ../organizations ../channels
 
     for org in "${peers[@]}"; do
         cd "$org"
@@ -154,8 +154,12 @@ list() {
 
 genesis() {
     init 
-    configtxgen -profile OrgsOrdererGenesis -outputBlock ../config/genesisblock -channelID channel1
-    configtxgen -profile OrgsChannel -outputCreateChannelTx ../config/channel.tx -channelID channel1
+    configtxgen -profile OrgsOrdererGenesis -outputBlock ../channels/genesisblock -channelID channel1
+    configtxgen -profile OrgsChannel -outputCreateChannelTx ../channels/channel.tx -channelID channel1
+}
+
+cli() {
+    docker exec -it cli bash
 }
 
 boot() {
@@ -226,7 +230,10 @@ case "$1" in
     boot)
         boot
         ;;
+    cli)
+        cli
+        ;;
     *)
-        echo "Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis}"
+        echo "Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis|cli}"
         exit 1
 esac

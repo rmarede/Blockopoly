@@ -264,8 +264,9 @@ services:
     command: orderer
     volumes:
         - ./ordering-service1/clients/orderer1-os1/msp:/var/hyperledger/orderer/msp
-        - ./ordering-service1/clients/orderer1-os1/production:/var/hyperledger/production/orderer
+        - ./ordering-service1/clients/orderer1-os1/production:/var/hyperledger/production/orderer # FileLedger.Location
         - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
+        - ../channels:/var/hyperledger/orderer/channels # where is genesis block (BootstrapFile folder path)
     ports:
       - 5801:5801
       - 5811:5811
@@ -273,32 +274,6 @@ services:
     networks:
       - fabric-ca
 
-  orderer1-os2:
-    container_name: orderer1-os2
-    image: hyperledger/fabric-orderer:latest
-    environment:
-      - FABRIC_CFG_PATH=/etc/hyperledger/config
-      - FABRIC_LOGGING_SPEC=INFO
-      # Peer specific variables
-      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-      - ORDERER_GENERAL_LISTENPORT=5901
-      - ORDERER_GENERAL_LOCALMSPID=os2MSP
-      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:5911
-      - ORDERER_OPERATIONS_LISTENADDRESS=orderer1-os2:5921
-      # - ORDERER_METRICS_PROVIDER=prometheus
-    working_dir: /root
-    command: orderer # orderer start?
-    volumes:
-        - ./ordering-service2/clients/orderer1-os2/msp:/var/hyperledger/orderer/msp
-        - ./ordering-service2/clients/orderer1-os2/production:/var/hyperledger/production/orderer
-        - ../config:/etc/hyperledger/config # FABRIC_CFG_PATH
-    ports:
-      - 5901:5901
-      - 5911:5911
-      - 5921:5921
-    networks:
-      - fabric-ca
 
 
 
@@ -327,6 +302,7 @@ services:
       - ../config:/etc/hyperledger/config
       - .:/opt/gopath/src/hyperledger/fabric/organizations
       - ../scripts:/opt/gopath/src/hyperledger/fabric/scripts # scripts accessible through the repository 'scripts' folder
+      - ../channels:/opt/gopath/src/hyperledger/fabric/channels # channel & genesisblock material
     networks:
       - fabric-ca
 
