@@ -98,6 +98,8 @@ enroll() {
 
         mkdir $org/clients/peer1-${abrevs[$org]}/msp/admincerts
         cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/peer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
+        cp ../config.yaml ./$org/clients/admin-${abrevs[$org]}/msp/config.yaml
+        mv ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
     done
 
