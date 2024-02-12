@@ -40,22 +40,16 @@ Organizations:
         Policies: &UserRegistryPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('UserRegistry.member')"
-                # If your MSP is configured with the new NodeOUs, you might
-                # want to use a more specific rule like the following:
-                # Rule: "OR('SampleOrg.admin', 'SampleOrg.peer', 'SampleOrg.client')"
+                Rule: "OR('urMSP.admin', 'urMSP.peer', 'urMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('UserRegistry.member')"
-                # If your MSP is configured with the new NodeOUs, you might
-                # want to use a more specific rule like the following:
-                # Rule: "OR('SampleOrg.admin', 'SampleOrg.client')"
+                Rule: "OR('urMSP.admin', 'urMSP.peer', 'urMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('UserRegistry.admin')"
+                Rule: "OR('urMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('UserRegistry.member')"
+                Rule: "OR('urMSP.peer')"
 
         # AnchorPeers defines the location of peers which can be used for
         # cross-org gossip communication.
@@ -76,16 +70,16 @@ Organizations:
         Policies: &LandRegistryPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('LandRegistry.member')"
+                Rule: "OR('lrMSP.admin', 'lrMSP.peer', 'lrMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('LandRegistry.member')"
+                Rule: "OR('lrMSP.admin', 'lrMSP.peer', 'lrMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('LandRegistry.admin')"
+                Rule: "OR('lrMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('LandRegistry.member')"
+                Rule: "OR('lrMSP.peer')"
         AnchorPeers:
             - Host: peer1-lr # TODO ou 0.0.0.0 ?
               Port: 5501
@@ -98,16 +92,16 @@ Organizations:
         Policies: &GovPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('Gov.member')"
+                Rule: "OR('govMSP.admin', 'govMSP.peer', 'govMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Gov.member')"
+                Rule: "OR('govMSP.admin', 'govMSP.peer', 'govMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Gov.admin')"
+                Rule: "OR('govMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Gov.member')"
+                Rule: "OR('govMSP.peer')"
         AnchorPeers:
             - Host: peer1-gov # TODO ou 0.0.0.0 ?
               Port: 5601
@@ -120,16 +114,16 @@ Organizations:
         Policies: &Bank1Policies
             Readers:
                 Type: Signature
-                Rule: "OR('Bank1.member')"
+                Rule: "OR('b1MSP.admin', 'b1MSP.peer', 'b1MSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Bank1.member')"
+                Rule: "OR('b1MSP.admin', 'b1MSP.peer', 'b1MSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Bank1.admin')"
+                Rule: "OR('b1MSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Bank1.member')"
+                Rule: "OR('b1MSP.peer')"
         AnchorPeers:
             - Host: peer1-b1 # TODO ou 0.0.0.0 ?
               Port: 5701
@@ -142,16 +136,16 @@ Organizations:
         Policies: &OrderingService1Policies
             Readers:
                 Type: Signature
-                Rule: "OR('OrderingService1.member')"
+                Rule: "OR('os1MSP.admin', 'os1MSP.orderer', 'os1MSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrderingService1.member')"
+                Rule: "OR('os1MSP.admin', 'os1MSP.orderer', 'os1MSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrderingService1.admin')"
+                Rule: "OR('os1MSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('OrderingService1.member')"
+                Rule: "OR('os1MSP.orderer')"
         # OrdererEndpoints is a list of all orderers this org runs which clients
         # and peers may to connect to to push transactions and receive blocks respectively.
         OrdererEndpoints:
@@ -159,32 +153,6 @@ Organizations:
         AnchorPeers:
             - Host: orderer1-os1 # TODO ou 0.0.0.0 ?
               Port: 5801
-
-    - &OrderingService2
-        Name: OrderingService2
-        SkipAsForeign: false
-        ID: os2MSP
-        MSPDir: ../organizations/ordering-service2/msp
-        Policies: &OrderingService2Policies
-            Readers:
-                Type: Signature
-                Rule: "OR('OrderingService2.member')"
-            Writers:
-                Type: Signature
-                Rule: "OR('OrderingService2.member')"
-            Admins:
-                Type: Signature
-                Rule: "OR('OrderingService2.admin')"
-            Endorsement:
-                Type: Signature
-                Rule: "OR('OrderingService2.member')"
-        # OrdererEndpoints is a list of all orderers this org runs which clients
-        # and peers may to connect to to push transactions and receive blocks respectively.
-        OrdererEndpoints:
-            - "orderer1-os2:5901"
-        AnchorPeers:
-            - Host: orderer1-os2 # TODO ou 0.0.0.0 ?
-              Port: 5901
 
 ################################################################################
 #
@@ -248,7 +216,7 @@ Capabilities:
 #
 ################################################################################
 Application: &ApplicationDefaults
-    ACLs: &ACLsDefault
+    ACLs: &ACLsDefault # Access Control Lists
         # This section provides defaults for policies for various resources
         # in the system. These "resources" could be functions on system chaincodes
         # (e.g., "GetBlockByNumber" on the "qscc" system chaincode) or other resources
@@ -329,7 +297,11 @@ Application: &ApplicationDefaults
 
     # Organizations lists the orgs participating on the application side of the
     # network.
-    Organizations:
+    Organizations: # TODO antes estava vazio
+        - <<: *UserRegistry
+        - <<: *LandRegistry
+        - <<: *Gov
+        - <<: *Bank1
 
     # Policies defines the set of policies at this level of the config tree
     # For Application policies, their canonical path is
@@ -349,7 +321,7 @@ Application: &ApplicationDefaults
             Rule: "ANY Writers"
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins" # TODO must be MAJORITY
 
     # Capabilities describes the application level capabilities, see the
     # dedicated Capabilities section elsewhere in this file for a full
@@ -379,7 +351,6 @@ Orderer: &OrdererDefaults
     Addresses:
         # - 127.0.0.1:7050 TODO
         - "orderer1-os1:5801"
-        #- "orderer1-os2:5901"
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -477,7 +448,7 @@ Orderer: &OrdererDefaults
     # Organizations lists the orgs participating on the orderer side of the
     # network.
     Organizations:
-        - *OrderingService1 # TODO com ou sem *
+        - <<: *OrderingService1 # TODO com ou sem *
         # - *OrderingService2 # TODO
 
     # Policies defines the set of policies at this level of the config tree
@@ -492,7 +463,7 @@ Orderer: &OrdererDefaults
             Rule: "ANY Writers"
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins" # TODO must be MAJORITY
         # BlockValidation specifies what signatures must be included in the block
         # from the orderer for the peer to validate it.
         BlockValidation:
@@ -529,7 +500,7 @@ Channel: &ChannelDefaults
         # By default, who may modify elements at this config level
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins" # TODO must be MAJORITY
 
 
     # Capabilities describes the channel level capabilities, see the
@@ -559,6 +530,8 @@ Profiles:
             OrdererType: solo
             Organizations:
                 - <<: *OrderingService1
+                  Policies:
+                    <<: *OrderingService1Policies
         Consortiums:
             SampleConsortium:
                 Organizations:
@@ -574,7 +547,15 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - <<: *UserRegistry
+                  Policies:
+                    <<: *UserRegistryPolicies
                 - <<: *LandRegistry
+                  Policies:
+                    <<: *LandRegistryPolicies
                 - <<: *Gov
+                  Policies:
+                    <<: *GovPolicies
                 - <<: *Bank1
+                  Policies:
+                    <<: *Bank1Policies
 

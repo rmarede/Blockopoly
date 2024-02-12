@@ -49,25 +49,27 @@ stop() {
     docker stop $(docker ps -a -q)
 }
 
-# enroll ca-admin for each CA and register an admin, a peer and an orderer for each organization 
+# enroll ca-admin for each CA and register an admin, peers and orderers 
 register() {
     init
 
-    # register an admin, and a peer for every endorser
+    # --id.type -> role of the identity. four possible types: peer, orderer, admin, and client (used for applications). 
+    #              this type must be linked to the relevant NodeOU.
+    #              the four roles are mutually exclusive
+    # --id.attrs -> https://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html#attribute-based-access-control 
+
     for org in "${peers[@]}"; do
         cp $org/ca-cert.pem ../organizations/$org/msp/cacerts/ca-cert.pem
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client enroll -u "http://ca-${abrevs[$org]}-admin:adminpw@0.0.0.0:${ports[$org]}"
-        fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}"
+        fabric-ca-client register --id.name "admin-${abrevs[$org]}" --id.secret adminpw --id.type admin -u "http://0.0.0.0:${ports[$org]}" # TODO --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert"
         fabric-ca-client register --id.name "peer1-${abrevs[$org]}" --id.secret peerpw --id.type peer -u "http://0.0.0.0:${ports[$org]}"
     done
-
-    # register users on the user registry
+   
     export FABRIC_CA_CLIENT_HOME=$PWD/user-registry/clients/ca-admin-ur/
-    fabric-ca-client register --id.name user1-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
-    fabric-ca-client register --id.name user2-ur --id.secret userpw --id.type user -u http://0.0.0.0:7054
-
-    # register orderers for each ordering service organization
+    fabric-ca-client register --id.name user1-ur --id.secret userpw --id.type client -u http://0.0.0.0:7054
+    fabric-ca-client register --id.name user2-ur --id.secret userpw --id.type client -u http://0.0.0.0:7054
+    
     for org in "${orderers[@]}"; do
         cp $org/ca-cert.pem ../organizations/$org/msp/cacerts/ca-cert.pem
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/ca-admin-${abrevs[$org]}/
@@ -87,20 +89,27 @@ enroll() {
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://peer1-${abrevs[$org]}:peerpw@0.0.0.0:${ports[$org]}"
         # cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/peer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
-        cp ../config.yaml ./$org/clients/peer1-${abrevs[$org]}/msp/config.yaml
-        mv ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
-
 
         # enroll org's admin, responsible for activities such as installing and instantiating chaincode
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://admin-${abrevs[$org]}:adminpw@0.0.0.0:${ports[$org]}"
 
+        # local MSPs need config.yaml file
+        cp ../config.yaml ./$org/clients/peer1-${abrevs[$org]}/msp/config.yaml
+        cp ../config.yaml ./$org/clients/admin-${abrevs[$org]}/msp/config.yaml
+
+        # peer local MSPs need the public certificate of an admin
         mkdir $org/clients/peer1-${abrevs[$org]}/msp/admincerts
         cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/peer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
-        cp ../config.yaml ./$org/clients/admin-${abrevs[$org]}/msp/config.yaml
+
+        # rename ca-certs on localMSPs (important because of config.yaml)
+        mv ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
         mv ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
+        # TODO
+        mkdir ../organizations/$org/msp/admincerts
+        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "../organizations/$org/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
     done
 
     for org in "${orderers[@]}"; do
@@ -109,17 +118,27 @@ enroll() {
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://orderer1-${abrevs[$org]}:ordererpw@0.0.0.0:${ports[$org]}"
         # cp "../cryptogen/${abrevs[$org]}-config.yaml" $org/clients/orderer1-${abrevs[$org]}/msp/config.yaml # TODO necessario?
-        cp ../config.yaml ./$org/clients/orderer1-${abrevs[$org]}/msp/config.yaml
-        mv ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
         # enroll org's admin
         export FABRIC_CA_CLIENT_HOME=$PWD/$org/clients/admin-${abrevs[$org]}
         export FABRIC_CA_CLIENT_MSPDIR=msp
         fabric-ca-client enroll -u "http://admin-${abrevs[$org]}:adminpw@0.0.0.0:${ports[$org]}"
 
+        # local MSPs need config.yaml file
+        cp ../config.yaml ./$org/clients/orderer1-${abrevs[$org]}/msp/config.yaml
+        cp ../config.yaml ./$org/clients/admin-${abrevs[$org]}/msp/config.yaml
+
+        # rename ca-certs on localMSPs (important because of config.yaml)
+        mv ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
+        mv ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/ca-cert.pem
+
+        # orderer local MSPs need the public certificate of an admin
         mkdir $org/clients/orderer1-${abrevs[$org]}/msp/admincerts
         cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/orderer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
 
+        # TODO
+        mkdir ../organizations/$org/msp/admincerts
+        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "../organizations/$org/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
     done
 }
 
