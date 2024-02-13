@@ -20,18 +20,41 @@ peer1() {
     export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/hyperledger/fabric/organizations/${directories[$1]}/clients/peer1-$1/msp
     export CORE_PEER_ADDRESS=peer1-$1:${ports[peer1-$1]} 
     export CORE_PEER_LOCALMSPID=${1}MSP
+    env-vars
 }
 
 admin() {
     init
     export CORE_PEER_ID=admin-$1
     export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/hyperledger/fabric/organizations/${directories[$1]}/clients/admin-$1/msp
-    export CORE_PEER_ADDRESS=admin-$1:${ports[admin-$1]} 
+    export CORE_PEER_ADDRESS=$2-$1:${ports[$2-$1]} 
     export CORE_PEER_LOCALMSPID=${1}MSP
+    env-vars
+}
+
+orderer1() {
+    # TODO apenas permitir orgs que temos como parametro
+    init
+    export CORE_PEER_ID=orderer1-$1
+    export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/hyperledger/fabric/organizations/${directories[$1]}/clients/orderer1-$1/msp
+    export CORE_PEER_ADDRESS=orderer1-$1:${ports[orderer1-$1]} 
+    export CORE_PEER_LOCALMSPID=${1}MSP
+    env-vars
 }
 
 create-channel() {
-    peer channel create -c channel1 -f ../channels/channel.tx -o orderer1-os1:5801 --outputBlock ../blocks/channel1.block
+    peer channel create -c channel1 -f ../channels/channel1.tx -o orderer1-os1:5801 --outputBlock ../channels/channel1.block
+}
+
+join-channel() {
+    peer channel join -b ../channels/channel1.block
+}
+
+env-vars() {
+    echo CORE_PEER_ID=$CORE_PEER_ID
+    echo CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH
+    echo CORE_PEER_ADDRESS=$CORE_PEER_ADDRESS
+    echo CORE_PEER_LOCALMSPID=$CORE_PEER_LOCALMSPID
 }
 
 
@@ -64,6 +87,8 @@ init() {
     ports[peer1-lr]=5501
     ports[peer1-gov]=5601
     ports[peer1-b1]=5701
+
+    ports[orderer1-os1]=5801
 } 
 
 # first argument determines function to call
@@ -72,12 +97,18 @@ case "$1" in
         peer1 $2
         ;;
     admin)
-        admin $2
+        admin $2 $3
+        ;;
+    orderer1)
+        orderer1 $2
         ;;
     create-channel)
         create-channel
         ;;
+    join-channel)
+        join-channel
+        ;;
     *)
-        echo "Usage: $0 {peer1 <org> | admin <org>}"
+        echo "Usage: $0 {peer1 <org> | admin <org> <target_node>}"
         exit 1
 esac

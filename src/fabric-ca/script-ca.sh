@@ -99,17 +99,10 @@ enroll() {
         cp ../config.yaml ./$org/clients/peer1-${abrevs[$org]}/msp/config.yaml
         cp ../config.yaml ./$org/clients/admin-${abrevs[$org]}/msp/config.yaml
 
-        # peer local MSPs need the public certificate of an admin
-        mkdir $org/clients/peer1-${abrevs[$org]}/msp/admincerts
-        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/peer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
-
         # rename ca-certs on localMSPs (important because of config.yaml)
         mv ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/peer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
         mv ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
-        # TODO
-        mkdir ../organizations/$org/msp/admincerts
-        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "../organizations/$org/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
     done
 
     for org in "${orderers[@]}"; do
@@ -132,13 +125,6 @@ enroll() {
         mv ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/orderer1-${abrevs[$org]}/msp/cacerts/ca-cert.pem
         mv ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/0-0-0-0-${ports[$org]}.pem ./$org/clients/admin-${abrevs[$org]}/msp/cacerts/ca-cert.pem
 
-        # orderer local MSPs need the public certificate of an admin
-        mkdir $org/clients/orderer1-${abrevs[$org]}/msp/admincerts
-        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "$org/clients/orderer1-${abrevs[$org]}/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
-
-        # TODO
-        mkdir ../organizations/$org/msp/admincerts
-        cp $org/clients/admin-${abrevs[$org]}/msp/signcerts/cert.pem "../organizations/$org/msp/admincerts/${abrevs[$org]}-admin-cert.pem"
     done
 }
 
@@ -175,8 +161,8 @@ list() {
 
 genesis() {
     init 
-    configtxgen -profile OrgsOrdererGenesis -outputBlock ../channels/genesisblock -channelID channel1
-    configtxgen -profile OrgsChannel -outputCreateChannelTx ../channels/channel.tx -channelID channel1
+    configtxgen -profile OrgsOrdererGenesis -outputBlock ../channels/genesisblock -channelID syschannel
+    configtxgen -profile OrgsChannel -outputCreateChannelTx ../channels/channel1.tx -channelID channel1
 }
 
 cli() {
