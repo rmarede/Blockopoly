@@ -42,14 +42,6 @@ orderer1() {
     env-vars
 }
 
-create-channel() {
-    peer channel create -c channel1 -f ../channels/channel1.tx -o orderer1-os1:5801 --outputBlock ../channels/channel1.block
-}
-
-join-channel() {
-    peer channel join -b ../channels/channel1.block
-}
-
 env-vars() {
     echo CORE_PEER_ID=$CORE_PEER_ID
     echo CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH
@@ -101,12 +93,6 @@ case "$1" in
         ;;
     orderer1)
         orderer1 $2
-        ;;
-    create-channel)
-        create-channel
-        ;;
-    join-channel)
-        join-channel
         ;;
     *)
         echo "Usage: $0 {peer1 <org> | admin <org> <target_node>}"

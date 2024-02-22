@@ -304,7 +304,7 @@ services:
     volumes:
       - ../config:/etc/hyperledger/config
       - .:/opt/gopath/src/hyperledger/fabric/organizations
-      - ../scripts:/opt/gopath/src/hyperledger/fabric/scripts # scripts accessible through the repository 'scripts' folder
+      - ../cli-scripts:/opt/gopath/src/hyperledger/fabric/scripts # scripts accessible through the repository 'cli-scripts' folder
       - ../channels:/opt/gopath/src/hyperledger/fabric/channels # channel & genesisblock material
     networks:
       - fabric-ca
