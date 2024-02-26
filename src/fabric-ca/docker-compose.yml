@@ -306,6 +306,7 @@ services:
       - .:/opt/gopath/src/hyperledger/fabric/organizations
       - ../cli-scripts:/opt/gopath/src/hyperledger/fabric/scripts # scripts accessible through the repository 'cli-scripts' folder
       - ../channels:/opt/gopath/src/hyperledger/fabric/channels # channel & genesisblock material
+      - ../chaincode:/opt/gopath/src/hyperledger/fabric/chaincode # chaincode
     networks:
       - fabric-ca
 

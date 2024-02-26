@@ -15,7 +15,7 @@ clean() {
 
     docker rm $(docker ps -a -f status=exited -q)
 
-    sudo rm -r ../organizations ../channels
+    sudo rm -r ../organizations ../channels ../chaincode/vendor
 
     for org in "${peers[@]}"; do
         cd "$org"

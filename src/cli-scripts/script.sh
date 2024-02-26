@@ -24,3 +24,26 @@
 # join bank1 to the channel
 . identity.sh admin b1 peer1
 . channel.sh join
+
+# package chaincode
+. chaincode.sh package
+
+# install chaincode on all peers
+. identity.sh admin ur peer1
+. chaincode.sh install
+. identity.sh admin lr peer1
+. chaincode.sh install
+. identity.sh admin gov peer1
+. chaincode.sh install
+. identity.sh admin b1 peer1
+. chaincode.sh install
+
+# approve chaincode for all orgs
+. identity.sh admin ur peer1
+. chaincode.sh approve
+. identity.sh admin lr peer1
+. chaincode.sh approve
+. identity.sh admin gov peer1
+. chaincode.sh approve
+. identity.sh admin b1 peer1
+. chaincode.sh approve
