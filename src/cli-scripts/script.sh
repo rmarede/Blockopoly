@@ -47,3 +47,6 @@
 . chaincode.sh approve
 . identity.sh admin b1 peer1
 . chaincode.sh approve
+
+. chaincode.sh commit
+
