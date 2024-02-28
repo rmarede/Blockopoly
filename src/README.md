@@ -49,14 +49,8 @@ After deploying the network, two additional folders will be created:
 ---
 
   ## 3. Deploying the network
-
-Start by opening a terminal at *Blockopoly/src*. The first thing to do is to define the environment variables for the Fabric binaries and configurations. The following commands **must be executed in every new terminal session**, and the specified paths **will vary** based on the location of the Blockopoly repository on your filesystem.
-	`
-	export PATH=$HOME/go/Blockopoly/src/bin:$PATH 
-	export FABRIC_CFG_PATH=$HOME/go/Blockopoly/src/config/ 
-	`
 	
-Deploying the network with the preconfigured settings for the proposed work is a seamless process, as all necessary commands are encapsulated within scripts provided in the repository. Before running any script, ensure it is executable by modifying its permissions with the *chmod* command, in this case: `chmod +x script.sh`
+Start by opening a terminal at *Blockopoly/src*. Deploying the network with the preconfigured settings for the proposed work is a seamless process, as all necessary commands are encapsulated within scripts provided in the repository. Before running any script, ensure it is executable by modifying its permissions with the *chmod* command, in this case: `chmod +x script.sh`
 
 Then, booting the network is as simple as running one single command: `. script.sh boot`
 
@@ -89,7 +83,8 @@ At the working directory of this container we have access to all the files neede
 (directory tree structure)
 The *chaincode* folder contains the source code for the smart contracts, which is written in Go. The *scripts* folder contains the scripts that automate the process of creating the channel and deploying the chaincode. The *requests.sh* script is used to interact with the chaincode, and it is the main tool for testing the network.
 
-To seamlessly deploy the chaincode, go inside the *scripts* folder (`cd scripts`) and run the following command: `. scripts.sh`
+To seamlessly deploy the chaincode, go inside the *scripts* folder (`cd scripts`) and run the following command: `. scripts.sh` 
+This step will take a few minutes, as it will compile and install the chaincode on every peer and instantiate it on the channel.
 
 You can then use the *requests.sh* script to interact with the chaincode, by running `. requests.sh ...` and passing the desired arguments. 
 
