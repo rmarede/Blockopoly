@@ -13,17 +13,13 @@ To deploy the network you will need the following technologies:
 2. **Git** - To manage versions and clone the repository; 
 3. **Docker** - Ensure WSL2.0 engine support is enabled if using WSL;
 4. **Curl** - Check curl documentation [here](https://curl.se/download.html) or run `sudo apt install curl`
-5. **Go Programming Language** - Check Go documentation [here](https://go.dev/dl/) or run:
-	  ```
-		TODO
-		sudo wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz	
-		sudo tar -C ../../usr/local  -xzf  go1.21.6.linux-amd64.tar.gz
-		...
-	  ```
+5. **Go Programming Language** - Check Go documentation [here](https://go.dev/dl/) or run: TODO
   
 Clone this repository to your working directory. If using WSL, ensure the directory is within the WSL filesystem.
- Afterwards, you must install Hyperledger Fabric's binaries and Docker image. The install script `install-fabric.sh` is included in this directory. Open a new terminal at *Blockopoly/src* and run the following command:
-  	  `chmod +x install-fabric.sh && ./install-fabric.sh docker binary`
+ Afterwards, you must install Hyperledger Fabric's Docker images. The official install script `install-fabric.sh` is included in this directory. Open a new terminal at *Blockopoly/src* and run the following command:
+  	  `chmod +x install-fabric.sh && ./install-fabric.sh docker`
+
+> **ProTip:** The Fabric binaries are already included in the repository, at *Blockopoly/src/bin*. However you can use this install script to re-download them if necessary, by running `./install-fabric.sh binary`. 
 
 ---
 
@@ -52,7 +48,7 @@ After deploying the network, two additional folders will be created:
 	
 Start by opening a terminal at *Blockopoly/src*. Deploying the network with the preconfigured settings for the proposed work is a seamless process, as all necessary commands are encapsulated within scripts provided in the repository. Before running any script, ensure it is executable by modifying its permissions with the *chmod* command, in this case: `chmod +x script.sh`
 
-Then, booting the network is as simple as running one single command: `. script.sh boot`
+Then, booting the network is as simple as running one single command: `./script.sh boot`
 
 Behind the scenes, this script will use the configuration files to generate the cryptographic material for each organization's Certificate Authorities (CAs), register and enroll the peers, orderers and admins, create the genesis block and channel configurations, and finally launch Docker containers for each of the peers and orderers. A CLI container will also be deployed, to facilitate the next steps. 
 In a production environment, the script's commands would require **individual execution** on each network node.
@@ -77,16 +73,40 @@ For the final version, we aim to bring TLS and use the Raft consensus algorithm 
 
 The process of creating the channel and installing the chaincode is similar to the previous one, as we will make use of the scripts provided in the repository, at *Blockopoly/src/cli-scripts*. In a production environment, the scripts' commands would require individual execution on each network node. In the testing environment, the commands can either be run directly on the host machine, or in an auxiliary CLI container. The ... assume ... to be run inside the CLI container, which was already deployed on the previous step.
 
-To access the terminal of this container, run `. script.sh cli`
+To access the terminal of this container, run `./script.sh cli`
 
 At the working directory of this container we have access to all the files needed to proceed. 
-(directory tree structure)
+(TODO directory tree structure)
 The *chaincode* folder contains the source code for the smart contracts, which is written in Go. The *scripts* folder contains the scripts that automate the process of creating the channel and deploying the chaincode. The *requests.sh* script is used to interact with the chaincode, and it is the main tool for testing the network.
 
-To seamlessly deploy the chaincode, go inside the *scripts* folder (`cd scripts`) and run the following command: `. scripts.sh` 
+To seamlessly deploy the chaincode, go inside the *scripts* folder (`cd scripts`) and run the following command: `. script.sh` 
 This step will take a few minutes, as it will compile and install the chaincode on every peer and instantiate it on the channel.
 
-You can then use the *requests.sh* script to interact with the chaincode, by running `. requests.sh ...` and passing the desired arguments. 
+You are now ready to interact with the network. The next section will guide you through the process of testing the network. 
+
+You can exit the CLI container by using the shortcut `Ctrl+d` when you are done with the testing. The container will still be running in the background, and you can access it again by running `./script.sh cli` in the host machine's terminal.
+
+---
+
+  ## 5. Testing the Network
+
+Currently, Blockopoly's business logic is still in development, and the chaincode is not yet fully functional. However, the network is already set up and ready to be tested.
+You can interact with the network by running the `requests.sh` script, which is located in the *cli-scripts* folder. On the CLI container, this script is available inside the *scripts* folder. It contains a collection of commands that interact with the chaincode, and it is the main tool for testing the network.
+
+Start by initializing the ledger with some initial data. Run the following command: `. requests.sh init`
+
+This command will create an initial set of assets, which can be retrieved by running the following command: `. requests.sh queryAll`
+
+New assets can be created by running the following command: `. requests.sh createAsset <assetID> <owner> <value>`
+ 
+
+---
+
+  ## 6. Logging and Monitoring (Optional)
+
+At *Blockopoly/src* you can find the *logspout.sh* script, which deploys a Logspout container to monitor the logs of the network's containers. This is an optional step, but it can be useful to monitor the network's activity and debug any issues that may arise.
+
+To deploy the Logspout container, open a new terminal at *Blockopoly/src* and run the following command: `./logspout.sh`
 
 ---
 
@@ -94,10 +114,7 @@ You can then use the *requests.sh* script to interact with the chaincode, by run
 
 <summary>stuff</summary>
 
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
-
-
-
+## Ignore the following content, it is just a placeholder for now.
 
 ## UML diagrams
 

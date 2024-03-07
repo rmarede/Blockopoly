@@ -6,8 +6,18 @@ declare -a orderers
 declare -A abrevs
 declare -A ports
 
+# Check if Docker is running
+docker info > /dev/null 2>&1
+
+# Check the exit status of the previous command
+if [ $? -ne 0 ]; then
+  echo "[ERROR] Docker is not initialized. Please start Docker and try again."
+  exit 1
+fi
+
 # delete docker containers and clean crypto material
 clean() {
+    echo "[INFO] Deleting all existing Docker instances..."
     # stop and remove all containers
     docker stop $(docker ps -a -q)
 
@@ -30,6 +40,8 @@ clean() {
 
 # start CA containers (generates crypto material if absent)
 up() {
+    echo "[INFO] Generating crypto material for all Certificate Authorities..."
+
     mkdir organizations
     
     for org in "${orgs[@]}"; do
@@ -57,6 +69,8 @@ register() {
     #              the four roles are mutually exclusive
     # --id.attrs -> https://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html#attribute-based-access-control 
 
+    echo "[INFO] Registering admins, peers and orderers. Enrolling ca-admins..."
+
     for org in "${peers[@]}"; do
         cp fabric-ca/$org/ca-cert.pem organizations/$org/msp/cacerts/ca-cert.pem
         export FABRIC_CA_CLIENT_HOME=$PWD/fabric-ca/$org/clients/ca-admin-${abrevs[$org]}/
@@ -80,6 +94,9 @@ register() {
 
 # enrolls peers and orderers, generating their crypto material
 enroll() {
+
+    echo "[INFO] Enrolling peers and orderers..."
+
     for org in "${peers[@]}"; do
         # enroll peer1
         export FABRIC_CA_CLIENT_HOME=$PWD/fabric-ca/$org/clients/peer1-${abrevs[$org]}/
@@ -126,6 +143,7 @@ enroll() {
 }
 
 launch-peers() {
+    echo "[INFO] Launching peer nodes' Docker contrainers..."
     cd fabric-ca
     for org in "${peers[@]}"; do
         docker compose up -d "peer1-${abrevs[$org]}"
@@ -134,6 +152,7 @@ launch-peers() {
 }
 
 launch-orderers() {
+    echo "[INFO] Launching ordering nodes' Docker contrainers..."
     cd fabric-ca
     for org in "${orderers[@]}"; do
         docker compose up -d "orderer1-${abrevs[$org]}"
@@ -142,6 +161,7 @@ launch-orderers() {
 }
 
 launch-cli() {
+    echo "[INFO] Launching the CLI Docker contrainer..."
     cd fabric-ca
     docker compose up -d cli
     cd ..
@@ -158,6 +178,7 @@ list() {
 }
 
 genesis() {
+    echo "[INFO] Generating genesis block of syschannel and configurations for channel1..."
     configtxgen -profile OrgsOrdererGenesis -outputBlock channels/genesisblock -channelID syschannel
     configtxgen -profile OrgsChannel -outputCreateChannelTx channels/channel1.tx -channelID channel1
 }
@@ -167,7 +188,7 @@ cli() {
 }
 
 boot() {
-    clean
+    clean 2> /dev/null
     up
     register
     enroll
@@ -206,7 +227,7 @@ init
 # first argument determines function to call
 case "$1" in
     clean)
-        clean
+        clean 2> /dev/null
         ;;
     up)
         up

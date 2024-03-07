@@ -92,6 +92,33 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 
 	return assetJSON != nil, nil
 }
+
+func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface) ([]*Asset, error) {
+	resultsIterator, err := ctx.GetStub().GetStateByRange("", "")
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	var assets []*Asset
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var asset Asset
+		err = json.Unmarshal(queryResponse.Value, &asset)
+		if err != nil {
+			return nil, err
+		}
+		assets = append(assets, &asset)
+	}
+
+	return assets, nil
+}
+
+
 /*
 func main() {
 	testChaincode, err := contractapi.NewChaincode(&SmartContract{})
