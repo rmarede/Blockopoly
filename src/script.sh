@@ -6,22 +6,28 @@ declare -a orderers
 declare -A abrevs
 declare -A ports
 
+RED='\033[0;31m'
+BLUE='\033[0;36m'
+NC='\033[0m' # reset color
+
 # Check if Docker is running
 docker info > /dev/null 2>&1
 
 # Check the exit status of the previous command
 if [ $? -ne 0 ]; then
-  echo "[ERROR] Docker is not initialized. Please start Docker and try again."
+  echo -e "${RED}[ERROR] Docker is not initialized. Please start Docker and try again.${NC}"
   exit 1
 fi
 
 # delete docker containers and clean crypto material
 clean() {
-    echo "[INFO] Deleting all existing Docker instances..."
+    echo -e "${BLUE}[INFO] Deleting all existing Docker instances...${NC}"
     # stop and remove all containers
     docker stop $(docker ps -a -q)
 
     docker rm $(docker ps -a -f status=exited -q)
+
+    echo -e "${BLUE}[INFO] Cleaning project directories and cryptographic material...${NC}"
 
     sudo rm -r organizations channels chaincode/vendor
 
@@ -40,7 +46,7 @@ clean() {
 
 # start CA containers (generates crypto material if absent)
 up() {
-    echo "[INFO] Generating crypto material for all Certificate Authorities..."
+    echo -e "${BLUE}[INFO] Generating crypto material for all Certificate Authorities...${NC}"
 
     mkdir organizations
     
@@ -69,7 +75,7 @@ register() {
     #              the four roles are mutually exclusive
     # --id.attrs -> https://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html#attribute-based-access-control 
 
-    echo "[INFO] Registering admins, peers and orderers. Enrolling ca-admins..."
+    echo -e "${BLUE}[INFO] Registering admins, peers and orderers. Enrolling ca-admins...${NC}"
 
     for org in "${peers[@]}"; do
         cp fabric-ca/$org/ca-cert.pem organizations/$org/msp/cacerts/ca-cert.pem
@@ -95,7 +101,7 @@ register() {
 # enrolls peers and orderers, generating their crypto material
 enroll() {
 
-    echo "[INFO] Enrolling peers and orderers..."
+    echo -e "${BLUE}[INFO] Enrolling peers and orderers...${NC}"
 
     for org in "${peers[@]}"; do
         # enroll peer1
@@ -143,7 +149,7 @@ enroll() {
 }
 
 launch-peers() {
-    echo "[INFO] Launching peer nodes' Docker contrainers..."
+    echo -e "${BLUE}[INFO] Launching peer nodes' Docker contrainers...${NC}"
     cd fabric-ca
     for org in "${peers[@]}"; do
         docker compose up -d "peer1-${abrevs[$org]}"
@@ -152,7 +158,7 @@ launch-peers() {
 }
 
 launch-orderers() {
-    echo "[INFO] Launching ordering nodes' Docker contrainers..."
+    echo -e "${BLUE}[INFO] Launching ordering nodes' Docker contrainers...${NC}"
     cd fabric-ca
     for org in "${orderers[@]}"; do
         docker compose up -d "orderer1-${abrevs[$org]}"
@@ -161,7 +167,7 @@ launch-orderers() {
 }
 
 launch-cli() {
-    echo "[INFO] Launching the CLI Docker contrainer..."
+    echo -e "${BLUE}[INFO] Launching the CLI Docker contrainer...${NC}"
     cd fabric-ca
     docker compose up -d cli
     cd ..
@@ -170,7 +176,7 @@ launch-cli() {
 # list every registered identity for each CA
 list() {
     for org in "${orgs[@]}"; do
-        echo "------------------------------------ REGISTERED IDENTITIES IN $org CA"
+        echo -e "${BLUE}------------------------------------ REGISTERED IDENTITIES IN $org CA${NC}"
         export FABRIC_CA_CLIENT_HOME=$PWD/fabric-ca/$org/clients/ca-admin-${abrevs[$org]}/
         fabric-ca-client identity list
         echo " "
@@ -178,7 +184,7 @@ list() {
 }
 
 genesis() {
-    echo "[INFO] Generating genesis block of syschannel and configurations for channel1..."
+    echo -e "${BLUE}[INFO] Generating genesis block of syschannel and configurations for channel1...${NC}"
     configtxgen -profile OrgsOrdererGenesis -outputBlock channels/genesisblock -channelID syschannel
     configtxgen -profile OrgsChannel -outputCreateChannelTx channels/channel1.tx -channelID channel1
 }
@@ -263,6 +269,6 @@ case "$1" in
         cli
         ;;
     *)
-        echo "Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis|cli}"
+        echo -e "${RED}Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis|cli}${NC}"
         exit 1
 esac
