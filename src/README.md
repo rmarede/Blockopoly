@@ -13,7 +13,7 @@ To deploy the network you will need the following technologies:
 2. **Git** - To manage versions and clone the repository; 
 3. **Docker** - Ensure WSL2.0 engine support is enabled if using WSL;
 4. **Curl** - Check curl documentation [here](https://curl.se/download.html) or run `sudo apt install curl`
-5. **Go Programming Language** - Check Go documentation [here](https://go.dev/dl/) or run: TODO
+5. **Go Programming Language** - Check Go documentation [here](https://go.dev/dl/).
   
 Clone this repository to your working directory. If using WSL, ensure the directory is within the WSL filesystem.
  Afterwards, you must install Hyperledger Fabric's Docker images. The official install script `install-fabric.sh` is included in this directory. Open a new terminal at *Blockopoly/src* and run the following command:
@@ -97,7 +97,7 @@ Start by initializing the ledger with some initial data. Run the following comma
 
 This command will create an initial set of assets, which can be retrieved by running the following command: `. requests.sh queryAll`
 
-New assets can be created by running the following command: `. requests.sh createAsset <assetID> <owner> <value>`
+New assets can be created by running the following command: `. requests.sh create <assetID> <owner> <value>`
  
 
 ---
@@ -106,7 +106,7 @@ New assets can be created by running the following command: `. requests.sh creat
 
 At *Blockopoly/src* you can find the *logspout.sh* script, which deploys a Logspout container to monitor the logs of the network's containers. This is an optional step, but it can be useful to monitor the network's activity and debug any issues that may arise.
 
-To deploy the Logspout container, open a new terminal at *Blockopoly/src* and run the following command: `./logspout.sh`
+To deploy the Logspout container, **open a new terminal** at *Blockopoly/src* and run the following command: `./logspout.sh`
 
 ---
 
