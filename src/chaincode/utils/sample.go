@@ -1,4 +1,4 @@
-package pakegi
+package utils
 
 import (
 	"encoding/json"

@@ -94,7 +94,10 @@ case "$1" in
     orderer1)
         orderer1 $2
         ;;
-    *)
+    help)
         echo "Usage: $0 {peer1 <org> | admin <org> <target_node>}"
         exit 1
+        ;;
+    *)
+        help
 esac

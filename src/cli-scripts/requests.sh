@@ -12,36 +12,55 @@ NC='\033[0m' # reset color
 init() {
     COMMAND="peer chaincode invoke -o orderer1-os1:5801 -C channel1 -n basic -c '{\"function\":\"InitLedger\",\"Args\":[]}' --peerAddresses peer1-ur:5401 --peerAddresses peer1-lr:5501 --peerAddresses peer1-gov:5601 --peerAddresses peer1-b1:5701"
 }
+
+getID() {
+    COMMAND="peer chaincode query -C channel1 -n basic -c '{\"Args\":[\"ClientAccountID\"]}'"
+}
     
-create() {
-    COMMAND="peer chaincode invoke -o orderer1-os1:5801 -C channel1 -n basic -c '{\"function\":\"CreateAsset\",\"Args\":[\"$1\", \"$2\", \"$3\"]}' --peerAddresses peer1-ur:5401 --peerAddresses peer1-lr:5501 --peerAddresses peer1-gov:5601 --peerAddresses peer1-b1:5701"
+mint() {
+    COMMAND="peer chaincode invoke -o orderer1-os1:5801 -C channel1 -n basic -c '{\"function\":\"Mint\",\"Args\":[\"$1\", \"$2\"]}' --peerAddresses peer1-ur:5401 --peerAddresses peer1-lr:5501 --peerAddresses peer1-gov:5601 --peerAddresses peer1-b1:5701"
 }
 
-queryAll() {
-    COMMAND="peer chaincode query -C channel1 -n basic -c '{\"Args\":[\"GetAllAssets\"]}'"
+approve() {
+    COMMAND="peer chaincode invoke -o orderer1-os1:5801 -C channel1 -n basic -c '{\"function\":\"Approve\",\"Args\":[\"$1\", \"$2\"]}' --peerAddresses peer1-ur:5401 --peerAddresses peer1-lr:5501 --peerAddresses peer1-gov:5601 --peerAddresses peer1-b1:5701"
 }
 
-readAsset() {
-    COMMAND="peer chaincode query -C channel1 -n basic -c '{\"Args\":[\"ReadAsset\", "$1"]}'"
+balance() {
+    COMMAND="peer chaincode query -C channel1 -n basic -c '{\"Args\":[\"ClientAccountBalance\"]}'"
 }
+
+available() {
+    COMMAND="peer chaincode query -C channel1 -n basic -c '{\"Args\":[\"ClientAvailableBalance\"]}'"
+}
+
+
 
 # first argument determines function to call
 case "$1" in
     init)
         init
         ;;
-    create)
-        create $2 $3 $4
+    mint)
+        mint $2 $3
         ;;
-    queryAll)
-        queryAll
+    getID)
+        getID
         ;;
-    readAsset)
-        readAsset $2
+    balance)
+        balance
+        ;;
+    available)
+        available
+        ;;
+    approve)
+        approve $2 $3	
+        ;;
+    help)
+        echo -e "${RED}Usage: $0 {init|mint|getID|balance}${NC}"
+        exit 1
         ;;
     *)
-        echo -e "${RED}Usage: $0 {init|create|queryAll|readAsset}${NC}"
-        exit 1
+        help
 esac
 
 echo -e "${BLUE}[RUNNING] $COMMAND${NC}" 

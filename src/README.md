@@ -9,9 +9,9 @@ Before beginning, it is highly recommended to read the Blockopoly Dissertation f
   ## 1. Prerequisites
 
 To deploy the network you will need the following technologies:  
-1. **Unix-based Operating system** or **WSL2.0** if you are using Windows;
+1. **Unix-based Operating system** or [WSL2.0](https://learn.microsoft.com/en-us/windows/wsl/install) if you are using Windows;
 2. **Git** - To manage versions and clone the repository; 
-3. **Docker** - Ensure WSL2.0 engine support is enabled if using WSL;
+3. **Docker** - Ensure [WSL2.0 engine support](https://docs.docker.com/desktop/wsl/) is enabled if using WSL;
 4. **Curl** - Check curl documentation [here](https://curl.se/download.html) or run `sudo apt install curl`
 5. **Go Programming Language** - Check Go documentation [here](https://go.dev/dl/).
   

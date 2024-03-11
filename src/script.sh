@@ -268,7 +268,10 @@ case "$1" in
     cli)
         cli
         ;;
-    *)
+    help)
         echo -e "${RED}Usage: $0 {boot|clean|up|stop|register|enroll|launch-peers|launch-orderers|launch-cli|list|genesis|cli}${NC}"
         exit 1
+        ;;
+    *)
+        help
 esac
