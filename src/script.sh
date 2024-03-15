@@ -29,7 +29,7 @@ clean() {
 
     echo -e "${BLUE}[INFO] Cleaning project directories and cryptographic material...${NC}"
 
-    sudo rm -r organizations channels chaincode/vendor
+    sudo rm -r organizations channels chaincode/marketplace/vendor chaincode/wallet/vendor
 
     for org in "${peers[@]}"; do
         cd "fabric-ca/$org"

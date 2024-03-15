@@ -12,55 +12,47 @@ RED='\033[0;31m'
 BLUE='\033[0;36m'
 NC='\033[0m' # reset color
 
+declare -a orgss
+orgss=("ur" "lr" "gov" "b1") 
+
+declare -a chaincodes
+chaincodes=("wallet" "marketplace") 
+
 echo -e "${BLUE}[INFO] Creating channel1 and joining peers...${NC}"
 
 # create channel and join user registry to it
 . identity.sh admin ur peer1
 . channel.sh create
-. channel.sh join
 
-# join land registry to the channel
-. identity.sh admin lr peer1
-. channel.sh join
+for org in "${orgss[@]}"; do
+    . identity.sh admin $org peer1
+    . channel.sh join
+done
 
-# # join gov org to the channel
-. identity.sh admin gov peer1
-. channel.sh join
 
-# join bank1 to the channel
-. identity.sh admin b1 peer1
-. channel.sh join
+for cc in "${chaincodes[@]}"; do
 
-echo -e "${BLUE}[INFO] Packaging chaincode...${NC}"
+    echo -e "${BLUE}[INFO] Packaging chaincode $cc...${NC}"
+    . chaincode.sh package $cc
 
-# package chaincode
-. chaincode.sh package
+    echo -e "${BLUE}[INFO] Installing chaincode $cc on peers...${NC}"
+    for org in "${orgss[@]}"; do
+        . identity.sh admin $org peer1
+        . chaincode.sh install $cc
+    done
 
-echo -e "${BLUE}[INFO] Installing chaincode on peers...${NC}"
+    echo -e "${BLUE}[INFO] Approving chaincode $cc for all organizations...${NC}"
+    for org in "${orgss[@]}"; do
+        . identity.sh admin $org peer1
+        . chaincode.sh approve $cc
+    done
 
-# install chaincode on all peers
-. identity.sh admin ur peer1
-. chaincode.sh install
-. identity.sh admin lr peer1
-. chaincode.sh install
-. identity.sh admin gov peer1
-. chaincode.sh install
-. identity.sh admin b1 peer1
-. chaincode.sh install
+    echo -e "${BLUE}[INFO] Committing chaincode $cc...${NC}"
+    . chaincode.sh commit $cc
 
-echo -e "${BLUE}[INFO] Approving chaincode for all organizations...${NC}"
+done
 
-# approve chaincode for all orgs
-. identity.sh admin ur peer1
-. chaincode.sh approve
-. identity.sh admin lr peer1
-. chaincode.sh approve
-. identity.sh admin gov peer1
-. chaincode.sh approve
-. identity.sh admin b1 peer1
-. chaincode.sh approve
 
-echo -e "${BLUE}[INFO] Committing chaincode...${NC}"
 
-. chaincode.sh commit
+
 
