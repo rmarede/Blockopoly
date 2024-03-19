@@ -1,0 +1,61 @@
+version: '3.7'
+
+services:
+
+  besu-node-1:
+    container_name: besu-node-1
+    image: hyperledger/besu:latest
+    user: root
+    environment:
+      BESU_DATA_PATH: /var/lib/besu/data
+      BESU_GENESIS_FILE: /var/lib/besu/genesis/genesis.json
+      BESU_RPC_HTTP_ENABLED: true
+      BESU_RPC_HTTP_API: ADMIN,ETH,NET,IBFT # PERM
+      BESU_HOST_ALLOWLIST: "*"
+      BESU_RPC_HTTP_CORS_ORIGINS: "all"
+      BESU_MIN_GAS_PRICE: 0
+      # PORTS
+      BESU_RPC_HTTP_PORT: 8501
+      BESU_P2P_PORT: 30301
+      #BESU_RPC_WS_PORT: 8523
+      BESU_BOOTNODES: <ENODE>
+    volumes:
+      - ../cryptogen/node1/data:/var/lib/besu/data
+      - ../genesis:/var/lib/besu/genesis
+    ports:
+      - 8501:8501
+      - 30301:30301
+      #- 8523:8523
+    networks:
+      besu_network:
+    restart: always
+
+  besu-node-2:
+    container_name: besu-node-2
+    image: hyperledger/besu:latest
+    user: root
+    environment:
+      BESU_DATA_PATH: /var/lib/besu/data
+      BESU_GENESIS_FILE: /var/lib/besu/genesis/genesis.json
+      BESU_RPC_HTTP_ENABLED: true
+      BESU_RPC_HTTP_API: ADMIN,ETH,NET,IBFT # PERM
+      BESU_HOST_ALLOWLIST: "*"
+      BESU_RPC_HTTP_CORS_ORIGINS: "all"
+      BESU_MIN_GAS_PRICE: 0
+      BESU_RPC_HTTP_PORT: 8502
+      BESU_P2P_PORT: 30302
+      BESU_BOOTNODES: <ENODE>
+    volumes:
+      - ../cryptogen/node2/data:/var/lib/besu/data
+      - ../genesis:/var/lib/besu/genesis
+    ports:
+      - 8502:8502
+      - 30302:30302
+    networks:
+      besu_network:
+    restart: always
+
+
+networks:
+  besu_network:
+    external: true
