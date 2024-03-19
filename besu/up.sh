@@ -19,24 +19,19 @@ fi
 echo -e "${BLUE}[INFO] Deploying bootnode besu-node-0...${NC}"
 docker-compose -f compose/docker-compose-bootnode.yml up -d
 
+echo "Fetching bootnode ENODE address. Please wait..."
 MAX_RETRIES=30 
-RETRY_DELAY=3
-
 for ((i=0; i<$MAX_RETRIES; i++)); do
   export ENODE=$(curl -s -X POST --data '{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}' http://127.0.0.1:8500 | jq -r '.result')
-
   if [ -n "$ENODE" ] && [ "$ENODE" != "null" ]; then
     break
   else
-    echo -e "Fetching ENODE... Retrying in $RETRY_DELAY seconds..."
-    sleep $RETRY_DELAY
+    sleep 3
   fi
 done
-
 if [ $i -eq $((MAX_RETRIES - 1)) ] && ([ -z "$ENODE" ] || [ "$ENODE" == "null" ]); then
   echo -e "${RED}[ERROR] Max retries reached. Unable to retrieve ENODE. ${NC}"
 fi
-
 echo -e "${BLUE}[SUCCESS] ENODE: $ENODE ${NC}"
 
 # Replace bootnode enode's localhost address with the docker besu-node-0 container's address
