@@ -1,6 +1,8 @@
 
-# get the smart contract's output JSON
-node compile.js
+cd ../src
 
-# get the contract's bytecode and ABI
-solc SimpleStorage.sol --bin --abi
+npx hardhat compile
+npx hardhat ignition deploy ignition/modules/Lock.js --network besu
+
+cd ../scripts
+

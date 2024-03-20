@@ -18,7 +18,7 @@ services:
       BESU_RPC_HTTP_PORT: 8501
       BESU_P2P_PORT: 30301
       #BESU_RPC_WS_PORT: 8523
-      BESU_BOOTNODES: <ENODE>
+      BESU_BOOTNODES: enode://eb104de1083083e47b19836bac9a0c0af9bb2acb32d9802a347552091c39a10e45bf58a7f3ddef44b928060427dfe84e7eae566822393507d6320d03cd9936aa@172.21.0.2:30300
     volumes:
       - ../cryptogen/node1/data:/var/lib/besu/data
       - ../genesis:/var/lib/besu/genesis
@@ -44,7 +44,7 @@ services:
       BESU_MIN_GAS_PRICE: 0
       BESU_RPC_HTTP_PORT: 8502
       BESU_P2P_PORT: 30302
-      BESU_BOOTNODES: <ENODE>
+      BESU_BOOTNODES: enode://eb104de1083083e47b19836bac9a0c0af9bb2acb32d9802a347552091c39a10e45bf58a7f3ddef44b928060427dfe84e7eae566822393507d6320d03cd9936aa@172.21.0.2:30300
     volumes:
       - ../cryptogen/node2/data:/var/lib/besu/data
       - ../genesis:/var/lib/besu/genesis
