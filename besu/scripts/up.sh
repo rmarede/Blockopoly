@@ -10,14 +10,13 @@ NC='\033[0m'
 
 # curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://67e61faee5458a3a626627ae0e54c2e9e44f87ac60ba36c85a4595791fab94dffd812cba156cdd65c6c2fbbc3687cf4d49c9731681b8be7a1dc42e0908cd5953@127.0.0.1:30303"],"id":1}' http://127.0.0.1:8546
 
-# docker compose up -d
 
 if ! docker network ls | grep -q besu_network; then
   docker network create besu_network
 fi
 
 echo -e "${BLUE}[INFO] Deploying bootnode besu-node-0...${NC}"
-docker-compose -f compose/docker-compose-bootnode.yml up -d
+docker-compose -f ../compose/docker-compose-bootnode.yml up -d
 
 echo "Fetching bootnode ENODE address. Please wait..."
 MAX_RETRIES=30 
@@ -42,14 +41,14 @@ echo "DOCKER_NODE_1_ADDRESS: $DOCKER_NODE_1_ADDRESS"
 export E_ADDRESS=$(echo $E_ADDRESS | sed -e "s/127.0.0.1/$DOCKER_NODE_1_ADDRESS/g")
 echo "E_ADDRESS: $E_ADDRESS"
 
-sed "s/<ENODE>/enode:\/\/$E_ADDRESS/g" compose/templates/docker-compose.yml > compose/docker-compose-nodes.yml
+sed "s/<ENODE>/enode:\/\/$E_ADDRESS/g" ../compose/templates/docker-compose.yml > ../compose/docker-compose-nodes.yml
 
 
-NODE_COUNT=$(jq '.blockchain.nodes.count' config/ibftConfigFile.json)
+NODE_COUNT=$(jq '.blockchain.nodes.count' ../config/ibftConfigFile.json)
 
 echo -e "${BLUE}[INFO] Deploying remaining $((NODE_COUNT-1)) nodes...${NC}"
 
 for (( i=1; i<$NODE_COUNT; i++ ))
 do
-  docker-compose -f compose/docker-compose-nodes.yml up -d "besu-node-$i"
+  docker-compose -f ../compose/docker-compose-nodes.yml up -d "besu-node-$i"
 done
