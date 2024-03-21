@@ -1,5 +1,5 @@
 cd scripts
 . clean.sh
-. gen.sh
+. cryptogen.sh
 . up.sh
 cd ..
