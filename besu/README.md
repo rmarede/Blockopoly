@@ -35,7 +35,7 @@ Afterwards, you must install Hyperledger Besu's Binaries.
 Install the following node modules globally (using the `-g` flag) or locally inside the *Blockopoly/besu/src* folder, depending on your preference:
 ```
 npm install hardhat
-npm install web3
+npm install ethers
 ```
 
 ---

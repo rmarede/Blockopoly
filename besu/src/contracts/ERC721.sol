@@ -12,17 +12,10 @@ contract ERC721 is IERC721 {
     using Address for address;
     using Strings for uint256;
 
-    string private _name;
-    string private _symbol;
     mapping(uint256 => address) private _owners;
     mapping(address => uint256) private _balances;
     mapping(uint256 => address) private _tokenApprovals;
     mapping(address => mapping(address => bool)) private _operatorApprovals;
-
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
-    }
 
     function balanceOf(address owner) public view virtual override returns (uint256) {
         require(owner != address(0), "ERC721: address zero is not a valid owner");
@@ -33,14 +26,6 @@ contract ERC721 is IERC721 {
         address owner = _owners[tokenId];
         require(owner != address(0), "ERC721: invalid token ID");
         return owner;
-    }
-
-    function name() public view virtual returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
     }
 
     function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
@@ -127,7 +112,7 @@ contract ERC721 is IERC721 {
         return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
     }
 
-    function _mint(address to, uint256 tokenId) internal virtual {
+    function mint(address to, uint256 tokenId) public virtual override returns (bool) {
         require(to != address(0), "ERC721: mint to the zero address");
         require(!_exists(tokenId), "ERC721: token already minted");
 
@@ -139,6 +124,8 @@ contract ERC721 is IERC721 {
         emit Transfer(address(0), to, tokenId);
 
         _afterTokenTransfer(address(0), to, tokenId);
+
+        return true;
     }
 
     function _burn(uint256 tokenId) internal virtual {

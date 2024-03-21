@@ -2,14 +2,13 @@
 pragma solidity ^0.8.0;
 
 import "./utils/Strings.sol";
-import "./utils/Arrays.sol";
 import "./interface/IERC721.sol";
 
 
 contract Marketplace {
 
-    address public constant ERC20_ADDRESS =0x777788889999AaAAbBbbCcccddDdeeeEfFFfCcCc;
-    address public constant ERC721_ADDRESS =0x777788889999AaAAbBbbCcccddDdeeeEfFFfCcCc;
+    address public constant ERC20_ADDRESS =0x42699A7612A82f1d9C36148af9C77354759b210b;
+    address public constant ERC721_ADDRESS =0xa50a51c09a5c451C52BB714527E1974b686D8e77;
 
     struct Sale {
         string id;
@@ -29,7 +28,7 @@ contract Marketplace {
     mapping(uint256 => uint256[]) private _bidsBySale;
 
 
-    function postSale(uint256 tokenId) public virtual {
+    function postSale(uint256 tokenId) public virtual returns (bool) {
          // check if this contract has approvaL for the ERC721 token, no ERC721 so deixar dar set da unapproval se nao houver sale com estado "open"
         IERC721 erc721contract = IERC721(ERC721_ADDRESS);
         require(erc721contract.getApproved(tokenId) == address(this), "Marketplace: contract is not approved to sell this token");
@@ -40,6 +39,8 @@ contract Marketplace {
             value: 100,
             status: "open"
         });
+
+        return true;
     }
 
     function getSale(uint256 tokenId) public view virtual returns (Sale memory) {
@@ -69,7 +70,7 @@ contract Marketplace {
     function closeSale(uint256 tokenId, uint256 bidId) public virtual {
         require(_sales[tokenId].value > 0, "Marketplace: sale does not exist");
         //require(_sales[tokenId].status == "open", "Marketplace: sale is not open");
-        require(Arrays.arrayContains(_bidsBySale[tokenId], bidId), "Marketplace: sale has no such bid");
+        require(_arrayContains(_bidsBySale[tokenId], bidId), "Marketplace: sale has no such bid");
 
         IERC721 erc721contract = IERC721(ERC721_ADDRESS);
         address owner = erc721contract.ownerOf(tokenId);
@@ -78,6 +79,15 @@ contract Marketplace {
         erc721contract.safeTransferFrom(owner, bid.bidder, tokenId);
 
         _sales[tokenId].status = "closed";
+    }
+
+    function _arrayContains(uint256[] memory array, uint256 target) private pure returns (bool) {
+        for (uint i = 0; i < array.length; i++) {
+            if (array[i] == target) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

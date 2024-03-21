@@ -12,22 +12,6 @@ contract ERC20 is IERC20 {
 
     uint256 private _totalSupply;
 
-    string private _name;
-    string private _symbol;
-
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
-    }
-
-    function name() public view virtual returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
-    }
-
     function decimals() public view virtual returns (uint8) {
         return 18;
     }
@@ -106,16 +90,17 @@ contract ERC20 is IERC20 {
         _afterTokenTransfer(from, to, amount);
     }
 
-    function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function mint(address to, uint256 amount) public virtual override returns (bool){
+        require(to != address(0), "ERC20: mint to the zero address");
 
-        _beforeTokenTransfer(address(0), account, amount);
+        _beforeTokenTransfer(address(0), to, amount);
 
         _totalSupply += amount;
-        _balances[account] += amount;
-        emit Transfer(address(0), account, amount);
+        _balances[to] += amount;
+        emit Transfer(address(0), to, amount);
 
-        _afterTokenTransfer(address(0), account, amount);
+        _afterTokenTransfer(address(0), to, amount);
+        return true;
     }
 
     function _burn(address account, uint256 amount) internal virtual {
