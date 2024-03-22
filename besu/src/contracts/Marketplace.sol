@@ -7,8 +7,8 @@ import "./interface/IERC721.sol";
 
 contract Marketplace {
 
-    address public constant ERC20_ADDRESS =0x42699A7612A82f1d9C36148af9C77354759b210b;
-    address public constant ERC721_ADDRESS =0xa50a51c09a5c451C52BB714527E1974b686D8e77;
+    address private _erc20address;
+    address private _erc721address;
 
     struct Sale {
         string id;
@@ -27,10 +27,15 @@ contract Marketplace {
     mapping(uint256 => Bid) private _bids;
     mapping(uint256 => uint256[]) private _bidsBySale;
 
+    
+    constructor(address erc20Address, address erc721Address) {
+        _erc20address = erc20Address;
+        _erc721address = erc721Address;
+    }
 
     function postSale(uint256 tokenId) public virtual returns (bool) {
          // check if this contract has approvaL for the ERC721 token, no ERC721 so deixar dar set da unapproval se nao houver sale com estado "open"
-        IERC721 erc721contract = IERC721(ERC721_ADDRESS);
+        IERC721 erc721contract = IERC721(_erc721address);
         require(erc721contract.getApproved(tokenId) == address(this), "Marketplace: contract is not approved to sell this token");
         require(_sales[tokenId].value == 0, "Marketplace: sale already exists");
 
@@ -72,7 +77,7 @@ contract Marketplace {
         //require(_sales[tokenId].status == "open", "Marketplace: sale is not open");
         require(_arrayContains(_bidsBySale[tokenId], bidId), "Marketplace: sale has no such bid");
 
-        IERC721 erc721contract = IERC721(ERC721_ADDRESS);
+        IERC721 erc721contract = IERC721(_erc721address);
         address owner = erc721contract.ownerOf(tokenId);
 
         Bid memory bid = getBid(bidId);

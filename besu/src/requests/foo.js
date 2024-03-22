@@ -5,11 +5,10 @@ const fs = require('fs');
 const PRIVATE_KEY_1 = '0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63';
 const PRIVATE_KEY_2 = '0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
 
-//const provider = new ethers.JsonRpcApiProvider('http://localhost:8500');
 const provider = new ethers.JsonRpcProvider("http://localhost:8500");
 const wallet1 = new ethers.Wallet(PRIVATE_KEY_1, provider);
-const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer1 = wallet1.connect(provider);
+const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer2 = wallet2.connect(provider);
 
 const ABI_PATH = '../artifacts/contracts/interface/';
@@ -51,7 +50,7 @@ async function approve(tokenId, signer) {
 
 async function post(tokenId, signer) {
   const MARKETPLACE = new ethers.Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
-  console.log(await MARKETPLACE.postSale(tokenId));
+  await MARKETPLACE.postSale(tokenId);
 }
 
 async function get(tokenId, signer) {
@@ -67,4 +66,4 @@ async function get(tokenId, signer) {
 
 //approve(123123, signer1);
 //post(123123, signer1);
-get(123123, signer1);
+//get(123123, signer2);

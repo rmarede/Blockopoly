@@ -13,4 +13,6 @@ echo -e "${BLUE}[INFO] Cleaning project directories and cryptographic material..
 
 sudo rm -r ../cryptogen ../genesis ../compose/docker-compose-nodes.yml 2> /dev/null
 
+sudo rm -r ../src/ignition/deployments 2> /dev/null
+
 echo -e "${BLUE}[INFO] Done.${NC}"
