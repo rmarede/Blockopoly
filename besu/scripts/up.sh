@@ -28,6 +28,7 @@ for ((i=0; i<$MAX_RETRIES; i++)); do
     sleep 3
   fi
 done
+
 if [ $i -eq $((MAX_RETRIES - 1)) ] && ([ -z "$ENODE" ] || [ "$ENODE" == "null" ]); then
   echo -e "${RED}[ERROR] Max retries reached. Unable to retrieve ENODE. ${NC}"
 fi

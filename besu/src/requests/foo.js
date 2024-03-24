@@ -1,6 +1,7 @@
 const { executionAsyncId } = require('async_hooks');
 const ethers = require('ethers');
 const fs = require('fs');
+const readline = require('readline');
 
 const PRIVATE_KEY_1 = '0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63';
 const PRIVATE_KEY_2 = '0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
@@ -12,16 +13,15 @@ const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer2 = wallet2.connect(provider);
 
 const ABI_PATH = '../artifacts/contracts/interface/';
-
 const ERC20_ABI = JSON.parse(fs.readFileSync(ABI_PATH + 'IERC20.sol/IERC20.json', 'utf8')).abi;
-const ERC20_ADDRESS = '0x42699A7612A82f1d9C36148af9C77354759b210b';
-
 const ERC721_ABI = JSON.parse(fs.readFileSync(ABI_PATH + 'IERC721.sol/IERC721.json', 'utf8')).abi;
-const ERC721_ADDRESS = '0xa50a51c09a5c451C52BB714527E1974b686D8e77';
-
 const MARKETPLACE_ABI = JSON.parse(fs.readFileSync('../artifacts/contracts/Marketplace.sol/Marketplace.json', 'utf8')).abi;
-const MARKETPLACE_ADDRESS = '0x9a3DBCa554e9f6b9257aAa24010DA8377C57c17e';
 
+const ADDRESSES_PATH = '../ignition/deployments/chain-1337/deployed_addresses.json'; 
+const jsonContent = JSON.parse(fs.readFileSync(ADDRESSES_PATH, 'utf8'))
+const ERC20_ADDRESS = jsonContent['ERC20Module#ERC20'];
+const ERC721_ADDRESS =  jsonContent['ERC721Module#ERC721'];
+const MARKETPLACE_ADDRESS =  jsonContent['MarketplaceModule#Marketplace'];
 
 async function mint20(amount, signer) {
   const ERC20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
@@ -58,12 +58,54 @@ async function get(tokenId, signer) {
   console.log(await MARKETPLACE.getSale(tokenId));
 }
 
-//mint20(1000, signer1);
-//balance(signer1);
 
-//mint721(123123, signer1);
-//owner(123123, signer1);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-//approve(123123, signer1);
-//post(123123, signer1);
-//get(123123, signer2);
+console.log('Enter a command: <command> <signer(1/2)> <param1> <param2> ... (type "exit" to quit)');
+
+// Prompt user for input
+rl.on('line', (input) => {
+  console.log(`You entered: ${input}`);
+  const [command, ...args] = input.split(' ');
+
+  const signer = args[0] === '1' ? signer1 : signer2;
+  
+  switch (command) {
+    case 'exit':
+      rl.close();
+      break;
+    case 'mint20':
+      mint20(args[1], signer);
+      break;
+    case 'mint721':
+      mint20(args[1], signer);
+      break;
+    case 'balance':
+      balance(signer);
+      break;
+    case 'owner':
+      owner(args[1], signer);
+      break;
+    case 'approve':
+      approve(args[1], signer);
+      break;
+    case 'post':
+      post(args[1], signer);
+      break;
+    case 'get':
+      get(args[1], signer);
+      break;
+    default:
+      console.log(`Unknown command: ${command}`);
+      console.log('Known commands: mint20, mint721, balance, owner, approve, post, get');
+  }
+
+  console.log('Enter a command: <command> <signer(1/2)> <param1> <param2> ... (type "exit" to quit)');
+});
+
+rl.on('close', () => {
+  process.exit(0);
+});
