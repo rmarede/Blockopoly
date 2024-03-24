@@ -72,6 +72,17 @@ contract Marketplace {
         return _bids[bidId];
     }
 
+    function getSaleBids(uint256 tokenId) public view virtual returns (Bid[] memory) {
+        uint256[] memory bidsIds = _bidsBySale[tokenId];
+        Bid[] memory bids = new Bid[](bidsIds.length);
+
+        for (uint i = 0; i < bidsIds.length; i++) {
+            bids[i] = getBid(bidsIds[i]);
+        }
+
+        return bids;
+    }
+
     function closeSale(uint256 tokenId, uint256 bidId) public virtual {
         require(_sales[tokenId].value > 0, "Marketplace: sale does not exist");
         //require(_sales[tokenId].status == "open", "Marketplace: sale is not open");

@@ -58,6 +58,21 @@ async function get(tokenId, signer) {
   console.log(await MARKETPLACE.getSale(tokenId));
 }
 
+async function bid(tokenId, value, signer) {
+  const MARKETPLACE = new ethers.Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
+  await MARKETPLACE.bid(tokenId, value);
+}
+
+async function getBids(tokenId, signer) {
+  const MARKETPLACE = new ethers.Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
+  console.log(await MARKETPLACE.getSaleBids(tokenId));
+}
+
+async function close(tokenId, bidId, signer) {
+  const MARKETPLACE = new ethers.Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
+  await MARKETPLACE.closeSale(tokenId, bidId);
+}
+
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -66,7 +81,6 @@ const rl = readline.createInterface({
 
 console.log('Enter a command: <command> <signer(1/2)> <param1> <param2> ... (type "exit" to quit)');
 
-// Prompt user for input
 rl.on('line', (input) => {
   console.log(`You entered: ${input}`);
   const [command, ...args] = input.split(' ');
@@ -81,7 +95,7 @@ rl.on('line', (input) => {
       mint20(args[1], signer);
       break;
     case 'mint721':
-      mint20(args[1], signer);
+      mint721(args[1], signer);
       break;
     case 'balance':
       balance(signer);
@@ -97,6 +111,15 @@ rl.on('line', (input) => {
       break;
     case 'get':
       get(args[1], signer);
+      break;
+    case 'bid':
+      bid(args[1], args[2], signer);
+      break;
+    case 'getBids':
+      getBids(args[1], signer);
+      break;
+    case 'close':
+      close(args[1], args[2], signer);
       break;
     default:
       console.log(`Unknown command: ${command}`);
