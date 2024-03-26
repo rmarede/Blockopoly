@@ -14,9 +14,6 @@ echo -e "${BLUE}[INFO] Generating cryptographic material for $NODE_COUNT nodes..
 
 besu operator generate-blockchain-config --config-file=../config/ibftConfigFile.json --to=../cryptogen --private-key-file-name=key
 
-mkdir ../genesis
-mv ../cryptogen/genesis.json ../genesis/genesis.json
-
 counter=0
 # iterate over every directory generated
 for dir in ../cryptogen/keys/*/ ; do
@@ -24,11 +21,30 @@ for dir in ../cryptogen/keys/*/ ; do
   if [ -d "$dir" ]; then
     mkdir -p "../cryptogen/node$counter"
     mv "$dir" "../cryptogen/node$counter/data" # rename the directory
-    cp ../config/permissions_config.toml "../cryptogen/node$counter/data" # copy the permissions file
     ((counter++))
   fi
 done
 
 rmdir ../cryptogen/keys
+
+# GENESIS FILE
+mkdir ../genesis
+mv ../cryptogen/genesis.json ../genesis/genesis.json
+
+echo -e "${BLUE}[INFO] Compiling smart contracts...${NC}"
+cd ../src
+npx hardhat compile
+cd ../scripts
+
+echo -e "${BLUE}[INFO] Pre-deploying system contracts...${NC}"
+ENVIRONMENT_CONTROLLER_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/system/EnvironmentController.sol/EnvironmentController.json)
+SERVICE_RESOLVER_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/system/ServiceResolver.sol/ServiceResolver.json)
+NODE_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/NodePermissions.sol/NodePermissions.json)
+ACCOUNT_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/AccountPermissions.sol/AccountPermissions.json)
+
+sed -i "s/ENVIRONMENT_CONTROLLER_CODE/$ENVIRONMENT_CONTROLLER_CODE/g" ../genesis/genesis.json
+sed -i "s/SERVICE_RESOLVER_CODE/$SERVICE_RESOLVER_CODE/g" ../genesis/genesis.json
+sed -i "s/NODE_PERMISSIONS_CODE/$NODE_PERMISSIONS_CODE/g" ../genesis/genesis.json
+sed -i "s/ACCOUNT_PERMISSIONS_CODE/$ACCOUNT_PERMISSIONS_CODE/g" ../genesis/genesis.json
 
 echo -e "${BLUE}[INFO] Done.${NC}"
