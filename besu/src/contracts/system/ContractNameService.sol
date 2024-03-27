@@ -1,9 +1,8 @@
 pragma solidity ^0.8.0;
 
-// alt names: ServiceResolver, ContractResolverService
 // REGISTRY DESIGN PATTERN
 // alt: ERC-1820
-contract ServiceResolver {
+contract ContractNameService {
 
     struct ContractInstance {
         string name;
@@ -16,7 +15,7 @@ contract ServiceResolver {
 
     constructor() {
         registry.push(ContractInstance({
-            name: "ServiceResolver",
+            name: "ContractNameService",
             addr: address(this),
             version: 1
         }));

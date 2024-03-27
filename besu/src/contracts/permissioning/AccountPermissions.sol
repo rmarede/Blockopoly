@@ -1,7 +1,5 @@
 pragma solidity ^0.8.0;
 
-import "../system/ServiceResolver.sol";
-
 // Account Permissions Interface Contract
 contract AccountPermissions {
 
