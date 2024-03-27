@@ -11,39 +11,50 @@ contract ServiceResolver {
         uint256 version;
     }
 
-    mapping(string => uint256) internal indexOf;
     ContractInstance[] internal registry;
+    mapping(string => uint256) internal indexOf;
 
-    constructor(string[] memory _names, address[] memory _addresses) {
-        require(_names.length == _addresses.length, "ContractDNS: names and addresses length mismatch");
-        for (uint256 i = 0; i < _names.length; i++) {
-            registry.push(ContractInstance({
-                name: _names[i],
-                addr: _addresses[i],
-                version: 1
-            }));
-
-            indexOf[_names[i]] = i;
-        }
+    constructor() {
+        registry.push(ContractInstance({
+            name: "ServiceResolver",
+            addr: address(this),
+            version: 1
+        }));
     }
 
-    function setContractAddress(string memory _name, address _addr) public virtual {
+    function setContractAddress(string calldata _name, address _addr) public virtual {
+        require(bytes(_name).length != 0, "Contract name must not be empty.");
+        require(_addr != address(0), "Contract address must not be zero.");
         require(isAuthorized(msg.sender), "Not authorized to update contract registry.");
-        uint256 index = indexOf[_name];
-        ContractInstance memory old = registry[index];
-        registry.push(ContractInstance({
-            name: _name,
-            addr: _addr,
-            version: old.version + 1
-        }));
+        ContractInstance memory instance;
+
+        if (indexOf[_name] > 0) {
+            uint256 index = indexOf[_name];
+            ContractInstance memory old = registry[index];
+            instance = ContractInstance({
+                name: _name,
+                addr: _addr,
+                version: old.version + 1
+            });
+        } else {
+            instance = ContractInstance({
+                name: _name,
+                addr: _addr,
+                version: 1
+            });
+        }
+
+        registry.push(instance);
         indexOf[_name] = registry.length - 1;
     }
 
-    function getContractVersion(string memory _name) public view virtual returns (uint256) {
+    function getContractVersion(string calldata _name) public view virtual returns (uint256) {
+        require(indexOf[_name] > 0, "Contract not found in registry.");
         return registry[indexOf[_name]].version;
     }
 
-    function getContractAddress(string memory _name) public view virtual returns (address) {
+    function getContractAddress(string calldata _name) public view virtual returns (address) {
+        require(indexOf[_name] > 0, "Contract not found in registry.");
         return registry[indexOf[_name]].addr;
     }
 

@@ -33,24 +33,12 @@
           "balance": "90000000000000000000000"
         },
         "0x0000000000000000000000000000000000001111": {
-          "comment": "Environment Controller Smart Contract",
-          "balance": "0",
-          "code": "ENVIRONMENT_CONTROLLER_CODE",
-          "storage": {}
-        },
-        "0x0000000000000000000000000000000000002222": {
-          "comment": "Service Resolver Smart Contract",
-          "balance": "0",
-          "code": "SERVICE_RESOLVER_CODE",
-          "storage": {}
-        },
-        "0x0000000000000000000000000000000000003333": {
           "comment": "Node Permissions Smart Contract",
           "balance": "0",
           "code": "NODE_PERMISSIONS_CODE",
           "storage": {}
         },
-        "0x0000000000000000000000000000000000004444": {
+        "0x0000000000000000000000000000000000002222": {
           "comment": "Account Permissions Smart Contract",
           "balance": "0",
           "code": "ACCOUNT_PERMISSIONS_CODE",

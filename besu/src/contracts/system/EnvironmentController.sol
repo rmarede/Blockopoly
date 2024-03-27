@@ -4,22 +4,33 @@ pragma solidity ^0.8.0;
 // State Machine Pattern? 
 contract EnvironmentController {
 
-    mapping(string => string) private _env;
+    mapping(string => string) private env;
 
-    constructor(string[] memory keys, string[] memory values) {
-        require(keys.length == values.length, "EnvironmentController: keys and values length mismatch");
+    enum Mode { Active, Paused, Dev }
+    Mode private mode = Mode.Dev; 
 
-        for (uint256 i = 0; i < keys.length; i++) {
-            _env[keys[i]] = values[i];
+    constructor(string[] memory _keys, string[] memory _values) {
+        require(_keys.length == _values.length, "EnvironmentController: keys and values length mismatch");
+
+        for (uint256 i = 0; i < _keys.length; i++) {
+            env[_keys[i]] = _values[i];
         }
     }
 
-    function set(string memory key, string memory value) public virtual {
-        _env[key] = value;
+    function set(string memory _key, string memory _value) public virtual {
+        env[_key] = _value;
     }
 
-    function get(string memory key) public view virtual returns (string memory) {
-        return _env[key];
+    function get(string memory _key) public view virtual returns (string memory) {
+        return env[_key];
+    }
+
+    function getMode() public view virtual returns (Mode) {
+        return mode;
+    }
+
+    function setMode(Mode _mode) public virtual {
+        mode = _mode;
     }
 
 }

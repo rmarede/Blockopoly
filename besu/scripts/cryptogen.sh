@@ -36,14 +36,10 @@ cd ../src
 npx hardhat compile
 cd ../scripts
 
-echo -e "${BLUE}[INFO] Pre-deploying system contracts...${NC}"
-ENVIRONMENT_CONTROLLER_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/system/EnvironmentController.sol/EnvironmentController.json)
-SERVICE_RESOLVER_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/system/ServiceResolver.sol/ServiceResolver.json)
+echo -e "${BLUE}[INFO] Pre-deploying permissioning contracts...${NC}"
 NODE_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/NodePermissions.sol/NodePermissions.json)
 ACCOUNT_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/AccountPermissions.sol/AccountPermissions.json)
 
-sed -i "s/ENVIRONMENT_CONTROLLER_CODE/$ENVIRONMENT_CONTROLLER_CODE/g" ../genesis/genesis.json
-sed -i "s/SERVICE_RESOLVER_CODE/$SERVICE_RESOLVER_CODE/g" ../genesis/genesis.json
 sed -i "s/NODE_PERMISSIONS_CODE/$NODE_PERMISSIONS_CODE/g" ../genesis/genesis.json
 sed -i "s/ACCOUNT_PERMISSIONS_CODE/$ACCOUNT_PERMISSIONS_CODE/g" ../genesis/genesis.json
 
