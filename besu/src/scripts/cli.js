@@ -50,7 +50,7 @@ async function approve(tokenId, signer) {
 
 async function post(tokenId, signer) {
   const MARKETPLACE = new ethers.Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
-  await MARKETPLACE.postSale(tokenId);
+  await MARKETPLACE.postSale(tokenId, 10, 200);
 }
 
 async function get(tokenId, signer) {

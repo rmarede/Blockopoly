@@ -23,9 +23,9 @@ function sleep(ms) {
 }
 
 (async () => {
-    await cns.setContractAddress("ERC20", ERC20_ADDRESS);
+    await cns.setContractAddress("Wallet", ERC20_ADDRESS);
     await sleep(1000);
-    await cns.setContractAddress("ERC721", ERC721_ADDRESS);
+    await cns.setContractAddress("Realties", ERC721_ADDRESS);
     await sleep(1000);
     await cns.setContractAddress("Marketplace", MARKETPLACE_ADDRESS);
     

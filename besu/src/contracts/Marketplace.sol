@@ -3,16 +3,17 @@ pragma solidity ^0.8.0;
 
 import "./utils/Strings.sol";
 import "./interface/IERC721.sol";
+import "./interface/IERC20.sol";
+import "./utils/Context.sol";
 
 
-contract Marketplace {
-
-    address private _erc20address;
-    address private _erc721address;
+contract Marketplace is Context {
 
     struct Sale {
         string id;
+        uint share;
         uint256 value;
+        address seller;
         string status;
     }
 
@@ -28,20 +29,18 @@ contract Marketplace {
     mapping(uint256 => uint256[]) private _bidsBySale;
 
     
-    constructor(address erc20Address, address erc721Address) {
-        _erc20address = erc20Address;
-        _erc721address = erc721Address;
-    }
+    constructor(address _cns) Context(_cns) {}
 
-    function postSale(uint256 tokenId) public virtual returns (bool) {
+    function postSale(uint256 _tokenId, uint _share, uint _value) public virtual returns (bool) {
          // check if this contract has approvaL for the ERC721 token, no ERC721 so deixar dar set da unapproval se nao houver sale com estado "open"
-        IERC721 erc721contract = IERC721(_erc721address);
-        require(erc721contract.getApproved(tokenId) == address(this), "Marketplace: contract is not approved to sell this token");
-        require(_sales[tokenId].value == 0, "Marketplace: sale already exists");
+        require(_getRealtyContract().getApproved(_tokenId) == address(this), "Marketplace: contract is not approved to sell this token");
+        require(_sales[_tokenId].value == 0, "Marketplace: sale already exists");
 
-        _sales[tokenId] = Sale({
-            id: Strings.toString(tokenId),
-            value: 100,
+        _sales[_tokenId] = Sale({
+            id: Strings.toString(_tokenId),
+            share: _share,
+            value: _value,
+            seller: msg.sender,
             status: "open"
         });
 
@@ -88,11 +87,10 @@ contract Marketplace {
         //require(_sales[tokenId].status == "open", "Marketplace: sale is not open");
         require(_arrayContains(_bidsBySale[tokenId], bidId), "Marketplace: sale has no such bid");
 
-        IERC721 erc721contract = IERC721(_erc721address);
-        address owner = erc721contract.ownerOf(tokenId);
+        address owner = _getRealtyContract().ownerOf(tokenId);
 
         Bid memory bid = getBid(bidId);
-        erc721contract.safeTransferFrom(owner, bid.bidder, tokenId);
+        _getRealtyContract().safeTransferFrom(owner, bid.bidder, tokenId);
 
         _sales[tokenId].status = "closed";
     }
@@ -106,6 +104,13 @@ contract Marketplace {
         return false;
     }
 
+    function _getRealtyContract() private view returns (IERC721) {
+        return IERC721(getCns().getContractAddress("Realties"));
+    }
+
+    function _getWalletContract() private view returns (IERC20) {
+        return IERC20(getCns().getContractAddress("Wallet"));
+    }
 
 }
 
