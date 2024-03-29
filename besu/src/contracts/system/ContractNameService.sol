@@ -13,17 +13,23 @@ contract ContractNameService {
     ContractInstance[] internal registry;
     mapping(string => uint256) internal indexOf;
 
-    constructor() {
+    constructor(string[] memory _names, address[] memory _addresses) {
+        require(_names.length == _addresses.length, "Names and addresses must be of equal length.");
+
         registry.push(ContractInstance({
             name: "ContractNameService",
             addr: address(this),
             version: 1
         }));
+
+        for (uint256 i = 0; i < _names.length; i++) {
+            setContractAddress(_names[i], _addresses[i]);
+        }
     }
 
-    function setContractAddress(string calldata _name, address _addr) public virtual {
+    function setContractAddress(string memory _name, address _address) public virtual {
         require(bytes(_name).length != 0, "Contract name must not be empty.");
-        require(_addr != address(0), "Contract address must not be zero.");
+        require(_address != address(0), "Contract address must not be zero.");
         require(isAuthorized(msg.sender), "Not authorized to update contract registry.");
         ContractInstance memory instance;
 
@@ -32,13 +38,13 @@ contract ContractNameService {
             ContractInstance memory old = registry[index];
             instance = ContractInstance({
                 name: _name,
-                addr: _addr,
+                addr: _address,
                 version: old.version + 1
             });
         } else {
             instance = ContractInstance({
                 name: _name,
-                addr: _addr,
+                addr: _address,
                 version: 1
             });
         }
