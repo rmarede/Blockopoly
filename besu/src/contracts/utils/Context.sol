@@ -5,10 +5,12 @@ import "../system/ContractNameService.sol";
 contract Context { 
 
     ContractNameService private cns;
+    address private cns_address;
     
     constructor(address _cns) {
         require(_cns != address(0), "Invalid CNS address");
         cns = ContractNameService(_cns);
+        cns_address = _cns;
     }
 
     function setCns(address _cns) internal {
@@ -18,5 +20,9 @@ contract Context {
 
     function getCns() internal view returns (ContractNameService) {
         return cns;
+    }
+
+    function getCnsAddress() internal view returns (address) {
+        return cns_address;
     }
 }

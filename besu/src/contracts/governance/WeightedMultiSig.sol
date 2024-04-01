@@ -38,7 +38,7 @@ contract WeightedMultiSig {
         _;
     }
 
-    address[] private participants;
+    address[] public participants; // TODO sera que queremos isto visivel para todos?
     mapping (address => uint) private shares; // TODO mudar nome para weight ou algo do genero
     uint totalShares;
 
@@ -59,12 +59,18 @@ contract WeightedMultiSig {
         }
     }
 
-    function changePolicy(Policy _policy) public {
+    function changePolicy(string memory _policy) public {
         require(msg.sender == address(this), "Permission denied");
-        policy = _policy;
+        if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("MAJORITY"))) {
+            policy = Policy.MAJORITY;
+        } else if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("UNANIMOUS"))) {
+            policy = Policy.UNANIMOUS;
+        } else {
+            revert("Invalid policy");
+        }
     }
 
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public returns (uint transactionId) {
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public isOwner(msg.sender) returns (uint transactionId) {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             destination: _destination,
@@ -84,7 +90,6 @@ contract WeightedMultiSig {
         confirmations[_transactionId][msg.sender] = true;
         executeTransaction(_transactionId);
     }
-
 
     function executeTransaction(uint _transactionId) public 
         isOwner(msg.sender)
@@ -116,10 +121,6 @@ contract WeightedMultiSig {
                 count += shares[participants[i]];
     }
 
-    function getParticipants() public view returns (address[] memory) {
-        return participants;
-    }
-
     function shareOf(address _owner) public view returns (uint) {
         return shares[_owner];
     }
@@ -128,14 +129,14 @@ contract WeightedMultiSig {
         require(canTransferShares(_from, msg.sender), "Permission denied");
         require(shares[_from] >= _amount, "Not enough shares");
 
-        if (shares[_to] == 0) {
+        if (shares[_to] == 0) { // TODO fazer override desta funcao no ownership para atualizar no realties
             participants.push(_to);
         }
 
         shares[_from] -= _amount;
         shares[_to] += _amount;
 
-        if (shares[_from] == 0) {
+        if (shares[_from] == 0) {  // TODO fazer override desta funcao no ownership para atualizar no realties
             for (uint i = 0; i < participants.length; i++) {
                 if (participants[i] == _from) {
                     participants[i] = participants[participants.length - 1];
@@ -149,7 +150,7 @@ contract WeightedMultiSig {
     function addShares(address to, uint amount) public {
         require(canAddShares(msg.sender), "Permission denied");
 
-        if (shares[to] == 0) {
+        if (shares[to] == 0) {  // TODO fazer override desta funcao no ownership para atualizar no realties
             participants.push(to);
         }
 
@@ -164,7 +165,7 @@ contract WeightedMultiSig {
         shares[from] -= amount;
         totalShares -= amount;
 
-        if (shares[from] == 0) {
+        if (shares[from] == 0) {  // fazer override desta funcao no ownership para atualizar no realties
             for (uint i = 0; i < participants.length; i++) {
                 if (participants[i] == from) {
                     participants[i] = participants[participants.length - 1];
@@ -175,18 +176,15 @@ contract WeightedMultiSig {
         }
     }
 
-    // Shall be overriden:
-    function canAddShares(address operator) public view returns (bool) {
+    function canAddShares(address operator) public view virtual returns (bool) {
         return operator == address(this);
     }
 
-    // Shall be overriden:
-    function canRemoveShares(address operator) public view returns (bool) {
+    function canRemoveShares(address operator) public view virtual returns (bool) {
         return operator == address(this);
     }
 
-    // Shall be overriden:
-    function canTransferShares(address from, address operator) public pure returns (bool) {
+    function canTransferShares(address from, address operator) public view virtual returns (bool) {
         return from == operator;
     }
 

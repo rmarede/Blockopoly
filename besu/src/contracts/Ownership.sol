@@ -8,9 +8,9 @@ contract Ownership is Context, WeightedMultiSig {
 
     mapping(address => address) private approvals;
 
-    constructor(address _cns, address[] memory _owners, uint[] memory _shares, Policy _policy) 
+    constructor(address _cns, address[] memory _owners, uint[] memory _shares) 
         Context(_cns) 
-        WeightedMultiSig(_owners, _shares, _policy) 
+        WeightedMultiSig(_owners, _shares, Policy.MAJORITY) 
     {
         require(_owners.length <= 100, "Max num of owners: 100");
         uint totalShares = 0;
@@ -26,11 +26,11 @@ contract Ownership is Context, WeightedMultiSig {
 
     function approve(address _addr) public {
         require(shareOf(msg.sender) > 0, "Permission denied");
-        // TODO se tiver sale open postada, retirar
+        // TODO apenas deixar se tiver sale open postada ou pensar noutra solucao que nao envolva usar o cns
         approvals[msg.sender] = _addr;
     }
 
-    function canTransferShares(address _from, address _operator) public override pure returns (bool) {
+    function canTransferShares(address _from, address _operator) public override view returns (bool) {
         return approvedOf(_from) == _operator|| (approvedOf(_from) == address(0) && _operator == _from);
     }
 
