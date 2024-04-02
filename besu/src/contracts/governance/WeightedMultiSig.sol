@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 // WIGHTED MULTI SIGNATURE WALLET PATTERN IMPLEMENTATION
@@ -39,7 +40,7 @@ contract WeightedMultiSig {
     }
 
     address[] public participants; // TODO sera que queremos isto visivel para todos?
-    mapping (address => uint) private shares; // TODO mudar nome para weight ou algo do genero
+    mapping (address => uint) public shares; // TODO mudar nome para weight ou algo do genero
     uint totalShares;
 
     mapping (uint => Transaction) public transactions;
@@ -125,7 +126,7 @@ contract WeightedMultiSig {
         return shares[_owner];
     }
 
-    function transferShares(address _from, address _to, uint _amount) public {
+    function transferShares(address _from, address _to, uint _amount) public virtual {
         require(canTransferShares(_from, msg.sender), "Permission denied");
         require(shares[_from] >= _amount, "Not enough shares");
 
@@ -150,7 +151,7 @@ contract WeightedMultiSig {
     function addShares(address to, uint amount) public {
         require(canAddShares(msg.sender), "Permission denied");
 
-        if (shares[to] == 0) {  // TODO fazer override desta funcao no ownership para atualizar no realties
+        if (shares[to] == 0) {  
             participants.push(to);
         }
 
@@ -165,7 +166,7 @@ contract WeightedMultiSig {
         shares[from] -= amount;
         totalShares -= amount;
 
-        if (shares[from] == 0) {  // fazer override desta funcao no ownership para atualizar no realties
+        if (shares[from] == 0) { 
             for (uint i = 0; i < participants.length; i++) {
                 if (participants[i] == from) {
                     participants[i] = participants[participants.length - 1];
