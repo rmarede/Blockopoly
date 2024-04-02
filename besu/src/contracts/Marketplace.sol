@@ -1,101 +1,126 @@
-
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./utils/Strings.sol";
-import "./interface/IERC721.sol";
+import "./Realties.sol";
+import "./Ownership.sol";
 import "./interface/IERC20.sol";
 import "./utils/Context.sol";
 
 
 contract Marketplace is Context {
 
+    modifier isActive(uint saleId) {
+        require(sales[saleId].status == SaleStatus.ACTIVE, "Marketplace: sale does not exist or is not active");
+        _;
+    }
+
+    modifier isApproved(uint assetId, address seller) {
+        require(_ownershipContract(assetId).approvedOf(seller) == address(this), "Marketplace: contract is not approved to sell this asset");
+        _;
+    }
+
     struct Sale {
-        string id;
+        uint id;
+        uint asset;
         uint share;
-        uint256 value;
+        uint value;
         address seller;
-        string status;
+        SaleStatus status;
+        uint winningBid;
     }
 
     struct Bid {
-        string id;
-        uint256 value;
+        uint id;
+        uint sale;
+        uint value;
         address bidder;
+        BidStatus status;
     }
 
-    uint256 private bidCounter = 0;
-    mapping(uint256 => Sale) private _sales;
-    mapping(uint256 => Bid) private _bids;
-    mapping(uint256 => uint256[]) private _bidsBySale;
+    enum SaleStatus { ACTIVE, CLOSED, CANCELLED }
+    enum BidStatus { ACTIVE, RETRIEVED }
+
+    uint public saleCounter;
+    Sale[] public sales;
+    uint[] public activeSales;
+    mapping(uint => uint[]) public salesOfAsset;
+
+
+    uint public bidCounter;
+    mapping(uint => Bid) public bids;
+    mapping(uint => uint[]) public bidsBySale;
+    mapping(address => uint[]) public userBids;
 
     
     constructor(address _cns) Context(_cns) {}
 
-    function postSale(uint256 _tokenId, uint _share, uint _value) public virtual returns (bool) {
-         // check if this contract has approvaL for the ERC721 token, no ERC721 so deixar dar set da unapproval se nao houver sale com estado "open"
-        require(_getRealtyContract().getApproved(_tokenId) == address(this), "Marketplace: contract is not approved to sell this token");
-        require(_sales[_tokenId].value == 0, "Marketplace: sale already exists");
+    function postSale(uint _assetId, uint _share, uint _value) public isApproved(_assetId, msg.sender) {
+        require(_ownershipContract(_assetId).shares(msg.sender) >= _share, "Marketplace: caller does not own (enough) asset");
+        require(!_isOnSale(_assetId), "Marketplace: asset already on sale");
 
-        _sales[_tokenId] = Sale({
-            id: Strings.toString(_tokenId),
+        Sale memory sale = Sale({
+            id: ++saleCounter,
+            asset: _assetId,
             share: _share,
             value: _value,
             seller: msg.sender,
-            status: "open"
+            status: SaleStatus.ACTIVE,
+            winningBid: 0
         });
 
-        return true;
+        sales.push(sale);
+        salesOfAsset[_assetId].push(saleCounter);
+        activeSales.push(saleCounter);
+
     }
 
-    function getSale(uint256 tokenId) public view virtual returns (Sale memory) {
-        return _sales[tokenId];
-    }
+    function bid(uint _saleId, uint _value) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
+        require(msg.sender != sales[_saleId].seller, "Marketplace: seller cannot bid on own sale");
+        require(_value > sales[_saleId].value, "Marketplace: bid is too low");
 
-    function bid(uint256 tokenId, uint256 value) public virtual {
-        require(_sales[tokenId].value > 0, "Marketplace: sale does not exist");
-        require(value > _sales[tokenId].value, "Marketplace: bid is too low");
-
-        _bids[bidCounter] = Bid({
-            id: Strings.toString(bidCounter),
-            value: value,
-            bidder: msg.sender
+        Bid memory b = Bid({
+            id: ++bidCounter,
+            sale: _saleId,
+            value: _value,
+            bidder: msg.sender,
+            status: BidStatus.ACTIVE
         });
 
-        _bidsBySale[tokenId].push(bidCounter);
-
-        bidCounter++;
+        bids[bidCounter] = b;
+        bidsBySale[_saleId].push(bidCounter);
+        userBids[msg.sender].push(bidCounter);
 
     }
 
-    function getBid(uint256 bidId) public view virtual returns (Bid memory) {
-        return _bids[bidId];
+    function retrieveBid(uint _bidId) public isActive(bids[_bidId].sale) {
+        require(bids[_bidId].bidder == msg.sender, "Marketplace: only bidder can retrieve bid");
+        require(bids[_bidId].status == BidStatus.ACTIVE, "Marketplace: bid is not active");
+
+        bids[_bidId].status = BidStatus.RETRIEVED;
     }
 
-    function getSaleBids(uint256 tokenId) public view virtual returns (Bid[] memory) {
-        uint256[] memory bidsIds = _bidsBySale[tokenId];
-        Bid[] memory bids = new Bid[](bidsIds.length);
+    function closeSale(uint _saleId, uint _bidId) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
+        require(msg.sender == sales[_saleId].seller, "Marketplace: only seller can close deal");
+        require(bids[_bidId].sale == _saleId, "Marketplace: sale has no such bid");
+        require(bids[_bidId].status == BidStatus.ACTIVE, "Marketplace: bid was retrieved");
 
-        for (uint i = 0; i < bidsIds.length; i++) {
-            bids[i] = getBid(bidsIds[i]);
-        }
+        Sale storage sale = sales[_saleId];
 
-        return bids;
+        sale.status = SaleStatus.CLOSED;
+        sale.winningBid = _bidId;
+
+        _ownershipContract(sale.asset).transferShares(sale.seller, bids[_bidId].bidder, sale.share);
     }
 
-    function closeSale(uint256 tokenId, uint256 bidId) public virtual {
-        require(_sales[tokenId].value > 0, "Marketplace: sale does not exist");
-        //require(_sales[tokenId].status == "open", "Marketplace: sale is not open");
-        require(_arrayContains(_bidsBySale[tokenId], bidId), "Marketplace: sale has no such bid");
+    function cancelSale(uint _saleId) public virtual isActive(_saleId) {
+        require(msg.sender == sales[_saleId].seller, "Marketplace: only seller can cancel sale");
 
-        address owner = _getRealtyContract().ownerOf(tokenId);
-
-        Bid memory bid = getBid(bidId);
-        _getRealtyContract().safeTransferFrom(owner, bid.bidder, tokenId);
-
-        _sales[tokenId].status = "closed";
+        Sale storage sale = sales[_saleId];
+        sale.status = SaleStatus.CANCELLED;
     }
 
-    function _arrayContains(uint256[] memory array, uint256 target) private pure returns (bool) {
+    function _arrayContains(uint[] memory array, uint target) private pure returns (bool) {
         for (uint i = 0; i < array.length; i++) {
             if (array[i] == target) {
                 return true;
@@ -104,12 +129,25 @@ contract Marketplace is Context {
         return false;
     }
 
-    function _getRealtyContract() private view returns (IERC721) {
-        return IERC721(getCns().getContractAddress("Realties"));
+    function _realtyContract() private view returns (Realties) {
+        return Realties(cns.getContractAddress("Realties"));
     }
 
-    function _getWalletContract() private view returns (IERC20) {
-        return IERC20(getCns().getContractAddress("Wallet"));
+    function _ownershipContract(uint _asset) private view returns (Ownership) {
+        return Ownership(_realtyContract().ownershipAddress(_asset));
+    }
+
+    function _walletContract() private view returns (IERC20) {
+        return IERC20(cns.getContractAddress("Wallet"));
+    }
+    
+    function _isOnSale(uint tokenId) private view returns (bool) {
+        for (uint i = 0 ; i < salesOfAsset[tokenId].length; i++) {
+            if (sales[salesOfAsset[tokenId][i]].status == SaleStatus.ACTIVE) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

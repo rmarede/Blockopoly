@@ -1,11 +1,12 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "../system/ContractNameService.sol";
 
 contract Context { 
 
-    ContractNameService private cns;
-    address private cns_address;
+    ContractNameService internal cns;
+    address internal cns_address;
     
     constructor(address _cns) {
         require(_cns != address(0), "Invalid CNS address");
@@ -18,11 +19,4 @@ contract Context {
         cns = ContractNameService(_cns);
     }
 
-    function getCns() internal view returns (ContractNameService) {
-        return cns;
-    }
-
-    function getCnsAddress() internal view returns (address) {
-        return cns_address;
-    }
 }

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./utils/Context.sol";
@@ -30,8 +31,27 @@ contract Ownership is Context, WeightedMultiSig {
         approvals[msg.sender] = _addr;
     }
 
+    function transferShares(address _from, address _to, uint _amount) public override {
+        super.transferShares(_from, _to, _amount);
+        if (shares[_from] == 0) {
+            // update in realties
+        }
+        if (shares[_to] == _amount) {
+            // update in realties
+        }
+    }
+
+    // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
     function canTransferShares(address _from, address _operator) public override view returns (bool) {
         return approvedOf(_from) == _operator|| (approvedOf(_from) == address(0) && _operator == _from);
+    }
+
+    function canAddShares(address operator) public pure override returns (bool) {
+        return false;
+    }
+
+    function canRemoveShares(address operator) public pure override returns (bool) {
+        return false;
     }
 
 }
