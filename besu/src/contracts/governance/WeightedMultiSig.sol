@@ -71,7 +71,7 @@ contract WeightedMultiSig {
         }
     }
 
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public isOwner(msg.sender) returns (uint transactionId) {
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual isOwner(msg.sender) returns (uint transactionId) {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             destination: _destination,

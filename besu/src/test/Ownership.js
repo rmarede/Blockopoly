@@ -1,28 +1,13 @@
-const {
-  time,
-  loadFixture,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {time, loadFixture,} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const getAbi = require('../scripts/utils/abi');
-const _ethers = require('ethers');
-
 describe("Ownership", function () {
-
-  async function deployCNSFixture() {
-    const CNS = await ethers.getContractFactory("ContractNameService");
-    const cns = await CNS.deploy([],[]);
-
-    return { cns };
-  }
 
   async function deployOwnershipFixture() {
     const [admin, account1, account2, account3, account4] = await ethers.getSigners();
-
-    const { cns } = await loadFixture(deployCNSFixture);
-
     const Ownership = await ethers.getContractFactory("Ownership");
-    const ownership = await Ownership.deploy(cns, [account1.address, account2.address, account3.address], [40, 30, 30]);
+    const ownership = await Ownership.deploy([account1.address, account2.address, account3.address], [40, 30, 30]);
 
     return {ownership, account1, account2, account3, account4};
   }
@@ -106,7 +91,7 @@ describe("Ownership", function () {
     it("Should not submit", async function () {
       const { ownership, account1, account2, account3, account4} = await loadFixture(deployOwnershipFixture);
 
-      let ownershipInterface = new _ethers.Interface(getAbi.getOwnershipAbi());
+      let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
       let destinationAddress = ownership.target;
       let functionToCall = 'changePolicy';
       let params = ["MAJORITY"];
@@ -118,13 +103,13 @@ describe("Ownership", function () {
     it("Should submit", async function () {
       const { ownership, account1, account2, account3, account4} = await loadFixture(deployOwnershipFixture);
 
-      let ownershipInterface = new _ethers.Interface(getAbi.getOwnershipAbi());
+      let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
       let destinationAddress = ownership.target;
       let functionToCall = 'changePolicy';
       let params = ["MAJORITY"];
       let data = ownershipInterface.encodeFunctionData(functionToCall, params);
 
-      await ownership.connect(account1).submitTransaction(destinationAddress, 0, data);
+      await expect(ownership.connect(account1).submitTransaction(destinationAddress, 0, data)).not.to.be.reverted;
 
       expect(await ownership.transactionCount()).to.equal(1);
       let result = await ownership.transactions(0);
@@ -139,7 +124,7 @@ describe("Ownership", function () {
     it("Should not confirm", async function () {
       const { ownership, account1, account2, account3, account4} = await loadFixture(deployOwnershipFixture);
 
-      let ownershipInterface = new _ethers.Interface(getAbi.getOwnershipAbi());
+      let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
       let destinationAddress = ownership.target;
       let functionToCall = 'changePolicy';
       let params = ["MAJORITY"];
@@ -154,7 +139,7 @@ describe("Ownership", function () {
       
       expect(await ownership.policy()).to.equal(0);
 
-      let ownershipInterface = new _ethers.Interface(getAbi.getOwnershipAbi());
+      let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
       let destinationAddress = ownership.target;
       let functionToCall = 'changePolicy';
       let params = ["UNANIMOUS"];

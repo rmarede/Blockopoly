@@ -15,14 +15,14 @@ contract Marketplace is Context {
         _;
     }
 
-    modifier isApproved(uint assetId, address seller) {
+    modifier isApproved(address assetId, address seller) {
         require(_ownershipContract(assetId).approvedOf(seller) == address(this), "Marketplace: contract is not approved to sell this asset");
         _;
     }
 
     struct Sale {
         uint id;
-        uint asset;
+        address asset;
         uint share;
         uint value;
         address seller;
@@ -44,7 +44,7 @@ contract Marketplace is Context {
     uint public saleCounter;
     Sale[] public sales;
     uint[] public activeSales;
-    mapping(uint => uint[]) public salesOfAsset;
+    mapping(address => uint[]) public salesOfAsset;
 
 
     uint public bidCounter;
@@ -55,7 +55,7 @@ contract Marketplace is Context {
     
     constructor(address _cns) Context(_cns) {}
 
-    function postSale(uint _assetId, uint _share, uint _value) public isApproved(_assetId, msg.sender) {
+    function postSale(address _assetId, uint _share, uint _value) public isApproved(_assetId, msg.sender) {
         require(_ownershipContract(_assetId).shares(msg.sender) >= _share, "Marketplace: caller does not own (enough) asset");
         require(!_isOnSale(_assetId), "Marketplace: asset already on sale");
 
@@ -91,6 +91,8 @@ contract Marketplace is Context {
         bidsBySale[_saleId].push(bidCounter);
         userBids[msg.sender].push(bidCounter);
 
+        // TODO transferir montante para o contrato e criar funcao para ver quanto o contrato tem bloqueado dos utilizadores
+
     }
 
     function retrieveBid(uint _bidId) public isActive(bids[_bidId].sale) {
@@ -98,6 +100,8 @@ contract Marketplace is Context {
         require(bids[_bidId].status == BidStatus.ACTIVE, "Marketplace: bid is not active");
 
         bids[_bidId].status = BidStatus.RETRIEVED;
+
+        // TODO devolver montante ao bidder
     }
 
     function closeSale(uint _saleId, uint _bidId) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
@@ -111,6 +115,8 @@ contract Marketplace is Context {
         sale.winningBid = _bidId;
 
         _ownershipContract(sale.asset).transferShares(sale.seller, bids[_bidId].bidder, sale.share);
+
+        // TODO mover montantes (partes e resto dos bidders)
     }
 
     function cancelSale(uint _saleId) public virtual isActive(_saleId) {
@@ -118,6 +124,8 @@ contract Marketplace is Context {
 
         Sale storage sale = sales[_saleId];
         sale.status = SaleStatus.CANCELLED;
+
+        // TODO devolver montantes a todos os bidders
     }
 
     function _arrayContains(uint[] memory array, uint target) private pure returns (bool) {
@@ -133,15 +141,15 @@ contract Marketplace is Context {
         return Realties(cns.getContractAddress("Realties"));
     }
 
-    function _ownershipContract(uint _asset) private view returns (Ownership) {
-        return Ownership(_realtyContract().ownershipAddress(_asset));
+    function _ownershipContract(address _asset) private view returns (Ownership) {
+        return Ownership(_asset);
     }
 
     function _walletContract() private view returns (IERC20) {
         return IERC20(cns.getContractAddress("Wallet"));
     }
     
-    function _isOnSale(uint tokenId) private view returns (bool) {
+    function _isOnSale(address tokenId) private view returns (bool) {
         for (uint i = 0 ; i < salesOfAsset[tokenId].length; i++) {
             if (sales[salesOfAsset[tokenId][i]].status == SaleStatus.ACTIVE) {
                 return true;
