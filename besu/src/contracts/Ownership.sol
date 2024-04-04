@@ -8,7 +8,7 @@ import "./Realties.sol";
 contract Ownership is WeightedMultiSig {
 
     mapping(address => address) private approvals;
-    mapping(address => bool) private blacklist;
+    mapping(address => bool) private blacklist; // TODO ou é melhor uma whitelist? 
     address private REALTIES_ADDRESS;
 
     constructor(address[] memory _owners, uint[] memory _shares) 

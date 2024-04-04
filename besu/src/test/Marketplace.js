@@ -11,14 +11,15 @@ describe("Marketplace", function () {
         return { cns };
     }
 
-    async function deployERC20Fixture() {
-        const ERC20 = await ethers.getContractFactory("ERC20");
-        const erc20 = await ERC20.deploy([],[]);
-        return { erc20 };
+    async function deployWalletFixture() {
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy();
+        return { wallet };
     }
 
     async function deployMarketplaceFixture() {
         const { cns } = await loadFixture(deployCNSFixture);
+        const { wallet } = await loadFixture(deployWalletFixture);
 
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
@@ -33,10 +34,11 @@ describe("Marketplace", function () {
         const Marketplace = await ethers.getContractFactory("Marketplace");
         const marketplace = await Marketplace.deploy(cns.target);
         
+        await cns.setContractAddress("Wallet", wallet.target);
         await cns.setContractAddress("Realties", realties.target);
         await cns.setContractAddress("Marketplace", marketplace.target);
 
-        return {cns, marketplace, realties};
+        return {cns, marketplace, realties, wallet};
     }
 
 

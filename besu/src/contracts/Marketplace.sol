@@ -39,7 +39,7 @@ contract Marketplace is Context {
     }
 
     enum SaleStatus { ACTIVE, CLOSED, CANCELLED }
-    enum BidStatus { ACTIVE, RETRIEVED }
+    enum BidStatus { ACTIVE, RETURNED, RETRIEVED }
 
     uint public saleCounter;
     mapping(uint => Sale) public sales;
@@ -73,9 +73,11 @@ contract Marketplace is Context {
         return saleId;
     }
 
-    function bid(uint _saleId, uint _value) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
+    function bid(uint _saleId, uint _amount) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
         require(msg.sender != sales[_saleId].seller, "Marketplace: seller cannot bid on own sale");
-        require(_value >= sales[_saleId].value, "Marketplace: bid is too low");
+        require(_amount >= sales[_saleId].value, "Marketplace: bid is too low");
+
+        _walletContract().transferFrom(msg.sender, address(this), _amount);
 
         uint bidId = bidCounter++;
         bidsBySale[_saleId].push(bidId);
@@ -83,22 +85,20 @@ contract Marketplace is Context {
         bids[bidId] = Bid({
             id: bidId,
             sale: _saleId,
-            value: _value,
+            value: _amount,
             bidder: msg.sender,
             status: BidStatus.ACTIVE
         });
-
-        // TODO transferir montante para o contrato e criar funcao para ver quanto o contrato tem bloqueado dos utilizadores
-
     }
 
     function retrieveBid(uint _bidId) public isActive(bids[_bidId].sale) {
-        require(bids[_bidId].bidder == msg.sender, "Marketplace: only bidder can retrieve bid");
-        require(bids[_bidId].status == BidStatus.ACTIVE, "Marketplace: bid is not active");
+        Bid storage b = bids[_bidId];
+        require(b.bidder == msg.sender, "Marketplace: only bidder can retrieve bid");
+        require(b.status == BidStatus.ACTIVE, "Marketplace: bid is not active");
 
-        bids[_bidId].status = BidStatus.RETRIEVED;
+        b.status = BidStatus.RETRIEVED;
 
-        // TODO devolver montante ao bidder
+        _walletContract().transfer(msg.sender, b.value);
     }
 
     function closeSale(uint _saleId, uint _bidId) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
@@ -106,14 +106,22 @@ contract Marketplace is Context {
         require(_saleHasBid(_saleId, _bidId), "Marketplace: sale has no such bid"); 
         require(bids[_bidId].status == BidStatus.ACTIVE, "Marketplace: bid was retrieved");
 
-        Sale storage sale = sales[_saleId];
+        Sale storage s = sales[_saleId];
+        Bid storage b = bids[_bidId];
 
-        sale.status = SaleStatus.CLOSED;
-        sale.winningBid = _bidId;
+        s.status = SaleStatus.CLOSED;
+        s.winningBid = _bidId;
 
-        Ownership(sale.asset).transferShares(sale.seller, bids[_bidId].bidder, sale.share);
+        Ownership(s.asset).transferShares(s.seller, b.bidder, s.share);
+        _walletContract().transfer(s.seller, b.value);
 
-        // TODO mover montantes (partes e resto dos bidders)
+        for (uint i = 0; i < bidsBySale[_saleId].length; i++) {
+            Bid storage _otherBid = bids[bidsBySale[_saleId][i]];
+            if (_otherBid.id != _bidId) {
+                _otherBid.status = BidStatus.RETURNED;
+                _walletContract().transfer(_otherBid.bidder, _otherBid.value);
+            }
+        }
     }
 
     function cancelSale(uint _saleId) public virtual isActive(_saleId) {
@@ -122,7 +130,11 @@ contract Marketplace is Context {
         Sale storage sale = sales[_saleId];
         sale.status = SaleStatus.CANCELLED;
 
-        // TODO devolver montantes a todos os bidders
+        for (uint i = 0; i < bidsBySale[_saleId].length; i++) {
+            Bid storage b = bids[bidsBySale[_saleId][i]];
+            b.status = BidStatus.RETURNED;
+            _walletContract().transfer(b.bidder, b.value);
+        }
     }
 
     function _arrayContains(uint[] memory array, uint target) private pure returns (bool) {

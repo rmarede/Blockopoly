@@ -51,22 +51,6 @@ contract ERC20 is IERC20 {
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        address owner = msg.sender;
-        _approve(owner, spender, allowance(owner, spender) + addedValue);
-        return true;
-    }
-
-    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        address owner = msg.sender;
-        uint256 currentAllowance = allowance(owner, spender);
-        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
-        unchecked {
-            _approve(owner, spender, currentAllowance - subtractedValue);
-        }
-
-        return true;
-    }
 
     function _transfer(
         address from,
@@ -76,7 +60,6 @@ contract ERC20 is IERC20 {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, amount);
 
         uint256 fromBalance = _balances[from];
         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
@@ -87,26 +70,22 @@ contract ERC20 is IERC20 {
 
         emit Transfer(from, to, amount);
 
-        _afterTokenTransfer(from, to, amount);
     }
 
     function mint(address to, uint256 amount) public virtual override returns (bool){
         require(to != address(0), "ERC20: mint to the zero address");
 
-        _beforeTokenTransfer(address(0), to, amount);
 
         _totalSupply += amount;
         _balances[to] += amount;
         emit Transfer(address(0), to, amount);
 
-        _afterTokenTransfer(address(0), to, amount);
         return true;
     }
 
     function _burn(address account, uint256 amount) internal virtual {
         require(account != address(0), "ERC20: burn from the zero address");
 
-        _beforeTokenTransfer(account, address(0), amount);
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
@@ -117,7 +96,6 @@ contract ERC20 is IERC20 {
 
         emit Transfer(account, address(0), amount);
 
-        _afterTokenTransfer(account, address(0), amount);
     }
 
     function _approve(
@@ -145,16 +123,4 @@ contract ERC20 is IERC20 {
             }
         }
     }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
-
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
 }

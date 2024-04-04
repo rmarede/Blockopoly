@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
+
+contract Wallet {
+
+    mapping(address => uint) private balances;
+    mapping(address => mapping(address => uint)) private allowances;
+
+    function mint(address to, uint amount) public virtual {
+        require(to != address(0), "Wallet: invalid input");
+        balances[to] += amount;
+    }
+
+    function burn(address to, uint amount) public virtual {
+        require(to != address(0), "Wallet: invalid input");
+        require(balances[to] >= amount, "Wallet: insufficient funds to burn");
+        balances[to] -= amount;
+    }
+
+    function balanceOf(address account) public view virtual returns (uint) {
+        //require(msg.sender == account || msg.sender == address(this), "Wallet: balance query for account not authorized");
+        return balances[account];
+    }
+
+    function transfer(address to, uint amount) public virtual {
+        _transfer(msg.sender, to, amount);
+    }
+
+    function transferFrom(address from, address to, uint amount) public virtual {
+        _spendAllowance(from, msg.sender, amount);
+        _transfer(from, to, amount);
+    }
+
+
+    function approve(address spender, uint amount) public virtual {
+        require(spender != address(0), "Wallet: invalid input");
+        allowances[msg.sender][spender] = amount;
+    }
+
+    function allowance(address owner, address spender) public view virtual returns (uint) {
+        return allowances[owner][spender];
+    }
+
+    function _transfer(address from, address to, uint amount) internal virtual {
+        require(from != address(0) && to != address(0), "Wallet: invalid input");
+        uint fromBalance = balances[from];
+        require(fromBalance >= amount, "Wallet: insufficient funds");
+        
+        balances[from] = fromBalance - amount;
+        balances[to] += amount;
+    }
+
+    function _spendAllowance(address owner, address spender, uint amount) internal virtual {
+        uint currentAllowance = allowance(owner, spender);
+        require(currentAllowance >= amount, "Wallet: insufficient allowance");
+        allowances[owner][spender] = currentAllowance - amount;
+    }
+    
+}
