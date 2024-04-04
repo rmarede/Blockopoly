@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./utils/Strings.sol";
 import "./Realties.sol";
 import "./Ownership.sol";
-import "./interface/IERC20.sol";
+import "./Wallet.sol";
 import "./utils/Context.sol";
 
 
@@ -96,9 +96,8 @@ contract Marketplace is Context {
         require(b.bidder == msg.sender, "Marketplace: only bidder can retrieve bid");
         require(b.status == BidStatus.ACTIVE, "Marketplace: bid is not active");
 
-        b.status = BidStatus.RETRIEVED;
-
         _walletContract().transfer(msg.sender, b.value);
+        b.status = BidStatus.RETRIEVED;
     }
 
     function closeSale(uint _saleId, uint _bidId) public virtual isActive(_saleId) isApproved(sales[_saleId].asset, sales[_saleId].seller) {
@@ -109,8 +108,8 @@ contract Marketplace is Context {
         Sale storage s = sales[_saleId];
         Bid storage b = bids[_bidId];
 
-        s.status = SaleStatus.CLOSED;
         s.winningBid = _bidId;
+        s.status = SaleStatus.CLOSED;
 
         Ownership(s.asset).transferShares(s.seller, b.bidder, s.share);
         _walletContract().transfer(s.seller, b.value);
@@ -150,8 +149,8 @@ contract Marketplace is Context {
         return Realties(cns.getContractAddress("Realties"));
     }
 
-    function _walletContract() private view returns (IERC20) {
-        return IERC20(cns.getContractAddress("Wallet"));
+    function _walletContract() private view returns (Wallet) {
+        return Wallet(cns.getContractAddress("Wallet"));
     }
     
     function _isOnSale(address tokenId) private view returns (bool) {

@@ -102,7 +102,10 @@ describe("Marketplace", function () {
 
         it("Should bid", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
             const assetAddr = await realties.registry(0);
@@ -113,16 +116,35 @@ describe("Marketplace", function () {
             await assetContract.connect(acc1).approve(marketplace.target);
             await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
 
+
             await expect(marketplace.connect(acc2).bid(0, 210)).not.to.be.reverted;
         });	
 
-        it("Should adjust balance on 2 bids???", async function () {
-            // TODO
+        it("Should not bid if not approved", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
+
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).to.be.reverted;
         });	
 
         it("Should not bid with no sales", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+            
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
 
@@ -131,7 +153,12 @@ describe("Marketplace", function () {
 
         it("Should not bid on closed sale", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
+            await expect(wallet.mint(acc3.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(marketplace.target, 220)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
             const assetAddr = await realties.registry(0);
@@ -150,7 +177,10 @@ describe("Marketplace", function () {
 
         it("Should not bid on non existing sale", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
 
@@ -159,7 +189,10 @@ describe("Marketplace", function () {
 
         it("Should not bid with no sales", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
 
@@ -172,7 +205,10 @@ describe("Marketplace", function () {
 
         it("Should transfer ownership", async function () {
             const [acc1, acc2, acc3] = await ethers.getSigners();
-            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+            const {cns, marketplace, realties, wallet} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(wallet.mint(acc2.address, 210)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(marketplace.target, 210)).not.to.be.reverted;
 
             await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
             const assetAddr = await realties.registry(0);
