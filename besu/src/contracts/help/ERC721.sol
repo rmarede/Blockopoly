@@ -3,9 +3,9 @@
 
 pragma solidity ^0.8.0;
 
-import "./utils/Strings.sol";
-import "./utils/Address.sol";
-import "./interface/IERC721.sol";
+import "../utils/Strings.sol";
+import "../utils/Address.sol";
+import "../interface/IERC721.sol";
 
 
 contract ERC721 is IERC721 {
