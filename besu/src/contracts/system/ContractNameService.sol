@@ -20,7 +20,7 @@ contract ContractNameService {
         registry.push(ContractInstance({
             name: "ContractNameService",
             addr: address(this),
-            version: 1
+            version: 0
         }));
 
         for (uint256 i = 0; i < _names.length; i++) {

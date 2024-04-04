@@ -8,7 +8,8 @@ import "./Realties.sol";
 contract Ownership is WeightedMultiSig {
 
     mapping(address => address) private approvals;
-    address[] private blacklist;
+    mapping(address => bool) private blacklist;
+    address private REALTIES_ADDRESS;
 
     constructor(address[] memory _owners, uint[] memory _shares) 
         WeightedMultiSig(_owners, _shares, Policy.MAJORITY) 
@@ -20,7 +21,8 @@ contract Ownership is WeightedMultiSig {
         }
         require(totalShares == 100, "Total shares must be equal to 100");
 
-        blacklist.push(msg.sender); // TODO ou passar blacklist no contrutor?
+        REALTIES_ADDRESS = msg.sender;
+        blacklist[REALTIES_ADDRESS] = true; // TODO ou passar blacklist no contrutor?
     }
 
     function approvedOf(address _addr) public view returns (address) {
@@ -35,30 +37,21 @@ contract Ownership is WeightedMultiSig {
     function transferShares(address _from, address _to, uint _amount) public override {
         super.transferShares(_from, _to, _amount);
         if (shares[_from] == 0) {
-            Realties(blacklist[0]).removeOwnership(address(this), _from);
+            Realties(REALTIES_ADDRESS).removeOwnership(address(this), _from);
         }
         if (shares[_to] == _amount) {
-            Realties(blacklist[0]).addOwnership(address(this), _from);
+            Realties(REALTIES_ADDRESS).addOwnership(address(this), _to);
         }
     }
 
     function submitTransaction(address _destination, uint _value, bytes memory _data) public override returns (uint transactionId) {
-        require(!isBlacklisted(_destination), "Blacklisted address");
+        require(!blacklist[_destination], "Blacklisted address");
         return super.submitTransaction(_destination, _value, _data);
     }
 
     function canTransferShares(address _from, address _operator) public override view returns (bool) {
         // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
         return approvedOf(_from) == _operator|| (approvedOf(_from) == address(0) && _operator == _from);
-    }
-
-    function isBlacklisted(address _addr) public view returns (bool) {
-        for (uint i = 0; i < blacklist.length; i++) {
-            if (blacklist[i] == _addr) {
-                return true;
-            }
-        }
-        return false;
     }
 
     function canAddShares(address operator) public pure override returns (bool) {

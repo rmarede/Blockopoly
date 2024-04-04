@@ -28,31 +28,183 @@ describe("Marketplace", function () {
                 Arraysz: arrays.target
             }
         });
-        const realties = await Realties.deploy(cns.target);
+        const realties = await Realties.deploy();
 
         const Marketplace = await ethers.getContractFactory("Marketplace");
         const marketplace = await Marketplace.deploy(cns.target);
+        
+        await cns.setContractAddress("Realties", realties.target);
+        await cns.setContractAddress("Marketplace", marketplace.target);
 
         return {cns, marketplace, realties};
     }
 
 
 
-    describe("Mint", function () {
-        it("Should mint Ownership contract", async function () {
-            const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
+    describe("Post Sale", function () {
+        it("Should post sale", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
             const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
 
-            await cns.setContractAddress("Realties", realties.target);
-            await cns.setContractAddress("Marketplace", marketplace.target);
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
 
-            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [40, 30, 30])).not.to.be.reverted;
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
-            
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await expect(marketplace.connect(acc1).postSale(assetAddr, 35, 200)).not.to.be.reverted;
 
+            const sale = await marketplace.sales(0);
+            expect(sale[1]).to.equal(assetAddr);
+            expect(await marketplace.activeSales(0)).to.equal(0);
+        });
 
+        it("Should not post sale", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await expect(marketplace.connect(acc1).postSale(assetAddr, 35, 200)).to.be.reverted;
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await expect(marketplace.connect(acc1).postSale(assetAddr, 55, 200)).to.be.reverted;
+            await expect(marketplace.connect(acc3).postSale(assetAddr, 10, 200)).to.be.reverted;
+        });
+
+        it("Should not let 2 active sales of same asset", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await expect(marketplace.connect(acc1).postSale(assetAddr, 20, 200)).not.to.be.reverted;
+            await expect(marketplace.connect(acc1).postSale(assetAddr, 15, 100)).to.be.reverted; // TODO bug : array out of bonds, quando se mete not.to.be.reverted
+        });
+
+        it("Should let 2 not active sales of same asset", async function () {
 
         });
+    });
+
+    describe("Bid", function () {
+
+        it("Should bid", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).not.to.be.reverted;
+        });	
+
+        it("Should adjust balance on 2 bids???", async function () {
+            // TODO
+        });	
+
+        it("Should not bid with no sales", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).to.be.reverted;
+        });	
+
+        it("Should not bid on closed sale", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).not.to.be.reverted;
+            await expect(marketplace.connect(acc1).closeSale(0, 0)).not.to.be.reverted;
+
+            await expect(marketplace.connect(acc3).bid(0, 220)).to.be.reverted;
+        });	
+
+        it("Should not bid on non existing sale", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+
+            await expect(marketplace.connect(acc2).bid(3, 210)).to.be.reverted;
+        });	
+
+        it("Should not bid with no sales", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).to.be.reverted;
+        });	
+
+    });
+
+    describe("Close Sale", function () {
+
+        it("Should transfer ownership", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
+
+            await expect(marketplace.connect(acc2).bid(0, 210)).not.to.be.reverted;
+
+            await expect(marketplace.connect(acc1).closeSale(0, 0)).not.to.be.reverted;
+
+
+
+        });	
+
+        it("Should not close sale with no bids", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            const {cns, marketplace, realties} = await loadFixture(deployMarketplaceFixture);
+
+            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [50, 50])).not.to.be.reverted;
+            const assetAddr = await realties.registry(0);
+
+            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const assetContract = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
+
+            await assetContract.connect(acc1).approve(marketplace.target);
+            await marketplace.connect(acc1).postSale(assetAddr, 35, 200);
+
+            await expect(marketplace.connect(acc1).closeSale(0, 0)).to.be.reverted; 
+
+        });	
     });
 
 });

@@ -40,13 +40,13 @@ contract WeightedMultiSig {
     }
 
     address[] public participants; // TODO sera que queremos isto visivel para todos?
-    mapping (address => uint) public shares; // TODO mudar nome para weight ou algo do genero
+    mapping (address => uint) internal shares; // TODO mudar nome para weight ou algo do genero
     uint totalShares;
 
     mapping (uint => Transaction) public transactions;
-    mapping (uint => mapping (address => bool)) public confirmations;
+    mapping (uint => mapping (address => bool)) internal confirmations;
     uint public transactionCount;
-    Policy public policy;   
+    Policy public policy;
 
     constructor (address[] memory _participants, uint[] memory _shares, Policy _policy) {
         require(_participants.length > 0, "No participants specified");
@@ -130,14 +130,14 @@ contract WeightedMultiSig {
         require(canTransferShares(_from, msg.sender), "Permission denied");
         require(shares[_from] >= _amount, "Not enough shares");
 
-        if (shares[_to] == 0) { // TODO fazer override desta funcao no ownership para atualizar no realties
+        if (shares[_to] == 0) { 
             participants.push(_to);
         }
 
         shares[_from] -= _amount;
         shares[_to] += _amount;
 
-        if (shares[_from] == 0) {  // TODO fazer override desta funcao no ownership para atualizar no realties
+        if (shares[_from] == 0) { 
             for (uint i = 0; i < participants.length; i++) {
                 if (participants[i] == _from) {
                     participants[i] = participants[participants.length - 1];

@@ -24,7 +24,7 @@ describe("Ownership", function () {
   });
 
   describe("Transfer", function () {
-    it("Should transfer shares", async function () {
+    it("Should transfer shares to other owner", async function () {
         const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
 
         await ownership.connect(account1).transferShares(account1.address, account2.address, 5);
@@ -33,11 +33,18 @@ describe("Ownership", function () {
 
       });
 
-      it("Should not transfer shares", async function () {
+      it("Should not transfer shares of other", async function () {
         
         const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
 
         await expect(ownership.connect(account2).transferShares(account1.address, account2.address, 5)).to.be.reverted;
+      });
+
+      it("Should not transfer shares that doesn't own", async function () {
+        
+        const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
+
+        await expect(ownership.connect(account1).transferShares(account1.address, account2.address, 50)).to.be.reverted;
       });
       
   });
