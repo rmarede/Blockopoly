@@ -14,7 +14,7 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     modifier canPay() {
-        require(block.timestamp >= terms.startDate + ((paymentCounter-1) * PERIOD), "RentalAgreement: cannot pay yet");
+        require(paymentCounter == 0 || (block.timestamp >= terms.startDate + ((paymentCounter-1) * PERIOD)), "RentalAgreement: cannot pay yet");
         _;
     }
 
@@ -38,19 +38,21 @@ contract RentalAgreement is PaymentSplitter {
         _;
     }
 
-    modifier onlyLandlord() {
-        require(msg.sender == realtyContract, "RentalAgreement: only landlord can call this function");
+    modifier onlyOwnershipContract() {
+        require(msg.sender == terms.realtyContract, "RentalAgreement: only ownership contract can call this function");
         _;
     }
 
     modifier onlyParties() {
-        require(msg.sender == realtyContract || msg.sender == tenant, "Only landlord or tenant can call this.");
+        require(msg.sender == terms.realtyContract || msg.sender == tenant, "Only landlord or tenant can call this.");
         _;
     }
 
     enum RentStatus { ACTIVE, COMPLETED, TERMINATED, DUMPED }
+    uint public constant PERIOD = 30 days;
     
     struct RentalTerms {
+        address realtyContract;
         uint rentValue;
         uint securityDeposit;
         uint startDate;
@@ -58,29 +60,27 @@ contract RentalAgreement is PaymentSplitter {
         uint earlyTerminationFee;
         uint earlyTerminationNotice; // in periods
         string extra;
+        address[] payees;
+        uint[] shares;
     }
 
-    uint public constant PERIOD = 30 days;
-
-    address realtyContract;
+    RentalTerms public terms;
     address public tenant;
     RentStatus public status;
     uint public paymentCounter;
-    RentalTerms public terms;
 
     uint public renewalRequested;
     address public renewalRequester;
 
-    constructor(address _cns, address _realty, address _tenant, address[] memory _payees, uint[] memory _shares, RentalTerms memory _terms) 
-        PaymentSplitter(_payees, _shares, _cns) 
+    constructor(address _cns, address _tenant, RentalTerms memory _terms) 
+        PaymentSplitter(_terms.payees, _terms.shares, _cns) 
     {
         require(_terms.rentValue > 0, "RentalAgreement: rent value must be greater than 0");
         require(_terms.duration > 0, "RentalAgreement: duration must be greater than 0");
-        require(_terms.startDate > block.timestamp, "RentalAgreement: start date must be in the future");
         require(_terms.earlyTerminationNotice <= _terms.duration, "RentalAgreement: early termination notice must be less or equal to duration");
         require(_tenant != address(0), "RentalAgreement: tenant address is zero");
+        //require(_terms.startDate > block.timestamp - 1 hours, "RentalAgreement: start date must be in the future");
 
-        realtyContract = _realty;
         tenant = _tenant;
         status = RentStatus.ACTIVE;
         terms = _terms;
@@ -119,9 +119,9 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function terminate(uint _penalty) public onlyLandlord completed rentTimeOver {
+    function terminate(uint _penalty) public onlyOwnershipContract completed rentTimeOver {
         require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
-        require(msg.sender == realtyContract, "RentalAgreement: only Ownership contract can terminate the agreement");
+        require(msg.sender == terms.realtyContract, "RentalAgreement: only Ownership contract can terminate the agreement");
         status = RentStatus.TERMINATED;
 
         uint remaining = terms.securityDeposit - _penalty;
@@ -135,7 +135,7 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function dump() public onlyLandlord active expired {
+    function dump() public onlyOwnershipContract active expired {
         require(block.timestamp - terms.startDate >= 1 weeks, "RentalAgreement: cannot dump tenant before 1 week of rent time has passed");
         status = RentStatus.DUMPED;
         super.payFrom(address(this), terms.securityDeposit); // security deposit splitted
@@ -146,7 +146,7 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     function reduceDuration(uint _periods) public active {
-        require(msg.sender == tenant || msg.sender == realtyContract, "RentalAgreement: only tenant or landlords can reduce duration");
+        require(msg.sender == tenant || msg.sender == terms.realtyContract, "RentalAgreement: only tenant or landlords can reduce duration");
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");
 
         terms.duration -= _periods;
@@ -154,7 +154,7 @@ contract RentalAgreement is PaymentSplitter {
         if (msg.sender == tenant) {
             super.pay(terms.earlyTerminationFee);
         } else {
-            _walletContract().transferFrom(realtyContract, tenant, terms.earlyTerminationFee);
+            _walletContract().transferFrom(terms.realtyContract, tenant, terms.earlyTerminationFee);
         }
     }
 
@@ -176,6 +176,10 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     function _canEditPayees(address _operator) internal override view returns (bool) {
-        return _operator == realtyContract;
+        return _operator == terms.realtyContract;
+    }
+
+    function getTerms() public view returns (RentalTerms memory) {
+        return terms;
     }
 }

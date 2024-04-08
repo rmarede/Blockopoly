@@ -18,4 +18,9 @@ function getOwnershipAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Ownership.sol/Ownership.json', 'utf8')).abi;
 }
 
-module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi };
+function getRentalAgreementAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'RentalAgreement.sol/RentalAgreement.json', 'utf8')).abi;
+}
+
+
+module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi };

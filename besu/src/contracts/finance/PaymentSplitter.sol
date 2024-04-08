@@ -9,16 +9,20 @@ contract PaymentSplitter is Context {
     event PaymentReleased(address to, uint amount);
     event PaymentReceived(address from, uint amount);
 
-    mapping(address => uint) private shares;
-    address[] private payees;
-    uint256 private totalShares;
+    mapping(address => uint) public shares;
+    address[] public payees;
+    uint256 public totalShares;
 
     constructor(address[] memory _payees, uint[] memory _shares, address _cns) Context(_cns) {
         require(_payees.length == _shares.length, "PaymentSplitter: payees and shares length mismatch");
-        //require(_payees.length > 0, "PaymentSplitter: no payees");
+        require(_payees.length > 0, "PaymentSplitter: no payees");
 
         for (uint i = 0; i < _payees.length; i++) {
-            editPayee(_payees[i], _shares[i]);
+            require(_payees[i] != address(0) && _shares[i] > 0, "PaymentSplitter: invalid input");
+            require(shares[_payees[i]] == 0, "PaymentSplitter: duplicate payee");
+            payees.push(_payees[i]);
+            shares[_payees[i]] = _shares[i];
+            totalShares += _shares[i];
         }
     }
 
@@ -30,15 +34,11 @@ contract PaymentSplitter is Context {
         return payees;
     }
 
-    function getTotalShares() public virtual view returns (uint) {
-        return totalShares;
-    }
-
     function pay(uint _amount) public virtual {
         require(_amount > 0, "PaymentSplitter: amount is 0");
-        for (uint i = 0; i < getPayees().length; i++) {
-            address payee = getPayees()[i];
-            uint payment = _amount * sharesOf(payee) / getTotalShares(); 
+        for (uint i = 0; i < payees.length; i++) {
+            address payee = payees[i];
+            uint payment = _amount * sharesOf(payee) / totalShares; 
             _walletContract().transferFrom(msg.sender, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
@@ -46,24 +46,24 @@ contract PaymentSplitter is Context {
 
     function payFrom(address _from, uint _amount) internal virtual { // TODO ou publica e override? ou deixar so esta e apagar a pay?
         require(_amount > 0, "PaymentSplitter: amount is 0");
-        for (uint i = 0; i < getPayees().length; i++) {
-            address payee = getPayees()[i];
-            uint payment = _amount * sharesOf(payee) / getTotalShares(); 
+        for (uint i = 0; i < payees.length; i++) {
+            address payee = payees[i];
+            uint payment = _amount * sharesOf(payee) / totalShares; 
             _walletContract().transferFrom(_from, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }
 
+    // In case ownership changes, it is necessary to update the payees
     function editPayee(address _account, uint _shares) private {
         require(_canEditPayees(msg.sender), "PaymentSplitter: caller is not allowed to edit payees");
-        require(_account != address(0), "PaymentSplitter: invalid input");
-        require(_shares > 0, "PaymentSplitter: shares are 0");
-
-        if(shares[_account] == 0) {
+        require(_account != address(0) && _shares > 0, "PaymentSplitter: invalid input");
+        uint prev_shares = shares[_account];
+        if(prev_shares == 0) {
             payees.push(_account);
         }
         shares[_account] = _shares;
-        totalShares = totalShares + _shares;
+        totalShares = totalShares + _shares - prev_shares;
     }
 
     function _canEditPayees(address _operator) internal virtual view returns (bool) {

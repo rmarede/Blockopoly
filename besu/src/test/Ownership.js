@@ -146,13 +146,7 @@ describe("Ownership", function () {
       
       expect(await ownership.policy()).to.equal(0);
 
-      let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
-      let destinationAddress = ownership.target;
-      let functionToCall = 'changePolicy';
-      let params = ["UNANIMOUS"];
-      let data = ownershipInterface.encodeFunctionData(functionToCall, params);
-      
-      await ownership.connect(account1).submitTransaction(destinationAddress, 0, data);
+      await ownership.connect(account1).submitTransaction(ownership.target, 0, encodeOwnershipData('changePolicy', ['UNANIMOUS']));
       await expect(ownership.connect(account2).confirmTransaction(0)).not.to.be.reverted;
       let result = await ownership.transactions(0);
       expect(result[3]).to.equal(true);
@@ -162,6 +156,10 @@ describe("Ownership", function () {
   });
 
 
-
-
 });
+
+function encodeOwnershipData(functionToCall, params) {
+  let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
+  let data = ownershipInterface.encodeFunctionData(functionToCall, params);
+  return data;
+}
