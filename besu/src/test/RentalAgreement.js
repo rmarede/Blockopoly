@@ -4,7 +4,7 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-const getAbi = require('../scripts/utils/abi');
+const abi = require('../scripts/utils/abi-data-encoder');
   
 describe("RentalAgreement", function () {
 
@@ -116,22 +116,39 @@ describe("RentalAgreement", function () {
             await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
-            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, encodeRentalAgreementData('terminate', [5]))).to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('terminate', [5]))).to.be.reverted;
             await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
-            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, encodeRentalAgreementData('terminate', [5]))).not.to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('terminate', [5]))).not.to.be.reverted;
             expect(await wallet.balanceOf(acc1.address)).to.equal(605);
             expect(await wallet.balanceOf(acc2.address)).to.equal(1495);
           });
     });
 
+    describe("Dump", function () {
+        it("Should dump when expired", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePast);
+            const [acc1, acc2] = await ethers.getSigners();
 
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.mint(rentalAgreement.target, 100)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('dump', []))).not.to.be.reverted;
+            expect(await wallet.balanceOf(acc1.address)).to.equal(100);
+            expect(await rentalAgreement.status()).to.equal(3);
+          });
+
+          it("Should not dump if not expired", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
+            const [acc1, acc2] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.mint(rentalAgreement.target, 100)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('dump', []))).to.be.reverted;
+            expect(await rentalAgreement.status()).to.equal(0);
+          });
+    });
 
 
 
 });
-
-function encodeRentalAgreementData(functionToCall, params) {
-    let RentalAgreementInterface = new ethers.Interface(getAbi.getRentalAgreementAbi());
-    let data = RentalAgreementInterface.encodeFunctionData(functionToCall, params);
-    return data;
-  }

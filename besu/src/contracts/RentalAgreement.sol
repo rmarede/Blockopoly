@@ -86,30 +86,6 @@ contract RentalAgreement is PaymentSplitter {
         terms = _terms;
     }
 
-    /*
-    constructor(address _cns, address _realty, address[] memory _payees, uint[] memory _shares, address _tenant, uint _rentValue, uint _securityDeposit, 
-        uint _startDate, uint _duration, uint _earlyTerminationFee, uint _earlyTerminationNotice, string memory _extra) 
-        PaymentSplitter(_payees, _shares, _cns) 
-    {
-        require(_rentValue > 0, "RentalAgreement: rent value must be greater than 0");
-        require(duration > 0, "RentalAgreement: duration must be greater than 0");
-        require(_startDate > block.timestamp, "RentalAgreement: start date must be in the future");
-        require(_earlyTerminationNotice <= _duration, "RentalAgreement: early termination notice must be less or equal to duration");
-        require(_tenant != address(0), "RentalAgreement: tenant address is zero"); // TODO - verificar se é da org correta
-
-        realtyContract = _realty;
-        tenant = _tenant;
-        rentValue = _rentValue;
-        securityDeposit = _securityDeposit;
-        duration = _duration;
-        startDate = _startDate;
-        status = RentStatus.ACTIVE;
-        earlyTerminationFee = _earlyTerminationFee;
-        earlyTerminationNotice = _earlyTerminationNotice;
-        extra = _extra;
-
-    }*/
-
     function pay(uint _amount) public override active onlyTenant canPay {
         require(_amount == terms.rentValue, "RentalAgreement: incorrect payment amount");
         super.pay(_amount);

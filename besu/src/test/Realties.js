@@ -1,7 +1,7 @@
 const {time, loadFixture,} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-const getAbi = require('../scripts/utils/abi');
+const getAbi = require('../scripts/utils/get-abi');
 
 describe("Realties", function () {
 
