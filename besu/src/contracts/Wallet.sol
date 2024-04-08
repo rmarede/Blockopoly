@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./interface/IERC20.sol";
+
 // Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
 
-contract Wallet {
+contract Wallet is IERC20 {
 
     mapping(address => uint) private balances;
     mapping(address => mapping(address => uint)) private allowances;
 
-    function mint(address to, uint amount) public virtual {
+    function mint(address to, uint amount) public virtual returns (bool) {
         require(to != address(0), "Wallet: invalid input");
         balances[to] += amount;
+        return true;
     }
 
     function burn(address to, uint amount) public virtual {
@@ -24,19 +27,24 @@ contract Wallet {
         return balances[account];
     }
 
-    function transfer(address to, uint amount) public virtual {
+    function transfer(address to, uint amount) public virtual returns (bool) {
         _transfer(msg.sender, to, amount);
+        return true;
     }
 
-    function transferFrom(address from, address to, uint amount) public virtual {
-        _spendAllowance(from, msg.sender, amount);
+    function transferFrom(address from, address to, uint amount) public virtual returns (bool) {
+        if (msg.sender != from) {
+            _spendAllowance(from, msg.sender, amount);
+        }
         _transfer(from, to, amount);
+        return true;
     }
 
 
-    function approve(address spender, uint amount) public virtual {
+    function approve(address spender, uint amount) public virtual returns (bool) {
         require(spender != address(0), "Wallet: invalid input");
         allowances[msg.sender][spender] = amount;
+        return true;
     }
 
     function allowance(address owner, address spender) public view virtual returns (uint) {

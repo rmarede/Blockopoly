@@ -35,7 +35,7 @@ contract WeightedMultiSig {
     }
 
     modifier isOwner(address addr) {
-        require(shares[msg.sender] > 0, "Permission denied");
+        require(shares[msg.sender] > 0, "WeightedMultiSig: Permission denied");
         _;
     }
 
@@ -49,25 +49,29 @@ contract WeightedMultiSig {
     Policy public policy;
 
     constructor (address[] memory _participants, uint[] memory _shares, Policy _policy) {
-        require(_participants.length > 0, "No participants specified");
-        require(_participants.length == _shares.length, "Invalid input");
+        require(_participants.length > 0, "WeightedMultiSig: No participants specified");
+        require(_participants.length == _shares.length, "WeightedMultiSig: Invalid input");
         policy = _policy;
         for (uint i=0; i<_participants.length; i++) {
-            require(_participants[i] != address(0) && _shares[i] > 0, "Invalid input");
+            require(_participants[i] != address(0) && _shares[i] > 0, "WeightedMultiSig: Invalid input");
             participants.push(_participants[i]);
             shares[_participants[i]] = _shares[i];
             totalShares += _shares[i];
         }
     }
 
+    function getParticipants() public view returns (address[] memory) {
+        return participants;
+    }
+
     function changePolicy(string memory _policy) public {
-        require(msg.sender == address(this), "Permission denied");
+        require(msg.sender == address(this), "WeightedMultiSig: Permission denied");
         if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("MAJORITY"))) {
             policy = Policy.MAJORITY;
         } else if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("UNANIMOUS"))) {
             policy = Policy.UNANIMOUS;
         } else {
-            revert("Invalid policy");
+            revert("WeightedMultiSig: Invalid policy");
         }
     }
 
@@ -101,7 +105,7 @@ contract WeightedMultiSig {
             Transaction storage txn = transactions[_transactionId];
             (bool success, ) = txn.destination.call{value: txn.value}(txn.data);
             txn.executed = true;
-            require(success, "Transaction failed");
+            require(success, "WeightedMultiSig: Transaction failed");
         }
     }
 
@@ -127,8 +131,8 @@ contract WeightedMultiSig {
     }
 
     function transferShares(address _from, address _to, uint _amount) public virtual {
-        require(canTransferShares(_from, msg.sender), "Permission denied");
-        require(shares[_from] >= _amount, "Not enough shares");
+        require(canTransferShares(_from, msg.sender), "WeightedMultiSig: Permission denied");
+        require(shares[_from] >= _amount, "WeightedMultiSig: Not enough shares");
 
         if (shares[_to] == 0) { 
             participants.push(_to);
@@ -149,7 +153,7 @@ contract WeightedMultiSig {
     }
 
     function addShares(address to, uint amount) public {
-        require(canAddShares(msg.sender), "Permission denied");
+        require(canAddShares(msg.sender), "WeightedMultiSig: Permission denied");
 
         if (shares[to] == 0) {  
             participants.push(to);
@@ -160,8 +164,8 @@ contract WeightedMultiSig {
     }
 
     function removeShares(address from, uint amount) public {
-        require(canRemoveShares(msg.sender), "Permission denied");
-        require(shares[from] > amount, "Not enough shares");
+        require(canRemoveShares(msg.sender), "WeightedMultiSig: Permission denied");
+        require(shares[from] > amount, "WeightedMultiSig: Not enough shares");
 
         shares[from] -= amount;
         totalShares -= amount;
