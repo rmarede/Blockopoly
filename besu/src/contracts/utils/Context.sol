@@ -2,6 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "../system/ContractNameService.sol";
+import "../Realties.sol";
+import "../Wallet.sol";
+
 
 contract Context { 
 
@@ -17,6 +20,14 @@ contract Context {
     function setCns(address _cns) internal {
         require(_cns != address(0), "Already set");
         cns = ContractNameService(_cns);
+    }
+
+    function realtyContract() internal view returns (Realties) {
+        return Realties(cns.getContractAddress("Realties"));
+    }
+
+    function walletContract() internal view returns (Wallet) {
+        return Wallet(cns.getContractAddress("Wallet"));
     }
 
 }

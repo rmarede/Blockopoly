@@ -77,7 +77,7 @@ contract Marketplace is Context {
         require(msg.sender != sales[_saleId].seller, "Marketplace: seller cannot bid on own sale");
         require(_amount >= sales[_saleId].value, "Marketplace: bid is too low");
 
-        _walletContract().transferFrom(msg.sender, address(this), _amount);
+        walletContract().transferFrom(msg.sender, address(this), _amount);
 
         uint bidId = bidCounter++;
         bidsBySale[_saleId].push(bidId);
@@ -96,7 +96,7 @@ contract Marketplace is Context {
         require(b.bidder == msg.sender, "Marketplace: only bidder can retrieve bid");
         require(b.status == BidStatus.ACTIVE, "Marketplace: bid is not active");
 
-        _walletContract().transfer(msg.sender, b.value);
+        walletContract().transfer(msg.sender, b.value);
         b.status = BidStatus.RETRIEVED;
     }
 
@@ -112,13 +112,13 @@ contract Marketplace is Context {
         s.status = SaleStatus.CLOSED;
 
         Ownership(s.asset).transferShares(s.seller, b.bidder, s.share);
-        _walletContract().transfer(s.seller, b.value);
+        walletContract().transfer(s.seller, b.value);
 
         for (uint i = 0; i < bidsBySale[_saleId].length; i++) {
             Bid storage _otherBid = bids[bidsBySale[_saleId][i]];
             if (_otherBid.id != _bidId) {
                 _otherBid.status = BidStatus.RETURNED;
-                _walletContract().transfer(_otherBid.bidder, _otherBid.value);
+                walletContract().transfer(_otherBid.bidder, _otherBid.value);
             }
         }
     }
@@ -132,7 +132,7 @@ contract Marketplace is Context {
         for (uint i = 0; i < bidsBySale[_saleId].length; i++) {
             Bid storage b = bids[bidsBySale[_saleId][i]];
             b.status = BidStatus.RETURNED;
-            _walletContract().transfer(b.bidder, b.value);
+            walletContract().transfer(b.bidder, b.value);
         }
     }
 
@@ -143,14 +143,6 @@ contract Marketplace is Context {
             }
         }
         return false;
-    }
-
-    function _realtyContract() private view returns (Realties) {
-        return Realties(cns.getContractAddress("Realties"));
-    }
-
-    function _walletContract() private view returns (Wallet) {
-        return Wallet(cns.getContractAddress("Wallet"));
     }
     
     function _isOnSale(address tokenId) private view returns (bool) {

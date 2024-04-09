@@ -39,7 +39,7 @@ contract PaymentSplitter is Context {
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
             uint payment = _amount * sharesOf(payee) / totalShares; 
-            _walletContract().transferFrom(msg.sender, payee, payment);
+            walletContract().transferFrom(msg.sender, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }
@@ -49,7 +49,7 @@ contract PaymentSplitter is Context {
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
             uint payment = _amount * sharesOf(payee) / totalShares; 
-            _walletContract().transferFrom(_from, payee, payment);
+            walletContract().transferFrom(_from, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }
@@ -68,10 +68,6 @@ contract PaymentSplitter is Context {
 
     function _canEditPayees(address _operator) internal virtual view returns (bool) {
         return _operator == address(this);
-    }
-
-    function _walletContract() internal view returns (Wallet) {
-        return Wallet(cns.getContractAddress("Wallet"));
     }
 
 }
