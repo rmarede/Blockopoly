@@ -131,7 +131,6 @@ contract WeightedMultiSig {
     }
 
     function transferShares(address _from, address _to, uint _amount) public virtual {
-        require(canTransferShares(_from, msg.sender), "WeightedMultiSig: Permission denied");
         require(shares[_from] >= _amount, "WeightedMultiSig: Not enough shares");
 
         if (shares[_to] == 0) { 
@@ -152,24 +151,18 @@ contract WeightedMultiSig {
         }
     }
 
-    function addShares(address to, uint amount) public {
-        require(canAddShares(msg.sender), "WeightedMultiSig: Permission denied");
-
+    function addShares(address to, uint amount) public virtual {
         if (shares[to] == 0) {  
             participants.push(to);
         }
-
         shares[to] = amount;
         totalShares += amount;
     }
 
-    function removeShares(address from, uint amount) public {
-        require(canRemoveShares(msg.sender), "WeightedMultiSig: Permission denied");
+    function removeShares(address from, uint amount) public virtual {
         require(shares[from] > amount, "WeightedMultiSig: Not enough shares");
-
         shares[from] -= amount;
         totalShares -= amount;
-
         if (shares[from] == 0) { 
             for (uint i = 0; i < participants.length; i++) {
                 if (participants[i] == from) {
@@ -179,18 +172,6 @@ contract WeightedMultiSig {
                 }
             }
         }
-    }
-
-    function canAddShares(address operator) public view virtual returns (bool) {
-        return operator == address(this);
-    }
-
-    function canRemoveShares(address operator) public view virtual returns (bool) {
-        return operator == address(this);
-    }
-
-    function canTransferShares(address from, address operator) public view virtual returns (bool) {
-        return from == operator;
     }
 
 }

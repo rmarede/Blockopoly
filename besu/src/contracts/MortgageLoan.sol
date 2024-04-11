@@ -3,18 +3,36 @@ pragma solidity ^0.8.0;
 
 import "./utils/Context.sol";
 import "./governance/WeightedMultiSig.sol";
+import "./Ownership.sol";
 
-// TODO opcionais: LTV ratio, fiador, equity
-
-// Equity refers to the portion of the property's value that the homeowner actually owns outright. 
-// It is the difference between the property's current market value and the amount the homeowner owes on the mortgage. 
-// Equity can increase in two ways:
-//      As the mortgage principal is paid down
-//      Through appreciation of property value -> not considered
-
-// Amortization is the process of paying off a debt with a fixed repayment schedule in regular installments over time.
+// TODO opcionais: fiador
 
 contract MortgageLoan is WeightedMultiSig, Context {
+
+    modifier pending() {
+        require(state == State.PENDING, "MortgageLoan: Loan not pending");
+        _;
+    }
+
+    modifier active() {
+        require(state == State.ACTIVE && paymentCounter < details.loanTerm, "MortgageLoan: Loan not active or already paid off");
+        _;
+    }
+
+    modifier completed() {
+        require(state == State.ACTIVE && paymentCounter == details.loanTerm, "MortgageLoan: Loan not completed");
+        _;
+    }
+
+    modifier onlyBorrower() {
+        require(msg.sender == details.borrower, "MortgageLoan: Permission denied");
+        _;
+    }
+
+    modifier onlyLender() {
+        require(msg.sender == details.lender, "MortgageLoan: Permission denied");
+        _;
+    }
 
     struct LoanDetails {
         address lender;
@@ -23,37 +41,34 @@ contract MortgageLoan is WeightedMultiSig, Context {
         uint downPayment;
         uint interestRate; // (100 for 1%)
         uint loanTerm;  // number of payments
+        uint startDate;
+        uint gracePeriod; 
+        uint latePaymentFee;
+        uint defaultDeadline;
     }
+
+    enum State { PENDING, ACTIVE }
+    uint public constant PERIOD = 30 days;
     
     uint public paymentCounter;
-    address public bankEntity;
     LoanDetails public details;
+    State public state;
+    address public asset; // quando se define o asset?
+    uint public share; 
 
-    constructor(address _cns, address _bankEntity, LoanDetails memory _details) 
-        WeightedMultiSig(_entities(_bankEntity, _details.lender), _shares(_details.principal, _details.downPayment), Policy.UNANIMOUS) 
+    constructor(address _cns, LoanDetails memory _details) 
+        WeightedMultiSig(_participant(_details.lender), _shares(_details.principal), Policy.UNANIMOUS) 
         Context(_cns)
     {
-        bankEntity = _bankEntity;
         details = _details;
         paymentCounter = 0;
-
+        state = State.PENDING;
     }
 
-    function amortize() public {
-        require(msg.sender == details.borrower, "MortgageLoan: Permission denied");
-        require(paymentCounter < details.loanTerm, "MortgageLoan: Loan already paid off");
-        uint amortizationValue = amortization();
-        uint remaining = walletContract().balanceOf(address(this));
-        if (remaining > amortizationValue) { // TODO not really necessary, mas ja agr fica bem
-            walletContract().transfer(bankEntity, amortizationValue);
-        } else if (remaining > 0) {
-            walletContract().transfer(bankEntity, remaining);
-            walletContract().transferFrom(details.lender, bankEntity, amortizationValue - remaining);
-        } else {
-            walletContract().transferFrom(details.lender, bankEntity, amortizationValue);
-        }
-        paymentCounter++;
-        _balanceEquity();
+    function enroll() public onlyBorrower pending {
+        walletContract().transferFrom(details.borrower, address(this), details.downPayment);
+        super.addShares(details.borrower, details.downPayment);
+        state = State.ACTIVE;
     }
 
     function amortization() public view returns (uint) {
@@ -61,23 +76,60 @@ contract MortgageLoan is WeightedMultiSig, Context {
         return details.principal * details.interestRate * aux / (aux - 1);
     }
 
+    function amortize() public onlyBorrower active {
+        uint _amortization = amortization();
+        uint _remaining = walletContract().balanceOf(address(this));
+        if (_remaining > _amortization) { // TODO not really necessary, mas ja agr fica bem
+            walletContract().transfer(details.lender, _amortization);
+        } else if (_remaining > 0) {
+            walletContract().transfer(details.lender, _remaining);
+            walletContract().transferFrom(details.borrower, details.lender, _amortization - _remaining);
+        } else {
+            walletContract().transferFrom(details.borrower, details.lender, _amortization);
+        }
+        paymentCounter++;
+        _balanceEquity();
+    }
+
+    function terminate() public completed {
+        Ownership(asset).transferShares(address(this), details.borrower, share);
+    }
+
+    function applyPenalty() public onlyLender active { // preciso ter cuidado para nao estragar a equity, aumentar o interest?
+        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + details.gracePeriod, "MortgageLoan: Grace period not reached");
+    }
+
+    function foreclosure() public onlyLender active { // hipotecar
+        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + details.defaultDeadline, "MortgageLoan: Default deadline not reached");
+        Ownership(asset).transferShares(address(this), details.lender, share);
+    }
+
     function _balanceEquity() private {
-        this.transferShares(bankEntity, msg.sender, amortization());
+        super.transferShares(details.lender, msg.sender, details.principal / details.loanTerm);
+    } 
+
+    function transferShares(address _from, address _to, uint _amount) public pure override {
+        require(false, "Ownership: Operation not allowed");
     }
 
-    function _entities(address _bankEntity, address _lender) private pure returns (address[] memory) {
-        address[] memory res = new address[](2);
-        res[0] = _bankEntity;
-        res[1] = _lender;
+    function addShares(address to, uint amount) public pure override {
+        require(false, "Ownership: Operation not allowed");
+    }
+
+    function removeShares(address from, uint amount) public pure override {
+        require(false, "Ownership: Operation not allowed");
+    }
+
+    function _participant(address _lender) private pure returns (address[] memory) {
+        address[] memory res = new address[](1);
+        res[0] = _lender;
         return res;
     }
 
-    function _shares(uint _principal, uint _downPayment) private pure returns (uint[] memory) {
-        uint[] memory res = new uint[](2);
+    function _shares(uint _principal) private pure returns (uint[] memory) {
+        uint[] memory res = new uint[](1);
         res[0] = _principal;
-        res[1] = _downPayment;
         return res;
     }
-
     
 }

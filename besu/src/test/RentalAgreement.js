@@ -23,7 +23,7 @@ describe("RentalAgreement", function () {
     async function deployOwnershipFixture() {
         const [acc1] = await ethers.getSigners();
         const Ownership = await ethers.getContractFactory("Ownership");
-        const ownership = await Ownership.deploy([acc1.address], [100]);
+        const ownership = await Ownership.deploy([acc1.address], [10000]);
     
         return {ownership };
     }
@@ -46,7 +46,7 @@ describe("RentalAgreement", function () {
             earlyTerminationNotice: 1,
             extra: 'extra terms', 
             payees: [acc1], 
-            shares: [100]
+            shares: [1]
         };
 
         const contract = await ethers.getContractFactory("RentalAgreement");
@@ -73,7 +73,7 @@ describe("RentalAgreement", function () {
             earlyTerminationNotice: 1,
             extra: 'extra terms', 
             payees: [acc1], 
-            shares: [100]
+            shares: [1]
         };
 
         const contract = await ethers.getContractFactory("RentalAgreement");

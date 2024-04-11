@@ -19,7 +19,7 @@ contract Ownership is WeightedMultiSig {
         for (uint i = 0; i < _owners.length; i++) {
             totalShares += _shares[i];
         }
-        require(totalShares == 100, "Total shares must be equal to 100");
+        require(totalShares == 10000, "Total shares must be equal to 10000 (100%)");
 
         REALTIES_ADDRESS = msg.sender;
         blacklist[REALTIES_ADDRESS] = true; // TODO ou passar blacklist no contrutor?
@@ -35,6 +35,8 @@ contract Ownership is WeightedMultiSig {
     }
 
     function transferShares(address _from, address _to, uint _amount) public override {
+        // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
+        require(approvedOf(_from) == msg.sender|| (approvedOf(_from) == address(0) && msg.sender == _from));
         super.transferShares(_from, _to, _amount);
         if (shares[_from] == 0) {
             Realties(REALTIES_ADDRESS).removeOwnership(address(this), _from);
@@ -49,17 +51,12 @@ contract Ownership is WeightedMultiSig {
         return super.submitTransaction(_destination, _value, _data);
     }
 
-    function canTransferShares(address _from, address _operator) public override view returns (bool) {
-        // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
-        return approvedOf(_from) == _operator|| (approvedOf(_from) == address(0) && _operator == _from);
+    function addShares(address to, uint amount) public pure override {
+        require(false, "Ownership: Operation not allowed");
     }
 
-    function canAddShares(address operator) public pure override returns (bool) {
-        return false;
-    }
-
-    function canRemoveShares(address operator) public pure override returns (bool) {
-        return false;
+    function removeShares(address from, uint amount) public pure override {
+        require(false, "Ownership: Operation not allowed");
     }
 
 }

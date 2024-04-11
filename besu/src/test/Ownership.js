@@ -7,7 +7,7 @@ describe("Ownership", function () {
   async function deployOwnershipFixture() {
     const [admin, account1, account2, account3, account4] = await ethers.getSigners();
     const Ownership = await ethers.getContractFactory("Ownership");
-    const ownership = await Ownership.deploy([account1.address, account2.address, account3.address], [40, 30, 30]);
+    const ownership = await Ownership.deploy([account1.address, account2.address, account3.address], [4000, 3000, 3000]);
 
     return {ownership, account1, account2, account3, account4};
   }
@@ -16,9 +16,9 @@ describe("Ownership", function () {
     it("Should set the right owners and shares", async function () {
         const { ownership, account1, account2, account3} = await loadFixture(deployOwnershipFixture);
 
-        expect(await ownership.shareOf(account1.address)).to.equal(40);
-        expect(await ownership.shareOf(account2.address)).to.equal(30);
-        expect(await ownership.shareOf(account3.address)).to.equal(30);
+        expect(await ownership.shareOf(account1.address)).to.equal(4000);
+        expect(await ownership.shareOf(account2.address)).to.equal(3000);
+        expect(await ownership.shareOf(account3.address)).to.equal(3000);
 
       });
   });
@@ -27,9 +27,9 @@ describe("Ownership", function () {
     it("Should transfer shares to other owner", async function () {
         const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
 
-        await ownership.connect(account1).transferShares(account1.address, account2.address, 5);
-        expect(await ownership.shareOf(account1.address)).to.equal(35);
-        expect(await ownership.shareOf(account2.address)).to.equal(35);
+        await ownership.connect(account1).transferShares(account1.address, account2.address, 500);
+        expect(await ownership.shareOf(account1.address)).to.equal(3500);
+        expect(await ownership.shareOf(account2.address)).to.equal(3500);
 
       });
 
@@ -37,14 +37,14 @@ describe("Ownership", function () {
         
         const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
 
-        await expect(ownership.connect(account2).transferShares(account1.address, account2.address, 5)).to.be.reverted;
+        await expect(ownership.connect(account2).transferShares(account1.address, account2.address, 500)).to.be.reverted;
       });
 
       it("Should not transfer shares that doesn't own", async function () {
         
         const { ownership, account1, account2} = await loadFixture(deployOwnershipFixture);
 
-        await expect(ownership.connect(account1).transferShares(account1.address, account2.address, 50)).to.be.reverted;
+        await expect(ownership.connect(account1).transferShares(account1.address, account2.address, 5000)).to.be.reverted;
       });
       
   });
@@ -63,9 +63,9 @@ describe("Ownership", function () {
       await ownership.connect(account1).approve(account2.address);
       expect(await ownership.approvedOf(account1.address)).to.equal(account2.address);
 
-      await ownership.connect(account2).transferShares(account1.address, account2.address, 5);
-      expect(await ownership.shareOf(account1.address)).to.equal(35);
-      expect(await ownership.shareOf(account2.address)).to.equal(35);
+      await ownership.connect(account2).transferShares(account1.address, account2.address, 500);
+      expect(await ownership.shareOf(account1.address)).to.equal(3500);
+      expect(await ownership.shareOf(account2.address)).to.equal(3500);
 
     });
 
@@ -75,9 +75,9 @@ describe("Ownership", function () {
         await ownership.connect(account1).approve(account4.address);
         expect(await ownership.approvedOf(account1.address)).to.equal(account4.address);
 
-        await ownership.connect(account4).transferShares(account1.address, account2.address, 5);
-        expect(await ownership.shareOf(account1.address)).to.equal(35);
-        expect(await ownership.shareOf(account2.address)).to.equal(35);
+        await ownership.connect(account4).transferShares(account1.address, account2.address, 500);
+        expect(await ownership.shareOf(account1.address)).to.equal(3500);
+        expect(await ownership.shareOf(account2.address)).to.equal(3500);
 
     });
 
@@ -87,7 +87,7 @@ describe("Ownership", function () {
       await ownership.connect(account1).approve(account2.address);
       expect(await ownership.approvedOf(account1.address)).to.equal(account2.address);
 
-      await expect(ownership.connect(account3).transferShares(account1.address, account2.address, 5)).to.be.reverted;
+      await expect(ownership.connect(account3).transferShares(account1.address, account2.address, 500)).to.be.reverted;
 
     });
       
