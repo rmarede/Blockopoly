@@ -10,6 +10,10 @@ contract Wallet is IERC20 {
     mapping(address => uint) private balances;
     mapping(address => mapping(address => uint)) private allowances;
 
+    function decimals() public view virtual override returns (uint8) {
+        return 2;
+    }
+
     function mint(address to, uint amount) public virtual returns (bool) {
         require(to != address(0), "Wallet: invalid input");
         balances[to] += amount;
@@ -23,7 +27,6 @@ contract Wallet is IERC20 {
     }
 
     function balanceOf(address account) public view virtual returns (uint) {
-        //require(msg.sender == account || msg.sender == address(this), "Wallet: balance query for account not authorized");
         return balances[account];
     }
 

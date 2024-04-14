@@ -15,22 +15,22 @@ contract WeightedMultiSig {
     }
 
     modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].destination != address(0));
+        require(transactions[transactionId].destination != address(0), "WeightedMultiSig: Transaction does not exist");
         _;
     }
 
     modifier confirmed(uint transactionId, address owner) {
-        require(confirmations[transactionId][owner]);
+        require(confirmations[transactionId][owner], "WeightedMultiSig: Transaction not confirmed");
         _;
     }
 
     modifier notConfirmed(uint transactionId, address owner) {
-        require(!confirmations[transactionId][owner]);
+        require(!confirmations[transactionId][owner], "WeightedMultiSig: Transaction already confirmed");
         _;
     }
 
     modifier notExecuted(uint transactionId) {
-        require(!transactions[transactionId].executed);
+        require(!transactions[transactionId].executed, "WeightedMultiSig: Transaction already executed");
         _;
     }
 
@@ -131,6 +131,7 @@ contract WeightedMultiSig {
     }
 
     function transferShares(address _from, address _to, uint _amount) public virtual {
+        require(_canTransferShares(_from, msg.sender), "WeightedMultiSig: Permission denied");
         require(shares[_from] >= _amount, "WeightedMultiSig: Not enough shares");
 
         if (shares[_to] == 0) { 
@@ -152,6 +153,7 @@ contract WeightedMultiSig {
     }
 
     function addShares(address to, uint amount) public virtual {
+        require(_canAddShares(msg.sender), "WeightedMultiSig: Permission denied: addShares");
         if (shares[to] == 0) {  
             participants.push(to);
         }
@@ -160,6 +162,7 @@ contract WeightedMultiSig {
     }
 
     function removeShares(address from, uint amount) public virtual {
+        require(_canRemoveShares(msg.sender), "WeightedMultiSig: Permission denied: removeShares");
         require(shares[from] > amount, "WeightedMultiSig: Not enough shares");
         shares[from] -= amount;
         totalShares -= amount;
@@ -172,6 +175,18 @@ contract WeightedMultiSig {
                 }
             }
         }
+    }
+
+    function _canAddShares(address operator) internal view virtual returns (bool) {
+        return operator == address(this);
+    }
+
+    function _canRemoveShares(address operator) internal view virtual returns (bool) {
+        return operator == address(this);
+    }
+
+    function _canTransferShares(address from, address operator) internal view virtual returns (bool) {
+        return from == operator;
     }
 
 }

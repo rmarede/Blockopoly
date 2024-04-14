@@ -117,10 +117,6 @@ contract RentalAgreement is PaymentSplitter {
         super.payFrom(address(this), terms.securityDeposit); // security deposit splitted
     }
 
-    function requestDurationReduction(uint _periods) public active {
-        terms.duration -= _periods;
-    }
-
     function reduceDuration(uint _periods) public active {
         require(msg.sender == tenant || msg.sender == terms.realtyContract, "RentalAgreement: only tenant or landlords can reduce duration");
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");

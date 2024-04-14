@@ -14,7 +14,7 @@ contract SaleAgreement is Context {
     uint public price;
     uint public share;
     address public realtor;
-    uint public comission;
+    uint public comission; // 100 is 1%
 
     bool private buyerSignature;
     bool private sellerSignature;
@@ -37,6 +37,7 @@ contract SaleAgreement is Context {
 
     constructor(address _cns, address _realty, address _buyer, address _seller, uint _price, uint _share, address _realtor, uint _comission) Context(_cns) {
         require(_price > 0 && _share > 0, "SaleAgreement: invalid input");
+        require(_comission < 10000, "SaleAgreement: comission can not be more than 10000 (100.00%)");
         require(Ownership(_realty).shareOf(_seller) >= _share, "SaleAgreement: seller does not have enough shares");
         realty = _realty;
         buyer = _buyer;
@@ -61,8 +62,9 @@ contract SaleAgreement is Context {
 
     function transfer() private signed {
         Ownership(realty).transferShares(seller, buyer, share);
-        walletContract().transfer(realtor, price * (comission / 100));
-        walletContract().transfer(seller, price * ((100 - comission) / 100));
+        uint comm = price * comission / 10000;
+        walletContract().transfer(realtor, comm);
+        walletContract().transfer(seller, price - comm);
     }
 
     function widthdraw() public unsigned onlyParties {

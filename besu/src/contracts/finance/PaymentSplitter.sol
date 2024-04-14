@@ -44,7 +44,7 @@ contract PaymentSplitter is Context {
         }
     }
 
-    function payFrom(address _from, uint _amount) internal virtual { // TODO ou publica e override? ou deixar so esta e apagar a pay?
+    function payFrom(address _from, uint _amount) public virtual { // TODO override desta para nao permitir que paguem por outros
         require(_amount > 0, "PaymentSplitter: amount is 0");
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];

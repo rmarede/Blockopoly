@@ -10,6 +10,10 @@ function getERC721Abi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'interface/IERC721.sol/IERC721.json', 'utf8')).abi;
 }
 
+function getWalletAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Wallet.sol/Wallet.json', 'utf8')).abi;
+}
+
 function getMarketplaceAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Marketplace.sol/Marketplace.json', 'utf8')).abi;
 }
@@ -22,5 +26,9 @@ function getRentalAgreementAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'RentalAgreement.sol/RentalAgreement.json', 'utf8')).abi;
 }
 
+function getWeightedMultiSigAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/WeightedMultiSig.sol/WeightedMultiSig.json', 'utf8')).abi;
+}
 
-module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi };
+
+module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi, getWeightedMultiSigAbi, getWalletAbi };

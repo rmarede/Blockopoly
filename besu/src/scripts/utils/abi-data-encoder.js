@@ -1,15 +1,29 @@
 const getAbi = require('./get-abi');
 
 function encodeRentalAgreementData(functionToCall, params) {
-    let RentalAgreementInterface = new ethers.Interface(getAbi.getRentalAgreementAbi());
-    let data = RentalAgreementInterface.encodeFunctionData(functionToCall, params);
+    let interface = new ethers.Interface(getAbi.getRentalAgreementAbi());
+    let data = interface.encodeFunctionData(functionToCall, params);
     return data;
 }
 
 function encodeOwnershipData(functionToCall, params) {
-    let ownershipInterface = new ethers.Interface(getAbi.getOwnershipAbi());
-    let data = ownershipInterface.encodeFunctionData(functionToCall, params);
+    letinterface = new ethers.Interface(getAbi.getOwnershipAbi());
+    let data = interface.encodeFunctionData(functionToCall, params);
     return data;
-  }
+}
 
-module.exports = { encodeRentalAgreementData, encodeOwnershipData };
+function encodeWeightedMultiSigData(functionToCall, params) {
+  let interface = new ethers.Interface(getAbi.getWeightedMultiSigAbi());
+  let data = interface.encodeFunctionData(functionToCall, params);
+  return data;
+}
+
+
+function encodeWalletData(functionToCall, params) {
+  let interface = new ethers.Interface(getAbi.getWalletAbi());
+  let data = interface.encodeFunctionData(functionToCall, params);
+  return data;
+}
+
+
+module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeWalletData };
