@@ -124,7 +124,7 @@ describe("RentalAgreement", function () {
           });
     });
 
-    describe("Dump", function () {
+    describe("Default", function () {
         it("Should dump when expired", async function () {
             const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePast);
             const [acc1, acc2] = await ethers.getSigners();

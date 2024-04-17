@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./Multisignable.sol";
+
 // WIGHTED MULTI SIGNATURE WALLET PATTERN IMPLEMENTATION
 // github.com/OpenZeppelin/gnosis-multisig -> TODO maybe upgrade com openzeppelin Governor.sol
-contract WeightedMultiSig {
-
-    enum Policy { MAJORITY, UNANIMOUS } 
+contract WeightedMultiSig is Multisignable {
 
     struct Transaction {
         address destination;
@@ -46,12 +46,10 @@ contract WeightedMultiSig {
     mapping (uint => Transaction) public transactions;
     mapping (uint => mapping (address => bool)) internal confirmations;
     uint public transactionCount;
-    Policy public policy;
 
-    constructor (address[] memory _participants, uint[] memory _shares, Policy _policy) {
+    constructor (address[] memory _participants, uint[] memory _shares, Policy _policy) Multisignable(_policy){
         require(_participants.length > 0, "WeightedMultiSig: No participants specified");
         require(_participants.length == _shares.length, "WeightedMultiSig: Invalid input");
-        policy = _policy;
         for (uint i=0; i<_participants.length; i++) {
             require(_participants[i] != address(0) && _shares[i] > 0, "WeightedMultiSig: Invalid input");
             participants.push(_participants[i]);
@@ -110,6 +108,7 @@ contract WeightedMultiSig {
     }
 
     function isConfirmed(uint _transactionId) public view returns (bool) {
+        // TODO Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
         if (policy == Policy.MAJORITY) {
             return getConfirmationCount(_transactionId) > totalShares / 2;
         } else if (policy == Policy.UNANIMOUS) {

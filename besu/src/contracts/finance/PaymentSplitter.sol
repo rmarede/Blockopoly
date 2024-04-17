@@ -11,7 +11,7 @@ contract PaymentSplitter is Context {
 
     mapping(address => uint) public shares;
     address[] public payees;
-    uint256 public totalShares;
+    uint public totalShares;
 
     constructor(address[] memory _payees, uint[] memory _shares, address _cns) Context(_cns) {
         require(_payees.length == _shares.length, "PaymentSplitter: payees and shares length mismatch");

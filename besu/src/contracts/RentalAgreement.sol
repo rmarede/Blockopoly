@@ -112,7 +112,7 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     function dump() public onlyOwnershipContract active expired {
-        require(block.timestamp - terms.startDate >= 1 weeks, "RentalAgreement: cannot dump tenant before 1 week of rent time has passed");
+        require(block.timestamp - terms.startDate >= 1 days, "RentalAgreement: cannot dump tenant on first day");
         status = RentStatus.DUMPED;
         super.payFrom(address(this), terms.securityDeposit); // security deposit splitted
     }

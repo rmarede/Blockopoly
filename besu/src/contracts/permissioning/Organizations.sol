@@ -12,6 +12,11 @@ contract Organizations is OrganizationMultiSig{
         _;
     }
 
+    modifier orgDoesNotExist(string memory _orgId) {
+        require(checkOrgExists(_orgId) == false, "org exists");
+        _;
+    }
+
     struct OrgDetails {
         string orgId;
         string parentId;
@@ -22,10 +27,10 @@ contract Organizations is OrganizationMultiSig{
         uint [] subOrgIndexList;
     }
 
-    modifier orgDoesNotExist(string memory _orgId) {
-        require(checkOrgExists(_orgId) == false, "org exists");
-        _;
+    constructor(bytes32[] memory _organizations) OrganizationMultiSig(_organizations, Policy.MAJORITY) {
     }
+
+    
 
     mapping(bytes32 => OrgDetails) private organizations;
     uint private orgNum = 0;
