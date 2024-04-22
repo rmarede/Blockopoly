@@ -57,10 +57,19 @@ contract PaymentSplitter is Context {
     // In case ownership changes, it is necessary to update the payees
     function editPayee(address _account, uint _shares) private {
         require(_canEditPayees(msg.sender), "PaymentSplitter: caller is not allowed to edit payees");
-        require(_account != address(0) && _shares > 0, "PaymentSplitter: invalid input");
+        require(_account != address(0), "PaymentSplitter: invalid input");
         uint prev_shares = shares[_account];
-        if(prev_shares == 0) {
+        if(prev_shares == 0 && _shares > 0) {
             payees.push(_account);
+        }
+        if(prev_shares > 0 && _shares == 0) {
+            for (uint i = 0; i < payees.length; i++) {
+                if(payees[i] == _account) {
+                    payees[i] = payees[payees.length - 1];
+                    payees.pop();
+                    break;
+                }
+            }
         }
         shares[_account] = _shares;
         totalShares = totalShares + _shares - prev_shares;

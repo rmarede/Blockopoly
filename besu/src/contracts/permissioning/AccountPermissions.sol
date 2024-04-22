@@ -1,22 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../system/ContractNameService.sol";
+import "./AccountRegistry.sol";
+import "./NodeRegistry.sol";
+import "./RolesRegistry.sol";
+
 // Account Permissions Interface Contract
 contract AccountPermissions {
 
-    address private ACCOUNT_RULES_ADDRESS = address(0);
+    address private CNS_ADDRESS = address(0);
     
     function transactionAllowed(address _sender, address _target, uint256 _value, uint256 _gasPrice, uint256 _gasLimit, bytes calldata _payload) 
     external view returns (bool) {
 
-        if(ACCOUNT_RULES_ADDRESS == address(0)) {
+        if(CNS_ADDRESS == address(0)) {
             return true;
         }
         
         if (accountPermitted(_sender)) {
             if (_target == address(0)) { // contract creation
                 return getCanCreateContracts(_sender);
-            }
+        }
             return true;
         } else {
             return false;
@@ -31,9 +36,9 @@ contract AccountPermissions {
         return true;
     }
 
-    function boot(address _rulesAddress) public {
-        require(_rulesAddress != address(0), "AccountPermissions: specified address is zero");
-        require(ACCOUNT_RULES_ADDRESS == address(0), "AccountPermissions: already booted");
-        ACCOUNT_RULES_ADDRESS = _rulesAddress;
+    function boot(address _cns) public {
+        require(_cns != address(0), "AccountPermissions: specified address is zero");
+        require(CNS_ADDRESS == address(0), "AccountPermissions: already booted");
+        CNS_ADDRESS = _cns;
     }
 }

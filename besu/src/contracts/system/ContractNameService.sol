@@ -64,11 +64,20 @@ contract ContractNameService {
         return registry[indexOf[_name]].addr;
     }
 
+    function isRegistered(address _address) public view virtual returns (string memory) {
+        for (uint256 i = 0; i < registry.length; i++) {
+            if (registry[i].addr == _address) {
+                return registry[i].name;
+            }
+        }
+        return "";
+    }
+
     function getContractHistory() public view virtual returns (ContractInstance[] memory) {
         return registry;
     }
 
-    function isAuthorized(address _account) public view returns(bool) {
+    function isAuthorized(address _account) public pure returns(bool) {
         return true;
     }
 

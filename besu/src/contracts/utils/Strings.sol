@@ -72,4 +72,21 @@ library Strings {
     function toHexString(address addr) internal pure returns (string memory) {
         return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);
     }
+
+    function toBytes32(string memory source) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(source));
+    }
+
+    function toBytes32Array(string[] memory _strArray) internal pure returns (bytes32[] memory) {
+        bytes32[] memory bytes32Array = new bytes32[](_strArray.length);
+        for (uint i = 0; i < _strArray.length; i++) {
+            bytes32Array[i] = keccak256(abi.encodePacked(_strArray[i]));
+        }
+        return bytes32Array;
+    }
+
+    function equals(string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
 }
