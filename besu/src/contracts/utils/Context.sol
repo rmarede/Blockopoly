@@ -45,8 +45,8 @@ contract Context {
         return cns.getContractAddress("AccountRegistry");
     }
 
-    function rolesRegistryAddress() internal view returns (address) {
-        return cns.getContractAddress("RolesRegistry");
+    function roleRegistryAddress() internal view returns (address) {
+        return cns.getContractAddress("RoleRegistry");
     }
 
 }

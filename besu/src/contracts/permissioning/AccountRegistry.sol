@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
-import "../permissioning/RolesRegistry.sol";
 
 contract AccountRegistry is Context {
 

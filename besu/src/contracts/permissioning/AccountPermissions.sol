@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../system/ContractNameService.sol";
 import "./AccountRegistry.sol";
-import "./RolesRegistry.sol";
+import "./RoleRegistry.sol";
 import "./OrganizationRegistry.sol";
 
 // Account Permissions Interface Contract
@@ -19,15 +19,12 @@ contract AccountPermissions {
         }
 
         OrganizationRegistry organizationRegistry = OrganizationRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("OrganizationRegistry"));
-        RolesRegistry rolesRegistry = RolesRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("RolesRegistry"));
+        RoleRegistry roleRegistry = RoleRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("RoleRegistry"));
         AccountRegistry accountRegistry = AccountRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("AccountRegistry"));
 
-        bool accountOK = accountRegistry.isActive(_sender);
-        bool orgOK = organizationRegistry.isActive(accountRegistry.orgOf(_sender));
-        
-        if (accountOK && orgOK) {
+        if (accountRegistry.isActive(_sender) && organizationRegistry.isActive(accountRegistry.orgOf(_sender))) {
             if (_target == address(0)) { // smart contract creation
-                return rolesRegistry.canCreateContracts(accountRegistry.roleOf(_sender));
+                return roleRegistry.canCreateContracts(accountRegistry.roleOf(_sender));
             }
             return true;
         } 

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
-contract RolesRegistry is Context {
+contract RoleRegistry is Context {
 
     modifier onlyMain() {
         require(msg.sender == permissionEndpointsAddress(), "OrganizationRegistry: Permission denied");

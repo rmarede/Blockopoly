@@ -54,7 +54,7 @@ contract NodeRegistry is Context {
         nodeList[indexOf[_enodeId]].active = true;
     }
 
-
+    //  TODO funcoes para alterar IP e port, onlyMain e verificar autorizacao la
 
 
 }
