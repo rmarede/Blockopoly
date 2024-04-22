@@ -17,6 +17,15 @@ contract PermissionEndpoints is Context {
 
     constructor(address _cns) Context(_cns) {}
 
+    // TODO talvez ter isto aqui e no AccountPermissions e NodePermissions apenas chamar este contrato
+    function accountPermitted(address _account) public view returns (bool) {
+        return true;
+    }
+
+    function getCanCreateContracts(address _account) public view returns (bool) {
+        return false;
+    }
+
     // -------------------------------- ORGANIZATION REGISTRY OPERATIONS --------------------------------
 
     function addOrganization(string calldata _orgId, address _admin, RolesRegistry.Permission[] memory _perms) public needsOrganizationConsensus {

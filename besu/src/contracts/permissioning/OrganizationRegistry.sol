@@ -14,18 +14,8 @@ contract OrganizationRegistry is OrganizationMultiSig, Context {
         _;
     }
 
-    modifier orgDoesNotExist(string memory _orgId) {
-        require(indexOf[_orgId] == 0, "OrganizationRegistry: Organization already exists");
-        _;
-    }
-
     modifier onlySelf() {
         require(msg.sender == address(this), "OrganizationRegistry: Permission denied");
-        _;
-    }
-
-    modifier orgExists(string memory _orgId) {
-        require(indexOf[_orgId] != 0, "OrganizationRegistry: Organization does not exist");
         _;
     }
 
@@ -47,18 +37,29 @@ contract OrganizationRegistry is OrganizationMultiSig, Context {
         }
     }
 
-    function addOrg(string calldata _orgId) public onlyMain orgDoesNotExist(_orgId) {
+    function addOrg(string calldata _orgId) public onlyMain {
+        require(!orgExists(_orgId));
         OrganizationDetails memory org = OrganizationDetails(_orgId, true);
         orgList.push(org);
         indexOf[_orgId] = orgList.length - 1;        
     }
 
-    function deactivateOrg(string calldata _orgId) public onlySelf orgExists(_orgId) {
+    function orgExists(string calldata _orgId) public view returns (bool) {
+        return indexOf[_orgId] != 0;
+    }
+
+    function isActive(string calldata _orgId) public view returns (bool) {
+        return orgList[indexOf[_orgId]].active;
+    }
+
+    function deactivateOrg(string calldata _orgId) public onlySelf {
+        require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = false;
     }
 
-    function reactivateOrg(string calldata _orgId) public onlySelf orgExists(_orgId) {
+    function reactivateOrg(string calldata _orgId) public onlySelf {
+        require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = true;
     }

@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import "../system/ContractNameService.sol";
 import "./AccountRegistry.sol";
-import "./NodeRegistry.sol";
 import "./RolesRegistry.sol";
+import "./OrganizationRegistry.sol";
 
 // Account Permissions Interface Contract
 contract AccountPermissions {
@@ -17,24 +17,24 @@ contract AccountPermissions {
         if(CNS_ADDRESS == address(0)) {
             return true;
         }
+
+        OrganizationRegistry organizationRegistry = OrganizationRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("OrganizationRegistry"));
+        RolesRegistry rolesRegistry = RolesRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("RolesRegistry"));
+        AccountRegistry accountRegistry = AccountRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("AccountRegistry"));
+
+        bool accountOK = accountRegistry.isActive(_sender);
+        bool orgOK = organizationRegistry.isActive(accountRegistry.orgOf(_sender));
         
-        if (accountPermitted(_sender)) {
-            if (_target == address(0)) { // contract creation
-                return getCanCreateContracts(_sender);
-        }
+        if (accountOK && orgOK) {
+            if (_target == address(0)) { // smart contract creation
+                return rolesRegistry.canCreateContracts(accountRegistry.roleOf(_sender));
+            }
             return true;
-        } else {
-            return false;
-        }
+        } 
+        
+        return false;
     }
 
-    function accountPermitted(address _account) public view returns (bool) {
-        return true;
-    }
-
-    function getCanCreateContracts(address _account) public view returns (bool) {
-        return true;
-    }
 
     function boot(address _cns) public {
         require(_cns != address(0), "AccountPermissions: specified address is zero");
