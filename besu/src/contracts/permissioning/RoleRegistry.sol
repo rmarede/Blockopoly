@@ -15,7 +15,7 @@ contract RoleRegistry is Context {
         string name;
         string orgId;
         bool isAdmin;
-        uint previlege;
+        uint privilege;
     }
 
     enum Permission {
@@ -36,10 +36,10 @@ contract RoleRegistry is Context {
         }
     }
 
-    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _previlege, Permission[] memory _perms) public onlyMain {
+    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public onlyMain {
         require(!Strings.equals(_roleName, "RoleRegistry: Role name cannot be empty"));
         require(!roleExists(_roleName), "RoleRegistry: Role already exists");
-        Role memory role = Role(_roleName, _orgId, _isAdmin, _previlege);
+        Role memory role = Role(_roleName, _orgId, _isAdmin, _privilege);
         roleList.push(role);
         indexOf[_roleName] = roleList.length - 1;
         for (uint i = 0; i < _perms.length; i++) {
@@ -56,9 +56,9 @@ contract RoleRegistry is Context {
         return roleList[indexOf[_roleName]].isAdmin;
     }
 
-    function previledgeOf(string memory _roleName) public view returns (uint) {
+    function privilegeOf(string memory _roleName) public view returns (uint) {
         require(roleExists(_roleName));
-        return roleList[indexOf[_roleName]].previlege;
+        return roleList[indexOf[_roleName]].privilege;
     }
 
     function canCreateAccounts(string memory _roleName) public view returns (bool) {

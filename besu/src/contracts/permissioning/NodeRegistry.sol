@@ -42,6 +42,14 @@ contract NodeRegistry is Context {
         return nodeList[indexOf[_enodeId]].orgId;
     }
 
+    function ipOf(string memory _enodeId) public view returns (string memory) {
+        return nodeList[indexOf[_enodeId]].ip;
+    }
+
+    function portOf(string memory _enodeId) public view returns (uint16) {
+        return nodeList[indexOf[_enodeId]].port;
+    }
+
     function isActive(string memory _enodeId) public view returns (bool) {
         return nodeList[indexOf[_enodeId]].active;
     }

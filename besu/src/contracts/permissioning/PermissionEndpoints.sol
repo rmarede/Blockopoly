@@ -38,7 +38,7 @@ contract PermissionEndpoints is Context {
     // ----------------------------------- ROLES REGISTRY OPERATIONS -----------------------------------
 
 
-    function addRole(string calldata _roleName, string memory _orgId, bool _isAdmin, uint _previlege, RoleRegistry.Permission[] memory _perms) public {
+    function addRole(string calldata _roleName, string memory _orgId, bool _isAdmin, uint _privilege, RoleRegistry.Permission[] memory _perms) public {
         AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
         RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
 
@@ -47,9 +47,13 @@ contract PermissionEndpoints is Context {
 
         require(Strings.equals(senderOrg, _orgId), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to create role");
-        require(_previlege > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Role previlege must be greater than sender's role previlege");
+        require(_privilege > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Role privilege must be greater than sender's role privilege");
 
-        roleRegistry.addRole(_roleName, _orgId, _isAdmin, _previlege, _perms);
+        for (uint i = 0; i < _perms.length; i++) {
+            require(roleRegistry.hasPermission(senderRole, _perms[i]), "RoleRegistry: Sender cannot grant permission that does not have");
+        }
+
+        roleRegistry.addRole(_roleName, _orgId, _isAdmin, _privilege, _perms);
     }
 
 
@@ -64,7 +68,7 @@ contract PermissionEndpoints is Context {
 
         require(Strings.equals(senderOrg, _orgId), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to create accounts");
-        require(roleRegistry.previledgeOf(_role) > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Sender cannot create accounts with this role");
+        require(roleRegistry.privilegeOf(_role) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot create accounts with this role");
 
         accountRegistry.addAccount(_account, _orgId, _role);
     }
@@ -79,8 +83,8 @@ contract PermissionEndpoints is Context {
 
         require(Strings.equals(senderOrg, accountRegistry.orgOf(_account)), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to change account role"); // TODO canCreateAccounts -> canChangeAccounts
-        require(roleRegistry.previledgeOf(accRole) > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Sender cannot change account with greater previledge");
-        require(roleRegistry.previledgeOf(_role) > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Sender cannot change account to a role with greater previledge");
+        require(roleRegistry.privilegeOf(accRole) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot change account with greater privilege");
+        require(roleRegistry.privilegeOf(_role) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot change account to a role with greater privilege");
 
         accountRegistry.changeRoleOf(_account, _role);
     }
@@ -95,7 +99,7 @@ contract PermissionEndpoints is Context {
 
         require(Strings.equals(senderOrg, accountRegistry.orgOf(_account)), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to deactivate accounts");
-        require(roleRegistry.previledgeOf(accRole) > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Sender cannot deactivate account with greater previledge");
+        require(roleRegistry.privilegeOf(accRole) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot deactivate account with greater privilege");
 
         accountRegistry.deactivateAccount(_account);
     }
@@ -110,7 +114,7 @@ contract PermissionEndpoints is Context {
 
         require(Strings.equals(senderOrg, accountRegistry.orgOf(_account)), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to activate accounts");
-        require(roleRegistry.previledgeOf(accRole) > roleRegistry.previledgeOf(senderRole), "RoleRegistry: Sender cannot activate account with greater previledge");
+        require(roleRegistry.privilegeOf(accRole) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot activate account with greater privilege");
 
         accountRegistry.activateAccount(_account);
     }
