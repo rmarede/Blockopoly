@@ -20,7 +20,18 @@ describe("MortgageLoan", function () {
         const Wallet = await ethers.getContractFactory("Wallet");
         const wallet = await Wallet.deploy(cns.target);
         
+        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
+        const accountRegistry = await AccountRegistry.deploy(cns.target);
+        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
+        const roleRegistry = await RoleRegistry.deploy(cns.target);
+        
         await cns.setContractAddress("Wallet", wallet.target);
+        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
+        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
+        await cns.setContractAddress("PermissionEndpoints", acc1.address);
+
+        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
 
         const terms = {
             lender: acc1.address,

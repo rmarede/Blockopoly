@@ -18,11 +18,22 @@ describe("PaymentSplitter", function () {
         const { cns } = await loadFixture(deployCNSFixture);
         const Wallet = await ethers.getContractFactory("Wallet");
         const wallet = await Wallet.deploy(cns.target);
-
+        
+        const PaymentSplitter = await ethers.getContractFactory("PaymentSplitter");
+        const paymentSplitter = await PaymentSplitter.deploy([acc1.address, acc2.address, acc3.address], [2, 1, 1], cns.target);
+        
+        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
+        const accountRegistry = await AccountRegistry.deploy(cns.target);
+        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
+        const roleRegistry = await RoleRegistry.deploy(cns.target);
+        
         await cns.setContractAddress("Wallet", wallet.target);
+        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
+        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
+        await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
-        const contract = await ethers.getContractFactory("PaymentSplitter");
-        const paymentSplitter = await contract.deploy([acc1.address, acc2.address, acc3.address], [2, 1, 1], cns.target);
+        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
     
         return {paymentSplitter, wallet };
     }
@@ -43,7 +54,7 @@ describe("PaymentSplitter", function () {
             const { paymentSplitter, wallet } = await loadFixture(deployPaymentSplitterFixture);
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
             
-            await expect(wallet.connect(acc4).mint(acc4.address, 1000)).not.to.be.reverted;
+            await expect(wallet.connect(acc1).mint(acc4.address, 1000)).not.to.be.reverted;
             await expect(wallet.connect(acc4).approve(paymentSplitter.target, 1000)).not.to.be.reverted;
             await expect(paymentSplitter.connect(acc4).payFrom(acc4.address, 1000)).not.to.be.reverted;
             expect(await wallet.balanceOf(paymentSplitter.target)).to.equal(0);

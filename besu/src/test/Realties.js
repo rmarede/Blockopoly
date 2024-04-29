@@ -35,8 +35,8 @@ describe("Realties", function () {
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
-        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
+        await expect(roleRegistry.connect(acc1).addRole("admin_landregi", "landregi", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "admin_landregi")).not.to.be.reverted; 
 
         return {realties, accountRegistry, roleRegistry};
     }
@@ -48,10 +48,10 @@ describe("Realties", function () {
 
             const {realties, accountRegistry, roleRegistry} = await loadFixture(deployRealtiesFixture);
 
-            expect(await accountRegistry.orgOf(acc1.address)).to.equal("bank");
-            expect(await accountRegistry.roleOf(acc1.address)).to.equal("admin_bank");
+            expect(await accountRegistry.orgOf(acc1.address)).to.equal("landregi");
+            expect(await accountRegistry.roleOf(acc1.address)).to.equal("admin_landregi");
             
-            expect(await roleRegistry.canMintRealties("admin_bank")).to.be.true;
+            expect(await roleRegistry.canMintRealties("admin_landregi")).to.be.true;
 
         });
     });
@@ -91,6 +91,7 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
+            await expect(realties.connect(acc2).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
             await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
             await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
             await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;

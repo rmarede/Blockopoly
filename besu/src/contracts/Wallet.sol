@@ -21,7 +21,7 @@ contract Wallet is IERC20, Context {
 
     function mint(address to, uint amount) public virtual returns (bool) {
         require(to != address(0) && amount > 0, "Wallet: invalid input");
-        //require(IRoleRegistry(roleRegistryAddress()).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
+        require(IRoleRegistry(roleRegistryAddress()).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
 
         balances[to] += amount;
         return true;
