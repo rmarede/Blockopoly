@@ -29,14 +29,27 @@ describe("SaleAgreement", function () {
         });
         const realties = await Realties.deploy(cns.target);
 
-        await realties.mint("foo", "faa", [acc2.address], [10000]);
+        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
+        const accountRegistry = await AccountRegistry.deploy(cns.target);
+
+        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
+        const roleRegistry = await RoleRegistry.deploy(cns.target);
+
+        await cns.setContractAddress("Wallet", wallet.target);
+        await cns.setContractAddress("Realties", realties.target);
+        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
+        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
+        await cns.setContractAddress("PermissionEndpoints", acc1.address);
+
+        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
+        await expect(realties.mint("foo", "faa", [acc2.address], [10000])).not.to.be.reverted;
 
         const ownershipAbi = getAbi.getOwnershipAbi(); 
         const assetAddr = await realties.registry(0);
         const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
-        cns.setContractAddress("Wallet", wallet.target);
-        cns.setContractAddress("Realties", realties.target);
+        
 
         const contract = await ethers.getContractFactory("SaleAgreement");
         // address _cns, address _realty, address _buyer, address _seller, uint _price, uint _share, address _realtor, uint _comission
