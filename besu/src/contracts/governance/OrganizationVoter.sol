@@ -3,21 +3,25 @@ pragma solidity ^0.8.0;
 
 import "./Multisignable.sol";
 import "../utils/Strings.sol";
+import "../utils/Context.sol";
 
-contract OrganizationMultiSig is Multisignable {
+import "../permissioning/AccountRegistry.sol";
+import "../permissioning/RoleRegistry.sol";
+
+contract OrganizationVoter is Multisignable, Context {
 
     modifier transactionExists(uint transactionId) {
         require(transactions[transactionId].destination != address(0));
         _;
     }
 
-    modifier notConfirmed(uint transactionId, string memory participant) {
-        require(!confirmations[transactionId][participant]);
+    modifier notExecuted(uint transactionId) {
+        require(!transactions[transactionId].executed);
         _;
     }
 
-    modifier notExecuted(uint transactionId) {
-        require(!transactions[transactionId].executed);
+    modifier onlySelf() {
+        require(msg.sender == address(this), "OrganizationVoter: Permission denied");
         _;
     }
 
@@ -34,17 +38,19 @@ contract OrganizationMultiSig is Multisignable {
     mapping (uint => mapping (string => bool)) internal confirmations;
     uint public transactionCount;
 
-    constructor(string[] memory _participants, Policy _policy) Multisignable(_policy) {
-        require(_participants.length > 0, "OrganizationMultiSig: No participants specified");
+    constructor(address _cns, string[] memory _participants, Policy _policy) Multisignable(_policy) Context(_cns) {
+        require(_participants.length > 0, "OrganizationVoter: No participants specified");
         policy = _policy;
         for (uint i=0; i<_participants.length; i++) {
-            require(!Strings.equals(_participants[i], ""), "OrganizationMultiSig: Invalid input");
+            require(!Strings.equals(_participants[i], ""), "OrganizationVoter: Invalid input");
             participants.push(_participants[i]);
         }
     }
 
-    function submitTransaction(string memory _participant, address _destination, uint _value, bytes memory _data) public virtual returns (uint transactionId) {
-        require(_isMultisignable(_destination), "OrganizationMultiSig: Target is not multisignable");
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual returns (uint transactionId) {
+        require(_isMultisignable(_destination), "OrganizationVoter: Target is not multisignable");
+        require(RoleRegistry(roleRegistryAddress()).isAdmin(AccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
+
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             destination: _destination,
@@ -53,16 +59,17 @@ contract OrganizationMultiSig is Multisignable {
             executed: false
         });
         transactionCount += 1;
-        confirmTransaction(transactionId, _participant);
+        confirmTransaction(transactionId);
     }
 
-    function confirmTransaction(uint _transactionId, string memory _participant) public 
+    function confirmTransaction(uint _transactionId) public 
         transactionExists(_transactionId) 
-        notConfirmed(_transactionId, _participant) 
     {
-        confirmations[_transactionId][_participant] = true;
+        AccountRegistry accounts = AccountRegistry(accountRegistryAddress());
+        require(RoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
+        confirmations[_transactionId][accounts.orgOf(msg.sender)] = true;
         executeTransaction(_transactionId);
-    }
+    }   
 
     function executeTransaction(uint _transactionId) public 
         notExecuted(_transactionId)
@@ -71,7 +78,7 @@ contract OrganizationMultiSig is Multisignable {
             Transaction storage txn = transactions[_transactionId];
             (bool success, ) = txn.destination.call{value: txn.value}(txn.data);
             txn.executed = true;
-            require(success, "OrganizationMultiSig: Transaction failed");
+            require(success, "OrganizationVoter: Transaction failed");
         }
     }
 
@@ -97,16 +104,14 @@ contract OrganizationMultiSig is Multisignable {
         return participants;
     }
 
-    function addParticipant(string memory _participant) public {
-        require(msg.sender == address(this), "OrganizationMultiSig: Unauthorized");
-        require(!Strings.equals(_participant, ""), "OrganizationMultiSig: Invalid input");
-        require(!participantExists(_participant), "OrganizationMultiSig: Participant already exists");
+    function addParticipant(string memory _participant) public onlySelf {
+        require(!Strings.equals(_participant, ""), "OrganizationVoter: Invalid input");
+        require(!participantExists(_participant), "OrganizationVoter: Participant already exists");
         participants.push(_participant);
     }
 
-    function removeParticipant(string memory _participant) public {
-        require(msg.sender == address(this), "OrganizationMultiSig: Unauthorized");
-        require(!Strings.equals(_participant, ""), "OrganizationMultiSig: Invalid input");
+    function removeParticipant(string memory _participant) public onlySelf {
+        require(!Strings.equals(_participant, ""), "OrganizationVoter: Invalid input");
         for (uint i=0; i<participants.length; i++) {
             if (Strings.equals(participants[i], _participant)) {
                 participants[i] = participants[participants.length - 1];

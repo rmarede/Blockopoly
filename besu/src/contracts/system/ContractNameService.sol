@@ -8,11 +8,11 @@ contract ContractNameService {
     struct ContractInstance {
         string name;
         address addr;
-        uint256 version;
+        uint version;
     }
 
     ContractInstance[] internal registry;
-    mapping(string => uint256) internal indexOf;
+    mapping(string => uint) internal indexOf;
 
     constructor(string[] memory _names, address[] memory _addresses) {
         require(_names.length == _addresses.length, "Names and addresses must be of equal length.");
@@ -23,7 +23,7 @@ contract ContractNameService {
             version: 0
         }));
 
-        for (uint256 i = 0; i < _names.length; i++) {
+        for (uint i = 0; i < _names.length; i++) {
             setContractAddress(_names[i], _addresses[i]);
         }
     }
@@ -35,7 +35,7 @@ contract ContractNameService {
         ContractInstance memory instance;
 
         if (indexOf[_name] > 0) {
-            uint256 index = indexOf[_name];
+            uint index = indexOf[_name];
             ContractInstance memory old = registry[index];
             instance = ContractInstance({
                 name: _name,
@@ -54,7 +54,7 @@ contract ContractNameService {
         indexOf[_name] = registry.length - 1;
     }
 
-    function getContractVersion(string calldata _name) public view virtual returns (uint256) {
+    function getContractVersion(string calldata _name) public view virtual returns (uint) {
         require(indexOf[_name] > 0, "Contract not found in registry.");
         return registry[indexOf[_name]].version;
     }
@@ -65,7 +65,7 @@ contract ContractNameService {
     }
 
     function isRegistered(address _address) public view virtual returns (string memory) {
-        for (uint256 i = 0; i < registry.length; i++) {
+        for (uint i = 0; i < registry.length; i++) {
             if (registry[i].addr == _address) {
                 return registry[i].name;
             }

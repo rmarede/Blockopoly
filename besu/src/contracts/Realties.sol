@@ -18,7 +18,7 @@ contract Realties {
     mapping(address => Realty) public realties;
     mapping(address => address[]) public realtiesOf;
 
-    function mint(string memory name, string memory description, address[] memory _owners, uint[] memory _shares) public returns (address) {
+    function mint(string memory _name, string memory _description, address[] memory _owners, uint[] memory _shares) public returns (address) {
         // TODO check if the caller is the from the appropriate organization
 
         Ownership newOwnershipContract = new Ownership(_owners, _shares);
@@ -26,8 +26,8 @@ contract Realties {
 
         registry.push(addr);
         realties[addr] = Realty({
-            name: name,
-            description: description,
+            name: _name,
+            description: _description,
             ownership: addr
         });
 

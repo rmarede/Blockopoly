@@ -39,6 +39,11 @@ contract WeightedMultiSig is Multisignable {
         _;
     }
 
+    modifier onlySelf() {
+        require(msg.sender == address(this), "WeightedMultiSig: Permission denied");
+        _;
+    }
+
     address[] public participants; // TODO sera que queremos isto visivel para todos?
     mapping (address => uint) internal shares; // TODO mudar nome para weight ou algo do genero
     uint totalShares;
@@ -62,8 +67,7 @@ contract WeightedMultiSig is Multisignable {
         return participants;
     }
 
-    function changePolicy(string memory _policy) public {
-        require(msg.sender == address(this), "WeightedMultiSig: Permission denied");
+    function changePolicy(string memory _policy) public onlySelf {
         if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("MAJORITY"))) {
             policy = Policy.MAJORITY;
         } else if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("UNANIMOUS"))) {
@@ -73,16 +77,16 @@ contract WeightedMultiSig is Multisignable {
         }
     }
 
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual isOwner(msg.sender) returns (uint transactionId) {
-        transactionId = transactionCount;
-        transactions[transactionId] = Transaction({
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual isOwner(msg.sender) returns (uint _transactionId) {
+        _transactionId = transactionCount;
+        transactions[_transactionId] = Transaction({
             destination: _destination,
             value: _value,
             data: _data,
             executed: false
         });
         transactionCount += 1;
-        confirmTransaction(transactionId);
+        confirmTransaction(_transactionId);
     }
 
     function confirmTransaction(uint _transactionId) public 
@@ -107,11 +111,11 @@ contract WeightedMultiSig is Multisignable {
         }
     }
 
-    function isConfirmed(uint _transactionId) public view returns (bool) {
+    function isConfirmed(uint _transactionId) public view virtual returns (bool) {
         // TODO Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
-        if (policy == Policy.MAJORITY) {
+        if (policy == Policy.MAJORITY || policy == Policy.MAJORITY_OR_ADMIN) {
             return getConfirmationCount(_transactionId) > totalShares / 2;
-        } else if (policy == Policy.UNANIMOUS) {
+        } else if (policy == Policy.UNANIMOUS || policy == Policy.UNANIMOUS_OR_ADMIN) {
             for (uint i=0; i<participants.length; i++)
                 if (!confirmations[_transactionId][participants[i]])
                     return false;
@@ -119,10 +123,10 @@ contract WeightedMultiSig is Multisignable {
         }
     }
 
-    function getConfirmationCount(uint _transactionId) public view returns (uint count) {
+    function getConfirmationCount(uint _transactionId) public view returns (uint _count) {
         for (uint i=0; i<participants.length; i++)
             if (confirmations[_transactionId][participants[i]])
-                count += shares[participants[i]];
+                _count += shares[participants[i]];
     }
 
     function shareOf(address _owner) public view returns (uint) {
@@ -151,23 +155,23 @@ contract WeightedMultiSig is Multisignable {
         }
     }
 
-    function addShares(address to, uint amount) public virtual {
+    function addShares(address _to, uint _amount) public virtual {
         require(_canAddShares(msg.sender), "WeightedMultiSig: Permission denied: addShares");
-        if (shares[to] == 0) {  
-            participants.push(to);
+        if (shares[_to] == 0) {  
+            participants.push(_to);
         }
-        shares[to] = amount;
-        totalShares += amount;
+        shares[_to] = _amount;
+        totalShares += _amount;
     }
 
-    function removeShares(address from, uint amount) public virtual {
+    function removeShares(address _from, uint _amount) public virtual {
         require(_canRemoveShares(msg.sender), "WeightedMultiSig: Permission denied: removeShares");
-        require(shares[from] > amount, "WeightedMultiSig: Not enough shares");
-        shares[from] -= amount;
-        totalShares -= amount;
-        if (shares[from] == 0) { 
+        require(shares[_from] > _amount, "WeightedMultiSig: Not enough shares");
+        shares[_from] -= _amount;
+        totalShares -= _amount;
+        if (shares[_from] == 0) { 
             for (uint i = 0; i < participants.length; i++) {
-                if (participants[i] == from) {
+                if (participants[i] == _from) {
                     participants[i] = participants[participants.length - 1];
                     participants.pop();
                     break;

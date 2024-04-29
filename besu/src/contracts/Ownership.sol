@@ -11,6 +11,8 @@ contract Ownership is WeightedMultiSig {
     mapping(address => bool) private blacklist; // TODO ou é melhor uma whitelist? 
     address private REALTIES_ADDRESS;
 
+    address public admin;
+
     constructor(address[] memory _owners, uint[] memory _shares) 
         WeightedMultiSig(_owners, _shares, Policy.MAJORITY) 
     {
@@ -34,8 +36,13 @@ contract Ownership is WeightedMultiSig {
         approvals[msg.sender] = _addr;
     }
 
+    function setAdmin(address _admin) public onlySelf {
+        admin = _admin;
+    }
+
     function transferShares(address _from, address _to, uint _amount) public override {
         super.transferShares(_from, _to, _amount);
+        admin = address(0);
         if (shares[_from] == 0) {
             Realties(REALTIES_ADDRESS).removeOwnership(address(this), _from);
         }
@@ -47,6 +54,14 @@ contract Ownership is WeightedMultiSig {
     function submitTransaction(address _destination, uint _value, bytes memory _data) public override returns (uint transactionId) {
         require(!blacklist[_destination], "Blacklisted address");
         return super.submitTransaction(_destination, _value, _data);
+    }
+
+    function isConfirmed(uint _transactionId) public view override returns (bool) {
+        // TODO Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
+        if (policy == Policy.MAJORITY_OR_ADMIN || policy == Policy.UNANIMOUS_OR_ADMIN) {
+            return confirmations[_transactionId][admin];
+        }        
+        return super.isConfirmed(_transactionId);
     }
 
     function _canTransferShares(address _from, address _operator) internal override view returns (bool) {

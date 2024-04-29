@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../governance/OrganizationMultiSig.sol";
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
-contract OrganizationRegistry is OrganizationMultiSig, Context {
+contract OrganizationRegistry is Context {
 
     bool private networkBoot = false;
 
@@ -14,20 +13,21 @@ contract OrganizationRegistry is OrganizationMultiSig, Context {
         _;
     }
 
-    modifier onlySelf() {
-        require(msg.sender == address(this), "OrganizationRegistry: Permission denied");
+    modifier onlyOrgVoter() {
+        require(msg.sender == organizationVoterAddress(), "OrganizationRegistry: Permission denied");
         _;
     }
 
     struct OrganizationDetails {
         string orgId;
         bool active;
+        // uint maxNodeNumber;
     }
 
     OrganizationDetails[] private orgList;
     mapping(string => uint) private indexOf;
 
-    constructor(address _cns, string[] memory _organizations) OrganizationMultiSig(_organizations, Policy.MAJORITY) Context(_cns) {
+    constructor(address _cns, string[] memory _organizations) Context(_cns) {
         for (uint i = 0; i < _organizations.length; i++) {
             require(!Strings.equals(_organizations[i], ""));
             require(indexOf[_organizations[i]] == 0, "OrganizationRegistry: Organization duplicated");
@@ -52,13 +52,13 @@ contract OrganizationRegistry is OrganizationMultiSig, Context {
         return orgList[indexOf[_orgId]].active;
     }
 
-    function deactivateOrg(string calldata _orgId) public onlySelf {
+    function deactivateOrg(string calldata _orgId) public onlyOrgVoter {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = false;
     }
 
-    function reactivateOrg(string calldata _orgId) public onlySelf {
+    function reactivateOrg(string calldata _orgId) public onlyOrgVoter {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = true;

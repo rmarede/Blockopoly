@@ -11,7 +11,7 @@ import "./NodeRegistry.sol";
 contract PermissionEndpoints is Context {
 
     modifier needsOrganizationConsensus() {
-        require(msg.sender == organizationRegistryAddress(), "PermissionEndpoints: Permission denied");
+        require(msg.sender == organizationVoterAddress(), "PermissionEndpoints: Permission denied");
         _;
     }
 
