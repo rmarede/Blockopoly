@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../interface/system/IContractNameService.sol";
+
 // REGISTRY DESIGN PATTERN
 // alt: ERC-1820
-contract ContractNameService {
-
-    struct ContractInstance {
-        string name;
-        address addr;
-        uint version;
-    }
+contract ContractNameService is IContractNameService {
 
     ContractInstance[] internal registry;
     mapping(string => uint) internal indexOf;
 
     constructor(string[] memory _names, address[] memory _addresses) {
-        require(_names.length == _addresses.length, "Names and addresses must be of equal length.");
+        require(_names.length == _addresses.length, "ContractNameService: Names and addresses must be of equal length.");
 
         registry.push(ContractInstance({
             name: "ContractNameService",
@@ -28,10 +24,10 @@ contract ContractNameService {
         }
     }
 
-    function setContractAddress(string memory _name, address _address) public virtual {
-        require(bytes(_name).length != 0, "Contract name must not be empty.");
-        require(_address != address(0), "Contract address must not be zero.");
-        require(isAuthorized(msg.sender), "Not authorized to update contract registry.");
+    function setContractAddress(string memory _name, address _address) public override {
+        require(bytes(_name).length != 0, "ContractNameService: Contract name must not be empty.");
+        require(_address != address(0), "ContractNameService: Contract address must not be zero.");
+        require(isAuthorized(msg.sender), "ContractNameService: Not authorized to update contract registry.");
         ContractInstance memory instance;
 
         if (indexOf[_name] > 0) {
@@ -54,17 +50,17 @@ contract ContractNameService {
         indexOf[_name] = registry.length - 1;
     }
 
-    function getContractVersion(string calldata _name) public view virtual returns (uint) {
-        require(indexOf[_name] > 0, "Contract not found in registry.");
+    function getContractVersion(string calldata _name) public view override returns (uint) {
+        require(indexOf[_name] > 0, "ContractNameService: Contract not found in registry.");
         return registry[indexOf[_name]].version;
     }
 
-    function getContractAddress(string calldata _name) public view virtual returns (address) {
-        require(indexOf[_name] > 0, "Contract not found in registry.");
+    function getContractAddress(string calldata _name) public view override returns (address) {
+        require(indexOf[_name] > 0, "ContractNameService: Contract not found in registry.");
         return registry[indexOf[_name]].addr;
     }
 
-    function isRegistered(address _address) public view virtual returns (string memory) {
+    function isRegistered(address _address) public view override returns (string memory) {
         for (uint i = 0; i < registry.length; i++) {
             if (registry[i].addr == _address) {
                 return registry[i].name;
@@ -73,7 +69,7 @@ contract ContractNameService {
         return "";
     }
 
-    function getContractHistory() public view virtual returns (ContractInstance[] memory) {
+    function getContractHistory() public view override returns (ContractInstance[] memory) {
         return registry;
     }
 

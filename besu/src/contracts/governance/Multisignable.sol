@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Multisignable {
+import "../interface/governance/IMultisignable.sol";
 
-    enum Policy { MAJORITY, UNANIMOUS, MAJORITY_OR_ADMIN, UNANIMOUS_OR_ADMIN } 
+contract Multisignable is IMultisignable {
 
     Policy public policy;
 
@@ -11,7 +11,7 @@ contract Multisignable {
         policy = _policy;
     }
 
-    function getMultisigPolicy() public view returns (Policy) {
+    function getMultisigPolicy() public view override returns (Policy) {
         return policy;
     }
 

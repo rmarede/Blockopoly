@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "../utils/Context.sol";
-import "../Wallet.sol";
+import "../interface/IERC20.sol";
+
 
 contract PaymentSplitter is Context {
 
@@ -39,7 +40,7 @@ contract PaymentSplitter is Context {
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
             uint payment = _amount * sharesOf(payee) / totalShares; 
-            walletContract().transferFrom(msg.sender, payee, payment);
+            IERC20(walletContractAddress()).transferFrom(msg.sender, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }
@@ -49,7 +50,7 @@ contract PaymentSplitter is Context {
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
             uint payment = _amount * sharesOf(payee) / totalShares; 
-            walletContract().transferFrom(_from, payee, payment);
+            IERC20(walletContractAddress()).transferFrom(_from, payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }

@@ -14,32 +14,20 @@ describe("SaleAgreement", function () {
         const cns = await contract.deploy([],[]);
         return { cns };
     }
-
-    async function deployWalletFixture() {
-        const contract = await ethers.getContractFactory("Wallet");
-        const wallet = await contract.deploy();
-        return { wallet };
-    }
-
-    async function deployRealtiesFixture() {    
+    
+    async function deploySaleAgreementFixture() {
+        const [acc1, acc2, acc3] = await ethers.getSigners();
+        const { cns } = await loadFixture(deployCNSFixture);
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy(cns.target);
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
-
         const Realties = await ethers.getContractFactory("Realties", {
             libraries: {
                 Arraysz: arrays.target
             }
         });
-        const realties = await Realties.deploy();
-        return {realties};
-    }
-
-    async function deploySaleAgreementFixture() {
-        const [acc1, acc2, acc3] = await ethers.getSigners();
-
-        const { cns } = await loadFixture(deployCNSFixture);
-        const { wallet } = await loadFixture(deployWalletFixture);
-        const { realties } = await loadFixture(deployRealtiesFixture);
+        const realties = await Realties.deploy(cns.target);
 
         await realties.mint("foo", "faa", [acc2.address], [10000]);
 

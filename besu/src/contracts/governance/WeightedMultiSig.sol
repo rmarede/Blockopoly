@@ -121,6 +121,7 @@ contract WeightedMultiSig is Multisignable {
                     return false;
             return true;
         }
+        return false;
     }
 
     function getConfirmationCount(uint _transactionId) public view returns (uint _count) {

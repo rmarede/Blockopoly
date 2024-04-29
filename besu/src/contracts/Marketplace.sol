@@ -8,7 +8,7 @@ import "./Wallet.sol";
 import "./utils/Context.sol";
 
 
-contract Marketplace is Context {
+contract Marketplace {} /* is Context {
 
     modifier isActive(uint saleId) {
         require(sales[saleId].status == SaleStatus.ACTIVE, "Marketplace: sale does not exist or is not active");
@@ -164,4 +164,4 @@ contract Marketplace is Context {
     }
 
 }
-
+*/

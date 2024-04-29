@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "./utils/Context.sol";
 import "./governance/WeightedMultiSig.sol";
 import "./Ownership.sol";
+import "./interface/IERC20.sol"; 
 
 // TODO opcionais: fiador
 
@@ -69,13 +70,13 @@ contract MortgageLoan is WeightedMultiSig, Context {
     }
 
     function init() public onlyLender tbd {
-        walletContract().transferFrom(details.lender, address(this), details.principal);
+        IERC20(walletContractAddress()).transferFrom(details.lender, address(this), details.principal);
         state = State.PENDING;
     }
 
     function enroll() public onlyBorrower pending {
-        require(walletContract().balanceOf(address(this)) >= details.principal, "MortgageLoan: Principal not fully funded");
-        walletContract().transferFrom(details.borrower, address(this), details.downPayment);
+        require(IERC20(walletContractAddress()).balanceOf(address(this)) >= details.principal, "MortgageLoan: Principal not fully funded");
+        IERC20(walletContractAddress()).transferFrom(details.borrower, address(this), details.downPayment);
         super.addShares(details.borrower, details.downPayment);
         state = State.ACTIVE;
     }
@@ -97,14 +98,14 @@ contract MortgageLoan is WeightedMultiSig, Context {
 
     function amortize() public onlyBorrower active {
         uint _amortization = amortization();
-        uint _remaining = walletContract().balanceOf(address(this));
+        uint _remaining = IERC20(walletContractAddress()).balanceOf(address(this));
         if (_remaining > _amortization) { // TODO not really necessary, mas ja agr fica bem
-            walletContract().transfer(details.lender, _amortization);
+            IERC20(walletContractAddress()).transfer(details.lender, _amortization);
         } else if (_remaining > 0) {
-            walletContract().transfer(details.lender, _remaining);
-            walletContract().transferFrom(details.borrower, details.lender, _amortization - _remaining);
+            IERC20(walletContractAddress()).transfer(details.lender, _remaining);
+            IERC20(walletContractAddress()).transferFrom(details.borrower, details.lender, _amortization - _remaining);
         } else {
-            walletContract().transferFrom(details.borrower, details.lender, _amortization);
+            IERC20(walletContractAddress()).transferFrom(details.borrower, details.lender, _amortization);
         }
         paymentCounter++;
         _balanceEquity();

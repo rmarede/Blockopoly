@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "./utils/Context.sol";
-import "./Wallet.sol";
 import "./Ownership.sol";
+import "./interface/IERC20.sol";
 
 
 contract SaleAgreement is Context {
@@ -51,7 +51,7 @@ contract SaleAgreement is Context {
     function sign() public onlyParties unsigned {
         if (msg.sender == buyer) {
             require(!buyerSignature, "SaleAgreement: this party has already signed");
-            walletContract().transferFrom(buyer, address(this), price);
+            IERC20(walletContractAddress()).transferFrom(buyer, address(this), price);
             buyerSignature = true;
         } else {
             require(buyerSignature, "SaleAgreement: buyer has to sign first");
@@ -63,13 +63,13 @@ contract SaleAgreement is Context {
     function transfer() private signed {
         Ownership(realty).transferShares(seller, buyer, share);
         uint comm = price * comission / 10000;
-        walletContract().transfer(realtor, comm);
-        walletContract().transfer(seller, price - comm);
+        IERC20(walletContractAddress()).transfer(realtor, comm);
+        IERC20(walletContractAddress()).transfer(seller, price - comm);
     }
 
     function widthdraw() public unsigned onlyParties {
         require(buyerSignature, "SaleAgreement: nothing to widthdraw");
-        walletContract().transfer(buyer, price);
+        IERC20(walletContractAddress()).transfer(buyer, price);
         buyerSignature = false;
     }
 

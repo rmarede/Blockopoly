@@ -5,7 +5,14 @@ const getAbi = require('../scripts/utils/get-abi');
 
 describe("Realties", function () {
 
-    async function deployRealtiesFixture() {    
+    async function deployCNSFixture() {
+        const contract = await ethers.getContractFactory("ContractNameService");
+        const cns = await contract.deploy([],[]);
+        return { cns };
+    }
+
+    async function deployRealtiesFixture() {  
+        const { cns } = await loadFixture(deployCNSFixture);  
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
 
@@ -14,11 +21,9 @@ describe("Realties", function () {
                 Arraysz: arrays.target
             }
         });
-        const realties = await Realties.deploy();
+        const realties = await Realties.deploy(cns.target);
         return {realties};
     }
-
-
 
     describe("Mint Asset", function () {
         it("Should mint asset's Ownership contract", async function () {

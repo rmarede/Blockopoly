@@ -2,20 +2,27 @@
 pragma solidity ^0.8.0;
 
 import "./interface/IERC20.sol";
+import "./utils/Context.sol";
+import "./interface/permissioning/IRoleRegistry.sol";
+import "./interface/permissioning/IAccountRegistry.sol";
 
 // Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
 
-contract Wallet is IERC20 {
+contract Wallet is IERC20, Context {
 
     mapping(address => uint) private balances;
     mapping(address => mapping(address => uint)) private allowances;
+
+    constructor(address _cns) Context(_cns) {}
 
     function decimals() public view virtual override returns (uint8) {
         return 2;
     }
 
     function mint(address to, uint amount) public virtual returns (bool) {
-        require(to != address(0), "Wallet: invalid input");
+        require(to != address(0) && amount > 0, "Wallet: invalid input");
+        //require(IRoleRegistry(roleRegistryAddress()).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
+
         balances[to] += amount;
         return true;
     }

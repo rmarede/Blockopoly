@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../interface/permissioning/IRoleRegistry.sol";
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
-contract RoleRegistry is Context {
+contract RoleRegistry is IRoleRegistry, Context {
 
     modifier onlyMain() {
         require(msg.sender == permissionEndpointsAddress(), "OrganizationRegistry: Permission denied");
@@ -18,13 +19,6 @@ contract RoleRegistry is Context {
         uint privilege;
     }
 
-    enum Permission {
-        CAN_CREATE_ACCOUNTS,
-        CAN_CREATE_ROLES,
-        CAN_CREATE_NODES,
-        CAN_CREATE_CONTRACTS
-    }
-
     Role[] private roleList;
     mapping(string => uint) private indexOf;
     mapping(string => mapping(Permission => bool)) rolePermission;
@@ -36,7 +30,7 @@ contract RoleRegistry is Context {
         }
     }
 
-    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public onlyMain {
+    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public override onlyMain {
         require(!Strings.equals(_roleName, "RoleRegistry: Role name cannot be empty"));
         require(!roleExists(_roleName), "RoleRegistry: Role already exists");
         Role memory role = Role(_roleName, _orgId, _isAdmin, _privilege);
@@ -47,37 +41,53 @@ contract RoleRegistry is Context {
         }
     }
 
-    function roleExists(string memory _roleName) public view returns (bool) {
+    function roleExists(string memory _roleName) public view override returns (bool) {
         return indexOf[_roleName] != 0;
     }
 
-    function isAdmin(string memory _roleName) public view returns (bool) {
+    function isAdmin(string memory _roleName) public view override returns (bool) {
         require(roleExists(_roleName));
         return roleList[indexOf[_roleName]].isAdmin;
     }
 
-    function privilegeOf(string memory _roleName) public view returns (uint) {
+    function privilegeOf(string memory _roleName) public view override returns (uint) {
         require(roleExists(_roleName));
         return roleList[indexOf[_roleName]].privilege;
     }
 
-    function canCreateAccounts(string memory _roleName) public view returns (bool) {
+    function canCreateAccounts(string memory _roleName) public view override returns (bool) {
         return hasPermission(_roleName, Permission.CAN_CREATE_ACCOUNTS) || isAdmin(_roleName);
     }
 
-    function canCreateRoles(string memory _roleName) public view returns (bool) {
+    function canCreateRoles(string memory _roleName) public view override returns (bool) {
         return hasPermission(_roleName, Permission.CAN_CREATE_ROLES) || isAdmin(_roleName);  
     }
 
-    function canCreateNodes(string memory _roleName) public view returns (bool) {
+    function canCreateNodes(string memory _roleName) public view override returns (bool) {
         return hasPermission(_roleName, Permission.CAN_CREATE_NODES) || isAdmin(_roleName);  
     }
 
-    function canCreateContracts(string memory _roleName) public view returns (bool) {
+    function canCreateContracts(string memory _roleName) public view override returns (bool) {
         return hasPermission(_roleName, Permission.CAN_CREATE_CONTRACTS);
     }
 
-    function hasPermission(string memory _roleName, Permission _perm) public view returns (bool) {
+    function canMintCurrency(string memory _roleName) public view override returns (bool) {
+        return hasPermission(_roleName, Permission.CAN_MINT_CURRENCY);
+    }
+
+    function canMintRealties(string memory _roleName) public view override returns (bool) {
+        return hasPermission(_roleName, Permission.CAN_MINT_REALTIES);
+    }
+
+    function canMintSaleAgreements(string memory _roleName) public view override returns (bool) {
+        return hasPermission(_roleName, Permission.CAN_MINT_SALEAGREEMENTS);
+    }
+
+    function canMintLoans(string memory _roleName) public view override returns (bool) {
+        return hasPermission(_roleName, Permission.CAN_MINT_LOANS);
+    }
+
+    function hasPermission(string memory _roleName, Permission _perm) public view override returns (bool) {
         require(roleExists(_roleName));
         return rolePermission[_roleName][_perm];
     }

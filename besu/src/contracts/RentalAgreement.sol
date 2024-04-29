@@ -103,7 +103,7 @@ contract RentalAgreement is PaymentSplitter {
         uint remaining = terms.securityDeposit - _penalty;
 
         if (remaining > 0) {
-            walletContract().transfer(tenant, remaining);
+            IERC20(walletContractAddress()).transfer(tenant, remaining);
         }
 
         if (_penalty > 0) {
@@ -126,7 +126,7 @@ contract RentalAgreement is PaymentSplitter {
         if (msg.sender == tenant) {
             super.pay(terms.earlyTerminationFee);
         } else {
-            walletContract().transferFrom(terms.realtyContract, tenant, terms.earlyTerminationFee);
+            IERC20(walletContractAddress()).transferFrom(terms.realtyContract, tenant, terms.earlyTerminationFee);
         }
     }
 

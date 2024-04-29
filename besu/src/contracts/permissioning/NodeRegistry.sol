@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
+import "../interface/permissioning/INodeRegistry.sol";
 
-contract NodeRegistry is Context {
+contract NodeRegistry is INodeRegistry, Context {
 
     modifier onlyMain() {
         require(msg.sender == permissionEndpointsAddress(), "OrganizationRegistry: Permission denied");
@@ -27,38 +28,38 @@ contract NodeRegistry is Context {
         nodeList.push(); // TODO verificar se isto da mm push e aumenta o tamanho do array
     }
 
-    function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort, string memory _orgId) public onlyMain {
+    function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort, string memory _orgId) public override onlyMain {
         require(!nodeExists(_enodeId), "NodeRegistry: Node already exists");
         NodeDetails memory node = NodeDetails(_enodeId, _ip, _port, _raftPort, _orgId, true);
         nodeList.push(node);
         indexOf[_enodeId] = nodeList.length - 1;
     }
 
-    function nodeExists(string memory _enodeId) public view returns (bool) {
+    function nodeExists(string memory _enodeId) public view override returns (bool) {
         return indexOf[_enodeId] != 0;
     }
 
-    function orgOf(string memory _enodeId) public view returns (string memory) {
+    function orgOf(string memory _enodeId) public view override returns (string memory) {
         return nodeList[indexOf[_enodeId]].orgId;
     }
 
-    function ipOf(string memory _enodeId) public view returns (string memory) {
+    function ipOf(string memory _enodeId) public view override returns (string memory) {
         return nodeList[indexOf[_enodeId]].ip;
     }
 
-    function portOf(string memory _enodeId) public view returns (uint16) {
+    function portOf(string memory _enodeId) public view override returns (uint16) {
         return nodeList[indexOf[_enodeId]].port;
     }
 
-    function isActive(string memory _enodeId) public view returns (bool) {
+    function isActive(string memory _enodeId) public view override returns (bool) {
         return nodeList[indexOf[_enodeId]].active;
     }
 
-    function deactivateNode(string memory _enodeId) public onlyMain {
+    function deactivateNode(string memory _enodeId) public override onlyMain {
         nodeList[indexOf[_enodeId]].active = false;
     }
 
-    function activateNode(string memory _enodeId) public onlyMain {
+    function activateNode(string memory _enodeId) public override onlyMain {
         nodeList[indexOf[_enodeId]].active = true;
     }
 

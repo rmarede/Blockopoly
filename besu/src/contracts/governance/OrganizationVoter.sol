@@ -5,8 +5,8 @@ import "./Multisignable.sol";
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
-import "../permissioning/AccountRegistry.sol";
-import "../permissioning/RoleRegistry.sol";
+import "../interface/permissioning/IAccountRegistry.sol";
+import "../interface/permissioning/IRoleRegistry.sol";
 
 contract OrganizationVoter is Multisignable, Context {
 
@@ -49,7 +49,7 @@ contract OrganizationVoter is Multisignable, Context {
 
     function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual returns (uint transactionId) {
         require(_isMultisignable(_destination), "OrganizationVoter: Target is not multisignable");
-        require(RoleRegistry(roleRegistryAddress()).isAdmin(AccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
+        require(IRoleRegistry(roleRegistryAddress()).isAdmin(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
 
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
@@ -65,8 +65,8 @@ contract OrganizationVoter is Multisignable, Context {
     function confirmTransaction(uint _transactionId) public 
         transactionExists(_transactionId) 
     {
-        AccountRegistry accounts = AccountRegistry(accountRegistryAddress());
-        require(RoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
+        IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
+        require(IRoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
         confirmations[_transactionId][accounts.orgOf(msg.sender)] = true;
         executeTransaction(_transactionId);
     }   
@@ -84,14 +84,15 @@ contract OrganizationVoter is Multisignable, Context {
 
     function isConfirmed(uint _transactionId) public view returns (bool) {
         Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
-        if (targetPolicy == Policy.MAJORITY) {
+        if (targetPolicy == Policy.MAJORITY || targetPolicy == Policy.MAJORITY_OR_ADMIN) {
             return getConfirmationCount(_transactionId) > participants.length / 2;
-        } else if (targetPolicy == Policy.UNANIMOUS) {
+        } else if (targetPolicy == Policy.UNANIMOUS || targetPolicy == Policy.UNANIMOUS_OR_ADMIN) {
             for (uint i=0; i<participants.length; i++)
                 if (!confirmations[_transactionId][participants[i]])
                     return false;
             return true;
         }
+        return false;
     }
 
     function getConfirmationCount(uint _transactionId) public view returns (uint count) {

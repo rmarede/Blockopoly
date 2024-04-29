@@ -16,12 +16,12 @@ contract Ownership is WeightedMultiSig {
     constructor(address[] memory _owners, uint[] memory _shares) 
         WeightedMultiSig(_owners, _shares, Policy.MAJORITY) 
     {
-        require(_owners.length <= 100, "Max num of owners: 100");
+        require(_owners.length <= 100, "Ownership: Max num of owners: 100");
         uint totalShares = 0;
         for (uint i = 0; i < _owners.length; i++) {
             totalShares += _shares[i];
         }
-        require(totalShares == 10000, "Total shares must be equal to 10000 (100%)");
+        require(totalShares == 10000, "Ownership: Total shares must be equal to 10000 (100%)");
 
         REALTIES_ADDRESS = msg.sender;
         blacklist[REALTIES_ADDRESS] = true; // TODO ou passar blacklist no contrutor?
@@ -32,11 +32,12 @@ contract Ownership is WeightedMultiSig {
     }
 
     function approve(address _addr) public {
-        require(shareOf(msg.sender) > 0, "Permission denied");
+        require(shareOf(msg.sender) > 0, "Ownership: Permission denied");
         approvals[msg.sender] = _addr;
     }
 
     function setAdmin(address _admin) public onlySelf {
+        require(shareOf(_admin) > 0, "Ownership: Invalid admin"); // TODO maybe not required?
         admin = _admin;
     }
 
@@ -52,7 +53,7 @@ contract Ownership is WeightedMultiSig {
     }
 
     function submitTransaction(address _destination, uint _value, bytes memory _data) public override returns (uint transactionId) {
-        require(!blacklist[_destination], "Blacklisted address");
+        require(!blacklist[_destination], "Ownership: Blacklisted address");
         return super.submitTransaction(_destination, _value, _data);
     }
 

@@ -3,9 +3,12 @@ pragma solidity ^0.8.0;
 
 import "./Ownership.sol";
 import "./utils/Arraysz.sol";
+import "./utils/Context.sol";
+import "./interface/permissioning/IRoleRegistry.sol";
+import "./interface/permissioning/IAccountRegistry.sol";
 
 // Ownership Factory
-contract Realties {
+contract Realties is Context {
 
     struct Realty {
         string name; 
@@ -18,8 +21,10 @@ contract Realties {
     mapping(address => Realty) public realties;
     mapping(address => address[]) public realtiesOf;
 
+    constructor(address _cns) Context(_cns) {}
+
     function mint(string memory _name, string memory _description, address[] memory _owners, uint[] memory _shares) public returns (address) {
-        // TODO check if the caller is the from the appropriate organization
+        //TODO require(IRoleRegistry(roleRegistryAddress()).canMintRealties(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Realties: sender does not have permission to mint");
 
         Ownership newOwnershipContract = new Ownership(_owners, _shares);
         address addr = address(newOwnershipContract);

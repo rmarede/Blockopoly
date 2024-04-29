@@ -3,10 +3,10 @@ pragma solidity ^0.8.0;
 
 import "../utils/Context.sol";
 import "../utils/Strings.sol";
-import "./OrganizationRegistry.sol";
-import "./RoleRegistry.sol";
-import "./AccountRegistry.sol";
-import "./NodeRegistry.sol";
+import "../interface/permissioning/IOrganizationRegistry.sol";
+import "../interface/permissioning/IRoleRegistry.sol";
+import "../interface/permissioning/IAccountRegistry.sol";
+import "../interface/permissioning/INodeRegistry.sol";
 
 contract PermissionEndpoints is Context {
 
@@ -28,19 +28,19 @@ contract PermissionEndpoints is Context {
 
     // -------------------------------- ORGANIZATION REGISTRY OPERATIONS --------------------------------
 
-    function addOrganization(string calldata _orgId, address _admin, RoleRegistry.Permission[] memory _perms) public needsOrganizationConsensus {
-        OrganizationRegistry(organizationRegistryAddress()).addOrg(_orgId);
+    function addOrganization(string calldata _orgId, address _admin, Permission[] memory _perms) public needsOrganizationConsensus {
+        IOrganizationRegistry(organizationRegistryAddress()).addOrg(_orgId);
         string memory adminRole = string(abi.encodePacked("admin_", _orgId));
-        RoleRegistry(roleRegistryAddress()).addRole(adminRole, _orgId, true, 1, _perms);
-        AccountRegistry(accountRegistryAddress()).addAccount(_admin, _orgId, adminRole);
+        IRoleRegistry(roleRegistryAddress()).addRole(adminRole, _orgId, true, 1, _perms);
+        IAccountRegistry(accountRegistryAddress()).addAccount(_admin, _orgId, adminRole);
     }
 
     // ----------------------------------- ROLES REGISTRY OPERATIONS -----------------------------------
 
 
-    function addRole(string calldata _roleName, string memory _orgId, bool _isAdmin, uint _privilege, RoleRegistry.Permission[] memory _perms) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+    function addRole(string calldata _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public {
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
@@ -60,8 +60,8 @@ contract PermissionEndpoints is Context {
     // ---------------------------------- ACCOUNT REGISTRY OPERATIONS ----------------------------------
 
     function addAccount(address _account, string memory _orgId, string memory _role) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
@@ -74,8 +74,8 @@ contract PermissionEndpoints is Context {
     }
 
     function changeRoleOf(address _account, string memory _role) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory accRole = accountRegistry.roleOf(_account);
         string memory senderRole = accountRegistry.roleOf(msg.sender);
@@ -90,8 +90,8 @@ contract PermissionEndpoints is Context {
     }
 
     function deactivateAccount(address _account) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory accRole = accountRegistry.roleOf(_account);
         string memory senderRole = accountRegistry.roleOf(msg.sender);
@@ -105,8 +105,8 @@ contract PermissionEndpoints is Context {
     }
 
     function activateAccount(address _account) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory accRole = accountRegistry.roleOf(_account);
         string memory senderRole = accountRegistry.roleOf(msg.sender);
@@ -122,8 +122,8 @@ contract PermissionEndpoints is Context {
     // ----------------------------------- NODE REGISTRY OPERATIONS -----------------------------------
 
     function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort, string memory _orgId) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
@@ -131,13 +131,13 @@ contract PermissionEndpoints is Context {
         require(Strings.equals(senderOrg, _orgId), "NodeRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateNodes(senderRole), "RoleRegistry: Sender does not have permission to create nodes");
 
-        NodeRegistry(nodeRegistryAddress()).addNode(_enodeId, _ip, _port, _raftPort, _orgId);
+        INodeRegistry(nodeRegistryAddress()).addNode(_enodeId, _ip, _port, _raftPort, _orgId);
     }
 
     function deactivateNode(string memory _enodeId) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
-        NodeRegistry nodeRegistry = NodeRegistry(nodeRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
+        INodeRegistry nodeRegistry = INodeRegistry(nodeRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
@@ -149,9 +149,9 @@ contract PermissionEndpoints is Context {
     }
 
     function activateNode(string memory _enodeId) public {
-        AccountRegistry accountRegistry = AccountRegistry(accountRegistryAddress());
-        RoleRegistry roleRegistry = RoleRegistry(roleRegistryAddress());
-        NodeRegistry nodeRegistry = NodeRegistry(nodeRegistryAddress());
+        IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
+        IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
+        INodeRegistry nodeRegistry = INodeRegistry(nodeRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);

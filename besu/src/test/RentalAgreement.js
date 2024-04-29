@@ -14,12 +14,6 @@ describe("RentalAgreement", function () {
         return { cns };
     }
 
-    async function deployWalletFixture() {
-        const Wallet = await ethers.getContractFactory("Wallet");
-        const wallet = await Wallet.deploy();
-        return { wallet };
-    }
-
     async function deployOwnershipFixture() {
         const [acc1] = await ethers.getSigners();
         const Ownership = await ethers.getContractFactory("Ownership");
@@ -31,7 +25,8 @@ describe("RentalAgreement", function () {
     async function deployRentalAgreementFixturePresent() {
         const [acc1, acc2] = await ethers.getSigners();
         const { cns } = await loadFixture(deployCNSFixture);
-        const { wallet } = await loadFixture(deployWalletFixture);
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy(cns.target);
         const { ownership } = await loadFixture(deployOwnershipFixture);
         
         await cns.setContractAddress("Wallet", wallet.target);
@@ -58,7 +53,8 @@ describe("RentalAgreement", function () {
     async function deployRentalAgreementFixturePast() {
         const [acc1, acc2] = await ethers.getSigners();
         const { cns } = await loadFixture(deployCNSFixture);
-        const { wallet } = await loadFixture(deployWalletFixture);
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy(cns.target);
         const { ownership } = await loadFixture(deployOwnershipFixture);
         
         await cns.setContractAddress("Wallet", wallet.target);

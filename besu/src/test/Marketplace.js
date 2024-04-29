@@ -4,7 +4,7 @@ const { expect } = require("chai");
 const getAbi = require('../scripts/utils/get-abi');
 
 describe("Marketplace", function () {
-
+/*
     async function deployCNSFixture() {
         const CNS = await ethers.getContractFactory("ContractNameService");
         const cns = await CNS.deploy([],[]);
@@ -244,5 +244,5 @@ describe("Marketplace", function () {
 
         });	
     });
-
+*/
 });

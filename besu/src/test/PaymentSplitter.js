@@ -12,17 +12,12 @@ describe("PaymentSplitter", function () {
         return { cns };
     }
 
-    async function deployWalletFixture() {
-        const Wallet = await ethers.getContractFactory("Wallet");
-        const wallet = await Wallet.deploy();
-        return { wallet };
-    }
-
     async function deployPaymentSplitterFixture() {
         const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
         const { cns } = await loadFixture(deployCNSFixture);
-        const { wallet } = await loadFixture(deployWalletFixture);
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy(cns.target);
 
         await cns.setContractAddress("Wallet", wallet.target);
 
