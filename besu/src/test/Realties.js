@@ -12,6 +12,7 @@ describe("Realties", function () {
     }
 
     async function deployRealtiesFixture() {  
+        const [acc1] = await ethers.getSigners();
         const { cns } = await loadFixture(deployCNSFixture);  
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
@@ -22,8 +23,38 @@ describe("Realties", function () {
             }
         });
         const realties = await Realties.deploy(cns.target);
-        return {realties};
+
+        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
+        const accountRegistry = await AccountRegistry.deploy(cns.target);
+
+        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
+        const roleRegistry = await RoleRegistry.deploy(cns.target);
+
+        await cns.setContractAddress("Realties", realties.target);
+        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
+        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
+        await cns.setContractAddress("PermissionEndpoints", acc1.address);
+
+        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
+
+        return {realties, accountRegistry, roleRegistry};
     }
+
+    describe("Deployment", function () {
+
+        it("Should deploy Realties contract", async function () {
+            const [acc1] = await ethers.getSigners();
+
+            const {realties, accountRegistry, roleRegistry} = await loadFixture(deployRealtiesFixture);
+
+            expect(await accountRegistry.orgOf(acc1.address)).to.equal("bank");
+            expect(await accountRegistry.roleOf(acc1.address)).to.equal("admin_bank");
+            
+            expect(await roleRegistry.canMintRealties("admin_bank")).to.be.true;
+
+        });
+    });
 
     describe("Mint Asset", function () {
         it("Should mint asset's Ownership contract", async function () {
@@ -31,7 +62,7 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);
@@ -60,11 +91,11 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
-            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
-            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
-            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
-            await expect(realties.mint("foo", "faa", [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
-            await expect(realties.mint("foo", "faa", [], [])).to.be.reverted;
+            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
+            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
+            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
+            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
+            await expect(realties.connect(acc1).mint("foo", "faa", [], [])).to.be.reverted;
         });
     });
 
@@ -75,7 +106,7 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);
@@ -107,7 +138,7 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);

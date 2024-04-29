@@ -2,7 +2,15 @@ require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.19",
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+      },
+    },
+  },
+  allowUnlimitedContractSize: true,
   networks: {
     besu: {
       url: "http://localhost:8500",

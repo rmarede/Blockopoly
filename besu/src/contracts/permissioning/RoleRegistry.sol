@@ -23,11 +23,8 @@ contract RoleRegistry is IRoleRegistry, Context {
     mapping(string => uint) private indexOf;
     mapping(string => mapping(Permission => bool)) rolePermission;
 
-    constructor(address _cns, string[] memory _orgs) Context(_cns) {
+    constructor(address _cns) Context(_cns) {
         roleList.push(); // TODO verificar se isto da mm push e aumenta o tamanho do array
-        for (uint i = 0; i < _orgs.length; i++) {
-            addRole(string(abi.encodePacked("admin_", _orgs[i])), _orgs[i], true, 1, new Permission[](0));
-        }
     }
 
     function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public override onlyMain {
@@ -88,7 +85,7 @@ contract RoleRegistry is IRoleRegistry, Context {
     }
 
     function hasPermission(string memory _roleName, Permission _perm) public view override returns (bool) {
-        require(roleExists(_roleName));
+        require(roleExists(_roleName), "RoleRegistry: Role does not exist");
         return rolePermission[_roleName][_perm];
     }
 
