@@ -18,11 +18,17 @@ contract AccountPermissions {
             return true;
         }
 
-        OrganizationRegistry organizationRegistry = OrganizationRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("OrganizationRegistry"));
-        RoleRegistry roleRegistry = RoleRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("RoleRegistry"));
-        AccountRegistry accountRegistry = AccountRegistry(ContractNameService(CNS_ADDRESS).getContractAddress("AccountRegistry"));
+        ContractNameService cns = ContractNameService(CNS_ADDRESS);
 
-        if (accountRegistry.isActive(_sender) && organizationRegistry.isActive(accountRegistry.orgOf(_sender))) {
+        if (cns.isRegistered(_sender)) {
+            return true;
+        }
+
+        OrganizationRegistry organizationRegistry = OrganizationRegistry(cns.getContractAddress("OrganizationRegistry"));
+        RoleRegistry roleRegistry = RoleRegistry(cns.getContractAddress("RoleRegistry"));
+        AccountRegistry accountRegistry = AccountRegistry(cns.getContractAddress("AccountRegistry"));
+
+        if (accountRegistry.accountExists(_sender) && accountRegistry.isActive(_sender) && organizationRegistry.isActive(accountRegistry.orgOf(_sender))) {
             if (_target == address(0)) { // smart contract creation
                 return roleRegistry.canCreateContracts(accountRegistry.roleOf(_sender));
             }

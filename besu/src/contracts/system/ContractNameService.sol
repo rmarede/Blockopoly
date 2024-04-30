@@ -60,13 +60,17 @@ contract ContractNameService is IContractNameService {
         return registry[indexOf[_name]].addr;
     }
 
-    function isRegistered(address _address) public view override returns (string memory) {
+    function isRegistered(address _address) public view override returns (bool) {
         for (uint i = 0; i < registry.length; i++) {
             if (registry[i].addr == _address) {
-                return registry[i].name;
+                return true;
             }
         }
-        return "";
+        return false;
+    }
+
+    function isRegistered(string memory _service) public view override returns (bool) {
+        return indexOf[_service] > 0;
     }
 
     function getContractHistory() public view override returns (ContractInstance[] memory) {

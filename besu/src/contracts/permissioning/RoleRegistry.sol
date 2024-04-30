@@ -53,15 +53,15 @@ contract RoleRegistry is IRoleRegistry, Context {
     }
 
     function canCreateAccounts(string memory _roleName) public view override returns (bool) {
-        return hasPermission(_roleName, Permission.CAN_CREATE_ACCOUNTS) || isAdmin(_roleName);
+        return hasPermission(_roleName, Permission.CAN_CREATE_ACCOUNTS);
     }
 
     function canCreateRoles(string memory _roleName) public view override returns (bool) {
-        return hasPermission(_roleName, Permission.CAN_CREATE_ROLES) || isAdmin(_roleName);  
+        return hasPermission(_roleName, Permission.CAN_CREATE_ROLES);  
     }
 
     function canCreateNodes(string memory _roleName) public view override returns (bool) {
-        return hasPermission(_roleName, Permission.CAN_CREATE_NODES) || isAdmin(_roleName);  
+        return hasPermission(_roleName, Permission.CAN_CREATE_NODES);  
     }
 
     function canCreateContracts(string memory _roleName) public view override returns (bool) {

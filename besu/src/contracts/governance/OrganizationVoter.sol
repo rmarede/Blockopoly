@@ -7,6 +7,7 @@ import "../utils/Context.sol";
 
 import "../interface/permissioning/IAccountRegistry.sol";
 import "../interface/permissioning/IRoleRegistry.sol";
+import "../interface/permissioning/IOrganizationRegistry.sol";
 
 contract OrganizationVoter is Multisignable, Context {
 
@@ -17,6 +18,13 @@ contract OrganizationVoter is Multisignable, Context {
 
     modifier notExecuted(uint transactionId) {
         require(!transactions[transactionId].executed);
+        _;
+    }
+
+    modifier canVote() {
+        IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
+        require(participantExists(accounts.orgOf(msg.sender)), "OrganizationVoter: Participant's organization does not participate in voting");
+        require(IRoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
         _;
     }
 
@@ -32,8 +40,7 @@ contract OrganizationVoter is Multisignable, Context {
         bool executed;
     }
 
-    string[] public participants; // podem nao ser todas as orgs... pode haver orgs sem voting rights
-
+    string[] public participants; 
     mapping (uint => Transaction) public transactions;
     mapping (uint => mapping (string => bool)) internal confirmations;
     uint public transactionCount;
@@ -42,15 +49,13 @@ contract OrganizationVoter is Multisignable, Context {
         require(_participants.length > 0, "OrganizationVoter: No participants specified");
         policy = _policy;
         for (uint i=0; i<_participants.length; i++) {
-            require(!Strings.equals(_participants[i], ""), "OrganizationVoter: Invalid input");
+            require(IOrganizationRegistry(organizationRegistryAddress()).orgExists(_participants[i]), "OrganizationVoter: Organization does not exist");
             participants.push(_participants[i]);
         }
     }
 
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual returns (uint transactionId) {
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual canVote returns (uint transactionId) {
         require(_isMultisignable(_destination), "OrganizationVoter: Target is not multisignable");
-        require(IRoleRegistry(roleRegistryAddress()).isAdmin(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
-
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             destination: _destination,
@@ -62,11 +67,8 @@ contract OrganizationVoter is Multisignable, Context {
         confirmTransaction(transactionId);
     }
 
-    function confirmTransaction(uint _transactionId) public 
-        transactionExists(_transactionId) 
-    {
+    function confirmTransaction(uint _transactionId) public canVote transactionExists(_transactionId) {
         IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
-        require(IRoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
         confirmations[_transactionId][accounts.orgOf(msg.sender)] = true;
         executeTransaction(_transactionId);
     }   
@@ -106,7 +108,7 @@ contract OrganizationVoter is Multisignable, Context {
     }
 
     function addParticipant(string memory _participant) public onlySelf {
-        require(!Strings.equals(_participant, ""), "OrganizationVoter: Invalid input");
+        require(IOrganizationRegistry(organizationRegistryAddress()).orgExists(_participant), "OrganizationVoter: Organization does not exist");
         require(!participantExists(_participant), "OrganizationVoter: Participant already exists");
         participants.push(_participant);
     }

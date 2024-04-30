@@ -30,5 +30,9 @@ function getWeightedMultiSigAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/WeightedMultiSig.sol/WeightedMultiSig.json', 'utf8')).abi;
 }
 
+function getOrganizationVoterAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/OrganizationVoter.sol/OrganizationVoter.json', 'utf8')).abi;
+}
 
-module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi, getWeightedMultiSigAbi, getWalletAbi };
+
+module.exports = { getERC20Abi, getERC721Abi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi, getWeightedMultiSigAbi, getOrganizationVoterAbi, getWalletAbi };

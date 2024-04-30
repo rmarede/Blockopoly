@@ -18,6 +18,11 @@ function encodeWeightedMultiSigData(functionToCall, params) {
   return data;
 }
 
+function encodeOrganizationVoterData(functionToCall, params) {
+  let interface = new ethers.Interface(getAbi.getOrganizationVoterAbi());
+  let data = interface.encodeFunctionData(functionToCall, params);
+  return data;
+}
 
 function encodeWalletData(functionToCall, params) {
   let interface = new ethers.Interface(getAbi.getWalletAbi());
@@ -26,4 +31,4 @@ function encodeWalletData(functionToCall, params) {
 }
 
 
-module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeWalletData };
+module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeOrganizationVoterData, encodeWalletData };

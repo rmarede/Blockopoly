@@ -10,8 +10,8 @@ import "../interface/permissioning/INodeRegistry.sol";
 
 contract PermissionEndpoints is Context {
 
-    modifier needsOrganizationConsensus() {
-        require(msg.sender == organizationVoterAddress(), "PermissionEndpoints: Permission denied");
+    modifier needsOrganizationConsensus() { // TODO tirar este isRegistered, e ter constructors nos registries
+        require(!cns.isRegistered("OrganizationVoter") || msg.sender == organizationVoterAddress(), "PermissionEndpoints: Permission denied");
         _;
     }
 

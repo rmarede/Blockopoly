@@ -28,14 +28,8 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
     OrganizationDetails[] private orgList;
     mapping(string => uint) private indexOf;
 
-    constructor(address _cns, string[] memory _organizations) Context(_cns) {
-        for (uint i = 0; i < _organizations.length; i++) {
-            require(!Strings.equals(_organizations[i], ""));
-            require(indexOf[_organizations[i]] == 0, "OrganizationRegistry: Organization duplicated");
-            OrganizationDetails memory org = OrganizationDetails(_organizations[i], true);
-            orgList.push(org);
-            indexOf[_organizations[i]] = orgList.length - 1; 
-        }
+    constructor(address _cns) Context(_cns) {
+        orgList.push();
     }
 
     function addOrg(string calldata _orgId) public override onlyMain {
