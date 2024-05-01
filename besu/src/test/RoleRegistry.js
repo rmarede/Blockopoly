@@ -30,7 +30,7 @@ describe("RoleRegistry", function () {
 
             const {roleRegistry} = await loadFixture(deployRoleRegistryFixture);
 
-            await expect(roleRegistry.connect(acc1).addRole("admin_org1", "org1", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+            await expect(roleRegistry.connect(acc1).addRole("admin", "org1", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
         });
     });
 
@@ -41,19 +41,17 @@ describe("RoleRegistry", function () {
 
             const {roleRegistry} = await loadFixture(deployRoleRegistryFixture);
 
-            await expect(roleRegistry.connect(acc1).addRole("admin_org1", "org1", true, 0, [0,2,3,5,6])).not.to.be.reverted;
+            await expect(roleRegistry.connect(acc1).addRole("admin", "org1", 0, [0,2,3,5,6])).not.to.be.reverted;
 
-            expect(await roleRegistry.roleExists("admin_org1")).to.be.true;
-            expect(await roleRegistry.isAdmin("admin_org1")).to.be.true;
-
-            expect(await roleRegistry.canCreateAccounts("admin_org1")).to.be.true;
-            expect(await roleRegistry.canCreateRoles("admin_org1")).to.be.false;
-            expect(await roleRegistry.canCreateNodes("admin_org1")).to.be.true;
-            expect(await roleRegistry.canCreateContracts("admin_org1")).to.be.true;
-            expect(await roleRegistry.canMintCurrency("admin_org1")).to.be.false;
-            expect(await roleRegistry.canMintRealties("admin_org1")).to.be.true;
-            expect(await roleRegistry.canMintSaleAgreements("admin_org1")).to.be.true;
-            expect(await roleRegistry.canMintLoans("admin_org1")).to.be.false;
+            expect(await roleRegistry.roleExists("org1_admin")).to.be.true;
+            expect(await roleRegistry.canCreateAccounts("org1_admin")).to.be.true;
+            expect(await roleRegistry.canCreateRoles("org1_admin")).to.be.false;
+            expect(await roleRegistry.canCreateNodes("org1_admin")).to.be.true;
+            expect(await roleRegistry.canCreateContracts("org1_admin")).to.be.true;
+            expect(await roleRegistry.canMintCurrency("org1_admin")).to.be.false;
+            expect(await roleRegistry.canMintRealties("org1_admin")).to.be.true;
+            expect(await roleRegistry.canMintSaleAgreements("org1_admin")).to.be.true;
+            expect(await roleRegistry.canMintLoans("org1_admin")).to.be.false;
         });
 
         it("Should not register new Role if unauthorized", async function () {
@@ -61,7 +59,7 @@ describe("RoleRegistry", function () {
 
             const {roleRegistry} = await loadFixture(deployRoleRegistryFixture);
 
-            await expect(roleRegistry.connect(acc2).addRole("admin_org1", "org1", true, 0, [0,1,2,3,4,5,6,7])).to.be.reverted;
+            await expect(roleRegistry.connect(acc2).addRole("admin", "org1", 0, [0,1,2,3,4,5,6,7])).to.be.reverted;
         });
     });
 

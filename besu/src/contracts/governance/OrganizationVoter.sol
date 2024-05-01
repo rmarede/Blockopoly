@@ -6,7 +6,6 @@ import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
 import "../interface/permissioning/IAccountRegistry.sol";
-import "../interface/permissioning/IRoleRegistry.sol";
 import "../interface/permissioning/IOrganizationRegistry.sol";
 
 contract OrganizationVoter is Multisignable, Context {
@@ -24,7 +23,7 @@ contract OrganizationVoter is Multisignable, Context {
     modifier canVote() {
         IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
         require(participantExists(accounts.orgOf(msg.sender)), "OrganizationVoter: Participant's organization does not participate in voting");
-        require(IRoleRegistry(roleRegistryAddress()).isAdmin(accounts.roleOf(msg.sender)), "OrganizationVoter: Sender is not organization admin");
+        require(accounts.isAdmin(msg.sender), "OrganizationVoter: Sender is not organization admin");
         _;
     }
 

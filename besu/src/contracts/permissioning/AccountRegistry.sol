@@ -13,24 +13,17 @@ contract AccountRegistry is IAccountRegistry, Context {
         _;
     }
 
-    struct AccountDetails {
-        address account;
-        string orgId;
-        string role;
-        bool active;
-    }
-
     AccountDetails[] private accountList;
     mapping(address => uint) private indexOf;
 
 
     constructor(address _cns) Context(_cns) {
-        accountList.push(); // TODO verificar se isto da mm push e aumenta o tamanho do array
+        accountList.push();
     }
 
-    function addAccount(address _account, string memory _orgId, string memory _role) public override onlyMain {
+    function addAccount(address _account, string memory _orgId, string memory _role, bool _isAdmin) public override onlyMain {
         require(!accountExists(_account), "AccountRegistry: Account already exists");
-        AccountDetails memory account = AccountDetails(_account, _orgId, _role, true);
+        AccountDetails memory account = AccountDetails(_account, _orgId, _role, _isAdmin, true);
         accountList.push(account);
         indexOf[_account] = accountList.length - 1;
     }
@@ -49,6 +42,10 @@ contract AccountRegistry is IAccountRegistry, Context {
 
     function accountExists(address _account) public view override returns (bool) {
         return indexOf[_account] != 0;
+    }
+
+    function isAdmin(address _account) public view override returns (bool) {
+        return accountList[indexOf[_account]].isAdmin;
     }
 
     function isActive(address _account) public view override returns (bool) {

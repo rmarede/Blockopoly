@@ -7,15 +7,16 @@ import "../interface/permissioning/IOrganizationRegistry.sol";
 import "../interface/permissioning/IRoleRegistry.sol";
 import "../interface/permissioning/IAccountRegistry.sol";
 import "../interface/permissioning/INodeRegistry.sol";
+import "../governance/Multisignable.sol";
 
-contract PermissionEndpoints is Context {
+contract PermissionEndpoints is Multisignable, Context {
 
     modifier needsOrganizationConsensus() { // TODO tirar este isRegistered, e ter constructors nos registries
         require(!cns.isRegistered("OrganizationVoter") || msg.sender == organizationVoterAddress(), "PermissionEndpoints: Permission denied");
         _;
     }
 
-    constructor(address _cns) Context(_cns) {}
+    constructor(address _cns) Context(_cns) Multisignable(Policy.MAJORITY) {}
 
     // TODO talvez ter isto aqui e no AccountPermissions e NodePermissions apenas chamar este contrato
     function accountPermitted(address _account) public view returns (bool) {
@@ -30,15 +31,23 @@ contract PermissionEndpoints is Context {
 
     function addOrganization(string calldata _orgId, address _admin, Permission[] memory _perms) public needsOrganizationConsensus {
         IOrganizationRegistry(organizationRegistryAddress()).addOrg(_orgId);
-        string memory adminRole = string(abi.encodePacked("admin_", _orgId));
-        IRoleRegistry(roleRegistryAddress()).addRole(adminRole, _orgId, true, 1, _perms);
-        IAccountRegistry(accountRegistryAddress()).addAccount(_admin, _orgId, adminRole);
+        IRoleRegistry(roleRegistryAddress()).addRole("admin", _orgId, 0, _perms);
+        string memory adminRole = string(abi.encodePacked(_orgId, "_admin"));
+        IAccountRegistry(accountRegistryAddress()).addAccount(_admin, _orgId, adminRole, true);
+    }
+
+    function deactivateOrganization(string calldata _orgId) public needsOrganizationConsensus {
+        IOrganizationRegistry(organizationRegistryAddress()).deactivateOrg(_orgId);
+    }
+
+    function reactivateOrganization(string calldata _orgId) public needsOrganizationConsensus {
+        IOrganizationRegistry(organizationRegistryAddress()).reactivateOrg(_orgId);
     }
 
     // ----------------------------------- ROLES REGISTRY OPERATIONS -----------------------------------
 
 
-    function addRole(string calldata _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public {
+    function addRole(string calldata _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) public {
         IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
         IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
@@ -46,20 +55,20 @@ contract PermissionEndpoints is Context {
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
 
         require(Strings.equals(senderOrg, _orgId), "AccountRegistry: Sender does not belong to the organization");
-        require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to create role");
+        require(roleRegistry.canCreateRoles(senderRole), "RoleRegistry: Sender does not have permission to create role");
         require(_privilege > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Role privilege must be greater than sender's role privilege");
 
         for (uint i = 0; i < _perms.length; i++) {
             require(roleRegistry.hasPermission(senderRole, _perms[i]), "RoleRegistry: Sender cannot grant permission that does not have");
         }
 
-        roleRegistry.addRole(_roleName, _orgId, _isAdmin, _privilege, _perms);
+        roleRegistry.addRole(_roleName, _orgId, _privilege, _perms);
     }
 
 
     // ---------------------------------- ACCOUNT REGISTRY OPERATIONS ----------------------------------
 
-    function addAccount(address _account, string memory _orgId, string memory _role) public {
+    function addAccount(address _account, string memory _orgId, string memory _role, bool _isAdmin) public {
         IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
         IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
@@ -70,7 +79,11 @@ contract PermissionEndpoints is Context {
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to create accounts");
         require(roleRegistry.privilegeOf(_role) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot create accounts with this role");
 
-        accountRegistry.addAccount(_account, _orgId, _role);
+        if(_isAdmin) {
+            require(accountRegistry.isAdmin(msg.sender), "AccountRegistry: Sender must be admin to create admin role");
+        }
+
+        accountRegistry.addAccount(_account, _orgId, _role, _isAdmin);
     }
 
     function changeRoleOf(address _account, string memory _role) public {

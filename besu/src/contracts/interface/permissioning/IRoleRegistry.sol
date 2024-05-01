@@ -13,9 +13,8 @@ enum Permission {
 }
 
 interface IRoleRegistry {
-    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) external;
+    function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) external;
     function roleExists(string memory _roleName) external view returns (bool);
-    function isAdmin(string memory _roleName) external view returns (bool);
     function privilegeOf(string memory _roleName) external view returns (uint);
     function canCreateAccounts(string memory _roleName) external view returns (bool);
     function canCreateRoles(string memory _roleName) external view returns (bool);
@@ -26,4 +25,5 @@ interface IRoleRegistry {
     function canMintSaleAgreements(string memory _roleName) external view returns (bool);
     function canMintLoans(string memory _roleName) external view returns (bool);
     function hasPermission(string memory _roleName, Permission _perm) external view returns (bool);
+    //function canTarget(string memory _senderRole, string memory _targetRole) external view returns (bool);
 }

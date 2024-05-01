@@ -14,11 +14,6 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
         _;
     }
 
-    modifier onlyOrgVoter() {
-        require(msg.sender == organizationVoterAddress(), "OrganizationRegistry: Permission denied");
-        _;
-    }
-
     struct OrganizationDetails {
         string orgId;
         bool active;
@@ -47,13 +42,13 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
         return orgList[indexOf[_orgId]].active;
     }
 
-    function deactivateOrg(string calldata _orgId) public override onlyOrgVoter {
+    function deactivateOrg(string calldata _orgId) public override onlyMain {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = false;
     }
 
-    function reactivateOrg(string calldata _orgId) public override onlyOrgVoter {
+    function reactivateOrg(string calldata _orgId) public override onlyMain {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = true;

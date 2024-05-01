@@ -32,8 +32,8 @@ describe("PaymentSplitter", function () {
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
-        await expect(roleRegistry.connect(acc1).addRole("admin_bank", "bank", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "admin_bank")).not.to.be.reverted; 
+        await expect(roleRegistry.connect(acc1).addRole("admin", "bank", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "bank", "bank_admin", true)).not.to.be.reverted; 
     
         return {paymentSplitter, wallet };
     }

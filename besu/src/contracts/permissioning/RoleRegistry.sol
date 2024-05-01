@@ -15,7 +15,6 @@ contract RoleRegistry is IRoleRegistry, Context {
     struct Role {
         string name;
         string orgId;
-        bool isAdmin;
         uint privilege;
     }
 
@@ -27,24 +26,20 @@ contract RoleRegistry is IRoleRegistry, Context {
         roleList.push(); // TODO verificar se isto da mm push e aumenta o tamanho do array
     }
 
-    function addRole(string memory _roleName, string memory _orgId, bool _isAdmin, uint _privilege, Permission[] memory _perms) public override onlyMain {
+    function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) public override onlyMain {
         require(!Strings.equals(_roleName, "RoleRegistry: Role name cannot be empty"));
-        require(!roleExists(_roleName), "RoleRegistry: Role already exists");
-        Role memory role = Role(_roleName, _orgId, _isAdmin, _privilege);
+        string memory roleName = string(abi.encodePacked(_orgId, "_", _roleName));
+        require(!roleExists(roleName), "RoleRegistry: Role already exists");
+        Role memory role = Role(roleName, _orgId, _privilege);
         roleList.push(role);
-        indexOf[_roleName] = roleList.length - 1;
+        indexOf[roleName] = roleList.length - 1;
         for (uint i = 0; i < _perms.length; i++) {
-            rolePermission[_roleName][_perms[i]] = true;
+            rolePermission[roleName][_perms[i]] = true;
         }
     }
 
     function roleExists(string memory _roleName) public view override returns (bool) {
         return indexOf[_roleName] != 0;
-    }
-
-    function isAdmin(string memory _roleName) public view override returns (bool) {
-        require(roleExists(_roleName));
-        return roleList[indexOf[_roleName]].isAdmin;
     }
 
     function privilegeOf(string memory _roleName) public view override returns (uint) {

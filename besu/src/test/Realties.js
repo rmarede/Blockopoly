@@ -35,8 +35,8 @@ describe("Realties", function () {
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
-        await expect(roleRegistry.connect(acc1).addRole("admin_landregi", "landregi", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "admin_landregi")).not.to.be.reverted; 
+        await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
 
         return {realties, accountRegistry, roleRegistry};
     }
@@ -49,9 +49,9 @@ describe("Realties", function () {
             const {realties, accountRegistry, roleRegistry} = await loadFixture(deployRealtiesFixture);
 
             expect(await accountRegistry.orgOf(acc1.address)).to.equal("landregi");
-            expect(await accountRegistry.roleOf(acc1.address)).to.equal("admin_landregi");
+            expect(await accountRegistry.roleOf(acc1.address)).to.equal("landregi_admin");
             
-            expect(await roleRegistry.canMintRealties("admin_landregi")).to.be.true;
+            expect(await roleRegistry.canMintRealties("landregi_admin")).to.be.true;
 
         });
     });

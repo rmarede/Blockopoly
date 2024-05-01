@@ -36,14 +36,14 @@ describe("OrganizationVoter", function () {
         await cns.setContractAddress("AccountRegistry", accountRegistry.target);
 
         await expect(organizationRegistry.addOrg("org1")).not.to.be.reverted;
-        await expect(roleRegistry.addRole("admin_org1", "org1", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(roleRegistry.addRole("user_org1", "org1", false, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.addAccount(acc1.address, "org1", "admin_org1")).not.to.be.reverted;
-        await expect(accountRegistry.addAccount(acc3.address, "org1", "user_org1")).not.to.be.reverted;
+        await expect(roleRegistry.addRole("admin", "org1", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(roleRegistry.addRole("user", "org1", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.addAccount(acc1.address, "org1", "org1_admin", true)).not.to.be.reverted;
+        await expect(accountRegistry.addAccount(acc3.address, "org1", "org1_user", false)).not.to.be.reverted;
 
         await expect(organizationRegistry.addOrg("org2")).not.to.be.reverted;
-        await expect(roleRegistry.addRole("admin_org2", "org2", true, 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.addAccount(acc2.address, "org2", "admin_org2")).not.to.be.reverted;
+        await expect(roleRegistry.addRole("admin", "org2", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+        await expect(accountRegistry.addAccount(acc2.address, "org2", "org2_admin", true)).not.to.be.reverted;
 
         const OrganizationVoter = await ethers.getContractFactory("OrganizationVoter");
         const organizationVoter = await OrganizationVoter.deploy(cns.target, ["org1"], 1);
@@ -163,6 +163,8 @@ describe("OrganizationVoter", function () {
             ).not.to.be.reverted;
 
             expect(await organizationVoter.getConfirmationCount(1)).to.be.equal(1);
+            expect(await organizationVoter.participantExists("org1")).to.be.true;
+            expect(await organizationVoter.participantExists("org2")).to.be.true;
         });
 
         it("Should confirm and execute", async function () {   

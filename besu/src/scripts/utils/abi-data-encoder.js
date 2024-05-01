@@ -30,5 +30,11 @@ function encodeWalletData(functionToCall, params) {
   return data;
 }
 
+function encodePermissionEndpointsData(functionToCall, params) {
+  let interface = new ethers.Interface(getAbi.getPermissionEndpointsAbi());
+  let data = interface.encodeFunctionData(functionToCall, params);
+  return data;
+}
 
-module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeOrganizationVoterData, encodeWalletData };
+
+module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeOrganizationVoterData, encodeWalletData, encodePermissionEndpointsData };
