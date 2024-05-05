@@ -10,10 +10,13 @@ contract SaleAgreementFactory is Context {
 
     constructor(address _cns) Context(_cns) {}
     
-    function createSaleAgreement(address _realty, address _buyer, address _seller, uint _price, uint _share, uint _comission) public returns (address) {
+    function createSaleAgreement(address _buyer, address _seller, address _realty, uint _share, uint _price, uint _earnest,
+    uint _comission, uint _contengencyPeriod, bytes[] memory _contengencyClauses) public returns (address) {
         require(IRoleRegistry(roleRegistryAddress()).canMintSaleAgreements(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "SaleAgreementFactory: only realtor can create sale agreement contracts");
 
-        SaleAgreement agreement = new SaleAgreement(cns_address, _realty, _buyer, _seller, _price, _share, msg.sender, _comission);
+        SaleAgreement.SaleDetails memory details = SaleAgreement.SaleDetails(_buyer, _seller, _realty, _share, _price, _earnest, msg.sender, _comission, _contengencyPeriod, _contengencyClauses);
+
+        SaleAgreement agreement = new SaleAgreement(cns_address, details);
         return address(agreement);
     }
     

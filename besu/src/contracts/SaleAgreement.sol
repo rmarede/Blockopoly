@@ -8,73 +8,109 @@ import "./interface/IERC20.sol";
 
 contract SaleAgreement is Context {
 
-    address public realty;
-    address public buyer;
-    address public seller;
-    uint public price;
-    uint public share;
-    address public realtor;
-    uint public comission; // 100 is 1%
+    enum Status { PENDING, AGREED, COMPLETED, WIDTHDRAWN, BREACHED }
+
+    struct SaleDetails {
+        address buyer;
+        address seller;
+        address realty;
+        uint share;
+        uint price;
+        uint earnest;
+        address realtor;
+        uint comission; // 100 is 1%
+        uint contengencyPeriod; // TODO alguma coisa a fazer com isto?
+        bytes[] contengencyClauses;
+    }
+
+    SaleDetails public details;
+    Status public status;
+    uint public createdAt;
 
     bool private buyerSignature;
     bool private sellerSignature;
 
     modifier onlyParties() {
-        require(msg.sender == buyer || msg.sender == seller, "SaleAgreement: only buyer or seller can call this function");
+        require(msg.sender == details.buyer || msg.sender == details.seller, "SaleAgreement: only buyer or seller can call this function");
         _;
     }
 
-    modifier unsigned() {
-        require(!buyerSignature || !sellerSignature, "SaleAgreement: already signed");
+    modifier onlySeller() {
+        require(msg.sender == details.seller, "SaleAgreement: only seller can call this function");
         _;
     }
 
-    modifier signed() {
-        require(buyerSignature && sellerSignature, "SaleAgreement: agreement not signed");
+    modifier privileged() { // TODO 
+        require(msg.sender == details.realtor, "SaleAgreement: only privileged entities can call this function");
         _;
     }
 
-
-    constructor(address _cns, address _realty, address _buyer, address _seller, uint _price, uint _share, address _realtor, uint _comission) Context(_cns) {
-        require(_price > 0 && _share > 0, "SaleAgreement: invalid input");
-        require(_comission < 10000, "SaleAgreement: comission can not be more than 10000 (100.00%)");
-        require(Ownership(_realty).shareOf(_seller) >= _share, "SaleAgreement: seller does not have enough shares");
-        realty = _realty;
-        buyer = _buyer;
-        seller = _seller;
-        price = _price;
-        share = _share;
-        realtor = _realtor;
-        comission = _comission;
+    constructor(address _cns, SaleDetails memory _details) Context(_cns) {
+        require(_details.price > 0 && _details.earnest > 0 && _details.share > 0, "SaleAgreement: invalid input");
+        require(_details.earnest <= _details.price, "SaleAgreement: earnest can not be more than price");
+        require(_details.comission < 10000, "SaleAgreement: comission can not be more than 10000 (100.00%)");
+        require(Ownership(_details.realty).shareOf(_details.seller) >= _details.share, "SaleAgreement: seller does not have enough shares");
+        details = _details;
+        status = Status.PENDING;
+        createdAt = block.timestamp;
     }
 
-    function sign() public onlyParties unsigned {
-        if (msg.sender == buyer) {
+    function consent() public { // TODO mudar nome pre agreement, terms, consent, hold in escrow?
+        require(status == Status.PENDING, "SaleAgreement: sale already agreed on");
+        Ownership(details.realty).transferShares(details.seller, address(this), details.share);
+        IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.earnest);
+        status = Status.AGREED;
+    }
+
+    function commit() public onlyParties {
+        require(status == Status.AGREED, "SaleAgreement: sale already processed or not yet agreed on");
+
+        if (msg.sender == details.buyer) {
             require(!buyerSignature, "SaleAgreement: this party has already signed");
-            IERC20(walletContractAddress()).transferFrom(buyer, address(this), price);
             buyerSignature = true;
         } else {
-            require(buyerSignature, "SaleAgreement: buyer has to sign first");
+            require(!sellerSignature, "SaleAgreement: this party has already signed");
             sellerSignature = true;
+        }
+
+        if (buyerSignature && sellerSignature) {
             transfer();
+            status = Status.COMPLETED;
         }
     }
 
-    function transfer() private signed {
-        Ownership(realty).transferShares(seller, buyer, share);
-        uint comm = price * comission / 10000;
-        IERC20(walletContractAddress()).transfer(realtor, comm);
-        IERC20(walletContractAddress()).transfer(seller, price - comm);
+    function transfer() private {
+        IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.price - details.earnest);
+        uint comm = details.price * details.comission / 10000;
+        IERC20(walletContractAddress()).transfer(details.realtor, comm);
+        IERC20(walletContractAddress()).transfer(details.seller, details.price - comm);
+        Ownership(details.realty).transferShares(address(this), details.buyer, details.share);
     }
 
-    function widthdraw() public unsigned onlyParties {
-        require(buyerSignature, "SaleAgreement: nothing to widthdraw");
-        IERC20(walletContractAddress()).transfer(buyer, price);
-        buyerSignature = false;
+    function widthdraw() public privileged {
+        require(status == Status.AGREED, "SaleAgreement: sale already processed or not yet agreed on");
+        require(block.timestamp - createdAt < details.contengencyPeriod, "SaleAgreement: contengency period already over");
+        IERC20(walletContractAddress()).transfer(details.buyer, details.earnest);
+        Ownership(details.realty).transferShares(address(this), details.seller, details.share);
+        status = Status.WIDTHDRAWN;
     }
 
+    function breach(uint _penalty) public privileged {
+        require(status == Status.AGREED, "SaleAgreement: sale already processed or not yet agreed on");
+        require(_penalty <= details.earnest, "SaleAgreement: penalty can not be more than earnest");
+        IERC20(walletContractAddress()).transfer(details.seller, _penalty);
+        if (details.earnest - _penalty > 0) {
+            IERC20(walletContractAddress()).transfer(details.buyer, details.earnest - _penalty);
+        }
+        Ownership(details.realty).transferShares(address(this), details.seller, details.share);
+        status = Status.BREACHED;
+    }
 
-
-
-    
+    // executa funcoes no contrato Ownership do realty
+    function executeTransaction(uint _value, bytes memory _data) public onlySeller {
+        require(status == Status.AGREED, "SaleAgreement: realty not held in escrow");
+        (bool success, ) = details.realty.call{value: _value}(_data);
+        require(success, "SaleAgreement: transaction failed");
+    }
+  
 }
