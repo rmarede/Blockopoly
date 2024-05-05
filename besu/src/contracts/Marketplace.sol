@@ -36,7 +36,7 @@ contract Marketplace is Context {
     uint public saleCounter;
     mapping(uint => Sale) public sales;
     uint[] public activeSales; 
-    mapping(address => uint[]) public salesOfAsset;
+    mapping(address => address[]) public salesOfAsset;
 
     mapping(uint => Bid[]) public bidsBySale;
     mapping(address => uint[]) public bidsByUser;
@@ -58,7 +58,6 @@ contract Marketplace is Context {
             winningBid: 0,
             agreementAddress: address(0)
         });
-        salesOfAsset[_assetId].push(saleId);
         activeSales.push(saleId);
 
         return saleId;
@@ -117,6 +116,7 @@ contract Marketplace is Context {
 
         SaleAgreement agreement = new SaleAgreement(cns_address, details);
         sale.agreementAddress = address(agreement);
+        salesOfAsset[sale.asset].push(address(agreement));
         return address(agreement);
     }
 

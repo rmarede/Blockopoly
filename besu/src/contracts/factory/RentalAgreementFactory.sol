@@ -9,6 +9,8 @@ contract RentalAgreementFactory {
 
     address private cns;
 
+    mapping (address => address[]) public rentalsOf;
+
     constructor(address _cns) {
         cns = _cns;
     }
@@ -44,6 +46,8 @@ contract RentalAgreementFactory {
         });
 
         RentalAgreement agreement = new RentalAgreement(cns, _tenant, terms);
+        rentalsOf[_realtyContract].push(address(agreement));
+        rentalsOf[_tenant].push(address(agreement));
         return address(agreement);
     }
     
