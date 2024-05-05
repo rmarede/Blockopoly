@@ -20,7 +20,7 @@ contract SaleAgreement is Context {
         address realtor;
         uint comission; // 100 is 1%
         uint contengencyPeriod; // TODO alguma coisa a fazer com isto?
-        bytes[] contengencyClauses;
+        bytes contengencyClauses;
     }
 
     SaleDetails public details;

@@ -6,6 +6,8 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const abi = require('../scripts/utils/abi-data-encoder');
 const getAbi = require('../scripts/utils/get-abi');
+
+const textEncoder = new TextEncoder();
   
 describe("SaleAgreement", function () {
 
@@ -59,7 +61,7 @@ describe("SaleAgreement", function () {
             realtor: acc1.address,
             comission: 5,
             contengencyPeriod: 10000, // TODO
-            contengencyClauses: []
+            contengencyClauses: textEncoder.encode("foo")
         }
 
         const contract = await ethers.getContractFactory("SaleAgreement");

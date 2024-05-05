@@ -63,7 +63,7 @@ describe("MortgageLoan", function () {
         });
     });
 
-    describe("Init", function () {
+    describe("Enroll", function () {
         it("Should initialize MortgageLoan", async function () {
             const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
             const [acc1, acc2] = await ethers.getSigners();
@@ -71,15 +71,21 @@ describe("MortgageLoan", function () {
             await expect(wallet.mint(acc1.address, 500)).not.to.be.reverted;
             await expect(wallet.mint(acc2.address, 100)).not.to.be.reverted;
 
-            await expect(wallet.connect(acc1).approve(mortgageLoan.target, 500)).not.to.be.reverted;
-            await expect(mortgageLoan.connect(acc1).init()).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(mortgageLoan.target, 100)).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
 
-            expect(await wallet.balanceOf(mortgageLoan.target)).to.equal(500);
-            expect(await wallet.balanceOf(acc1.address)).to.equal(0);
+            expect(await wallet.balanceOf(mortgageLoan.target)).to.equal(100);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(0);
+        });
+
+        it("Should not enroll if not approved or has no balance", async function () {
+        });
+
+        it("Should not enroll if already enrolled", async function () {
         });
     });
 
-    describe("Enroll", function () {
+    describe("Secure", function () {
         it("Should enroll in initialized MortgageLoan", async function () {
             const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
             const [acc1, acc2] = await ethers.getSigners();
@@ -89,11 +95,18 @@ describe("MortgageLoan", function () {
             await expect(wallet.connect(acc1).approve(mortgageLoan.target, 500)).not.to.be.reverted;
             await expect(wallet.connect(acc2).approve(mortgageLoan.target, 100)).not.to.be.reverted;
 
-            await expect(mortgageLoan.connect(acc1).init()).not.to.be.reverted;
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc1).secure()).not.to.be.reverted;
 
             expect(await wallet.balanceOf(mortgageLoan.target)).to.equal(600);
+            expect(await wallet.balanceOf(acc1.address)).to.equal(0);
             expect(await wallet.balanceOf(acc2.address)).to.equal(0);
+        });
+
+        it("Should not secure if not enrolled", async function () {
+        });
+
+        it("Should not secure if not approved or has no balance", async function () {
         });
     });
 
@@ -108,8 +121,8 @@ describe("MortgageLoan", function () {
             await expect(wallet.connect(acc1).approve(mortgageLoan.target, 500)).not.to.be.reverted;
             await expect(wallet.connect(acc2).approve(mortgageLoan.target, 100)).not.to.be.reverted;
 
-            await expect(mortgageLoan.connect(acc1).init()).not.to.be.reverted;
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc1).secure()).not.to.be.reverted;
 
             await expect(mortgageLoan.connect(acc2).submitTransaction(
                 wallet.target, 
@@ -132,8 +145,8 @@ describe("MortgageLoan", function () {
             await expect(wallet.connect(acc1).approve(mortgageLoan.target, 500)).not.to.be.reverted;
             await expect(wallet.connect(acc2).approve(mortgageLoan.target, 100)).not.to.be.reverted;
 
-            await expect(mortgageLoan.connect(acc1).init()).not.to.be.reverted;
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc1).secure()).not.to.be.reverted;
 
             await expect(mortgageLoan.connect(acc2).submitTransaction(
                 wallet.target, 

@@ -44,5 +44,16 @@ library Arraysz {
         }
         return result;
     }
+
+    function mergeBytes(bytes memory a, bytes memory b) public pure returns (bytes memory) {
+        bytes memory result = new bytes(a.length + b.length);
+        for (uint i = 0; i < a.length; i++) {
+            result[i] = a[i];
+        }
+        for (uint i = 0; i < b.length; i++) {
+            result[i + a.length] = b[i];
+        }
+        return result;
+    }
 }
 

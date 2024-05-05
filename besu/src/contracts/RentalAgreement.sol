@@ -68,6 +68,7 @@ contract RentalAgreement is PaymentSplitter {
     address public tenant;
     RentStatus public status;
     uint public paymentCounter;
+    string public review;
 
     uint public renewalRequested;
     address public renewalRequester;
@@ -141,6 +142,11 @@ contract RentalAgreement is PaymentSplitter {
         terms.duration += renewalRequested;
         status = RentStatus.ACTIVE;
         renewalRequested = 0;
+    }
+
+    function writeReview(string memory _review) public onlyTenant {
+        require(status == RentStatus.TERMINATED, "RentalAgreement: rent agreement is not completed");
+        review = _review;
     }
 
     function paymentExpirationDate() public view returns (uint) {
