@@ -61,7 +61,7 @@ contract MortgageLoan is WeightedMultiSig, Context {
     State public state;
 
     constructor(address _cns, LoanDetails memory _details) 
-        WeightedMultiSig(_participant(_details.lender), _shares(_details.principal), Policy.UNANIMOUS) 
+        WeightedMultiSig(_participant(_details.borrower), _shares(_details.downPayment), Policy.UNANIMOUS) 
         Context(_cns)
     {
         details = _details;
@@ -69,15 +69,14 @@ contract MortgageLoan is WeightedMultiSig, Context {
         state = State.TBD; 
     }
 
-    function init() public onlyLender tbd {
-        IERC20(walletContractAddress()).transferFrom(details.lender, address(this), details.principal);
+    function enroll() public onlyBorrower tbd {
+        IERC20(walletContractAddress()).transferFrom(details.borrower, address(this), details.downPayment);
         state = State.PENDING;
     }
 
-    function enroll() public onlyBorrower pending {
-        require(IERC20(walletContractAddress()).balanceOf(address(this)) >= details.principal, "MortgageLoan: Principal not fully funded");
-        IERC20(walletContractAddress()).transferFrom(details.borrower, address(this), details.downPayment);
-        super.addShares(details.borrower, details.downPayment);
+    function secure() public onlyLender pending {
+        IERC20(walletContractAddress()).transferFrom(details.lender, address(this), details.principal);
+        super.addShares(details.lender, details.principal);
         state = State.ACTIVE;
     }
 
