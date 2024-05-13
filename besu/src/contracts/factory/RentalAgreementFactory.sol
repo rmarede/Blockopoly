@@ -50,5 +50,9 @@ contract RentalAgreementFactory {
         rentalsOf[_tenant].push(address(agreement));
         return address(agreement);
     }
+
+    function getRentalsOf(address _account) public view returns (address[] memory) {
+        return rentalsOf[_account];
+    }
     
 }

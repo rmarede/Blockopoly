@@ -45,12 +45,13 @@ contract PaymentSplitter is Context {
         }
     }
 
-    function payFrom(address _from, uint _amount) public virtual { // TODO override desta para nao permitir que paguem por outros
-        require(_amount > 0, "PaymentSplitter: amount is 0");
+    function collect() public virtual {
+        uint amount = IERC20(walletContractAddress()).balanceOf(address(this));
+        if(amount == 0) return;
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
-            uint payment = _amount * sharesOf(payee) / totalShares; 
-            IERC20(walletContractAddress()).transferFrom(_from, payee, payment);
+            uint payment = amount * sharesOf(payee) / totalShares; 
+            IERC20(walletContractAddress()).transfer(payee, payment);
             //emit PaymentReleased(payee, payment);
         }
     }

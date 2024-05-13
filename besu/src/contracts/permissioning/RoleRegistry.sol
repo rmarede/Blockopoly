@@ -47,6 +47,11 @@ contract RoleRegistry is IRoleRegistry, Context {
         return roleList[indexOf[_roleName]].privilege;
     }
 
+    function orgOf(string memory _roleName) public view returns (string memory) {
+        require(roleExists(_roleName));
+        return roleList[indexOf[_roleName]].orgId;
+    }
+
     function canCreateAccounts(string memory _roleName) public view override returns (bool) {
         return hasPermission(_roleName, Permission.CAN_CREATE_ACCOUNTS);
     }

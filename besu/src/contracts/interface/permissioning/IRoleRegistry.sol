@@ -16,6 +16,7 @@ interface IRoleRegistry {
     function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) external;
     function roleExists(string memory _roleName) external view returns (bool);
     function privilegeOf(string memory _roleName) external view returns (uint);
+    function orgOf(string memory _roleName) external view returns (string memory);
     function canCreateAccounts(string memory _roleName) external view returns (bool);
     function canCreateRoles(string memory _roleName) external view returns (bool);
     function canCreateNodes(string memory _roleName) external view returns (bool);

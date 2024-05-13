@@ -21,7 +21,6 @@ contract Marketplace is Context {
         bytes contengencyClauses;
         SaleStatus status;
         uint winningBid;
-        address agreementAddress;
     }
 
     struct Bid {
@@ -55,8 +54,7 @@ contract Marketplace is Context {
             seller: msg.sender,
             contengencyClauses: _contengencyClauses,
             status: SaleStatus.ACTIVE,
-            winningBid: 0,
-            agreementAddress: address(0)
+            winningBid: 0
         });
         activeSales.push(saleId);
 
@@ -115,7 +113,6 @@ contract Marketplace is Context {
             Arraysz.mergeBytes(sale.contengencyClauses, bid.contengencyClauses));
 
         SaleAgreement agreement = new SaleAgreement(cns_address, details);
-        sale.agreementAddress = address(agreement);
         salesOfAsset[sale.asset].push(address(agreement));
         return address(agreement);
     }

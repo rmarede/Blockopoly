@@ -29,7 +29,7 @@ contract SaleAgreement is Context {
 
     bool private buyerSignature;
     bool private sellerSignature;
-
+    
     modifier onlyParties() {
         require(msg.sender == details.buyer || msg.sender == details.seller, "SaleAgreement: only buyer or seller can call this function");
         _;

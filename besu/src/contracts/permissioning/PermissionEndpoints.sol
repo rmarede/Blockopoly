@@ -47,14 +47,13 @@ contract PermissionEndpoints is Multisignable, Context {
     // ----------------------------------- ROLES REGISTRY OPERATIONS -----------------------------------
 
 
-    function addRole(string calldata _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) public {
+    function addRole(string calldata _roleName, uint _privilege, Permission[] memory _perms) public {
         IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
         IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
 
-        require(Strings.equals(senderOrg, _orgId), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateRoles(senderRole), "RoleRegistry: Sender does not have permission to create role");
         require(_privilege > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Role privilege must be greater than sender's role privilege");
 
@@ -62,28 +61,28 @@ contract PermissionEndpoints is Multisignable, Context {
             require(roleRegistry.hasPermission(senderRole, _perms[i]), "RoleRegistry: Sender cannot grant permission that does not have");
         }
 
-        roleRegistry.addRole(_roleName, _orgId, _privilege, _perms);
+        roleRegistry.addRole(_roleName, senderOrg, _privilege, _perms);
     }
 
 
     // ---------------------------------- ACCOUNT REGISTRY OPERATIONS ----------------------------------
 
-    function addAccount(address _account, string memory _orgId, string memory _role, bool _isAdmin) public {
+    function addAccount(address _account, string memory _role, bool _isAdmin) public {
         IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
         IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
 
-        require(Strings.equals(senderOrg, _orgId), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to create accounts");
+        require(Strings.equals(roleRegistry.orgOf(_role), senderOrg), "RoleRegistry: Account role must belong to sender's organization");
         require(roleRegistry.privilegeOf(_role) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot create accounts with this role");
 
         if(_isAdmin) {
             require(accountRegistry.isAdmin(msg.sender), "AccountRegistry: Sender must be admin to create admin role");
         }
 
-        accountRegistry.addAccount(_account, _orgId, _role, _isAdmin);
+        accountRegistry.addAccount(_account, senderOrg, _role, _isAdmin);
     }
 
     function changeRoleOf(address _account, string memory _role) public {
@@ -94,8 +93,9 @@ contract PermissionEndpoints is Multisignable, Context {
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
 
-        require(Strings.equals(senderOrg, accountRegistry.orgOf(_account)), "AccountRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateAccounts(senderRole), "RoleRegistry: Sender does not have permission to change account role"); // TODO canCreateAccounts -> canChangeAccounts
+        require(Strings.equals(roleRegistry.orgOf(accRole), senderOrg), "RoleRegistry: Account role must belong to sender's organization");
+        require(Strings.equals(roleRegistry.orgOf(_role), senderOrg), "RoleRegistry: Account role must belong to sender's organization");
         require(roleRegistry.privilegeOf(accRole) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot change account with greater privilege");
         require(roleRegistry.privilegeOf(_role) > roleRegistry.privilegeOf(senderRole), "RoleRegistry: Sender cannot change account to a role with greater privilege");
 
@@ -134,17 +134,16 @@ contract PermissionEndpoints is Multisignable, Context {
 
     // ----------------------------------- NODE REGISTRY OPERATIONS -----------------------------------
 
-    function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort, string memory _orgId) public {
+    function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort) public {
         IAccountRegistry accountRegistry = IAccountRegistry(accountRegistryAddress());
         IRoleRegistry roleRegistry = IRoleRegistry(roleRegistryAddress());
 
         string memory senderRole = accountRegistry.roleOf(msg.sender);
         string memory senderOrg = accountRegistry.orgOf(msg.sender);
 
-        require(Strings.equals(senderOrg, _orgId), "NodeRegistry: Sender does not belong to the organization");
         require(roleRegistry.canCreateNodes(senderRole), "RoleRegistry: Sender does not have permission to create nodes");
 
-        INodeRegistry(nodeRegistryAddress()).addNode(_enodeId, _ip, _port, _raftPort, _orgId);
+        INodeRegistry(nodeRegistryAddress()).addNode(_enodeId, _ip, _port, _raftPort, senderOrg);
     }
 
     function deactivateNode(string memory _enodeId) public {
@@ -177,3 +176,4 @@ contract PermissionEndpoints is Multisignable, Context {
 
     
 }
+

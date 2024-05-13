@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./finance/PaymentSplitter.sol";
 import "./Ownership.sol";
+import "./interface/IERC20.sol";
 
 // TODO escrever as clausulas qualitativas do contrato em comentarios?
 
@@ -13,7 +14,7 @@ contract RentalAgreement is PaymentSplitter {
         _;
     }
 
-    modifier canPay() {
+    modifier canPay() { // TODO recheck this, necessario ter paymentCounter == 0? 
         require(paymentCounter == 0 || (block.timestamp >= terms.startDate + ((paymentCounter-1) * PERIOD)), "RentalAgreement: cannot pay yet");
         _;
     }
@@ -38,17 +39,17 @@ contract RentalAgreement is PaymentSplitter {
         _;
     }
 
-    modifier onlyOwnershipContract() {
+    modifier onlyLandlord() {
         require(msg.sender == terms.realtyContract, "RentalAgreement: only ownership contract can call this function");
         _;
     }
 
     modifier onlyParties() {
-        require(msg.sender == terms.realtyContract || msg.sender == tenant, "Only landlord or tenant can call this.");
+        require(msg.sender == terms.realtyContract || msg.sender == tenant, "Only landlord or tenant can call this operation.");
         _;
     }
 
-    enum RentStatus { ACTIVE, COMPLETED, TERMINATED, DUMPED }
+    enum RentStatus { PENDING, ACTIVE, COMPLETED, CONCLUDED, TERMINATED, EVICTED }
     uint public constant PERIOD = 30 days;
     
     struct RentalTerms {
@@ -70,6 +71,8 @@ contract RentalAgreement is PaymentSplitter {
     uint public paymentCounter;
     string public review;
 
+    uint public penaltySum;
+
     uint public renewalRequested;
     address public renewalRequester;
 
@@ -83,43 +86,43 @@ contract RentalAgreement is PaymentSplitter {
         //require(_terms.startDate > block.timestamp - 1 hours, "RentalAgreement: start date must be in the future");
 
         tenant = _tenant;
-        status = RentStatus.ACTIVE;
+        status = RentStatus.PENDING;
         terms = _terms;
     }
 
-    function pay(uint _amount) public override active onlyTenant canPay {
-        require(_amount == terms.rentValue, "RentalAgreement: incorrect payment amount");
-        super.pay(_amount);
+    function enroll() public onlyTenant {
+        require(status == RentStatus.PENDING, "RentalAgreement: rent agreement is not active");
+        IERC20(walletContractAddress()).transferFrom(tenant, address(this), terms.securityDeposit);
+        status = RentStatus.ACTIVE;
+    }
 
+    function payRent() public active onlyTenant canPay {
+        super.pay(terms.rentValue + penaltySum);
+        penaltySum = 0;
         if (++paymentCounter == terms.duration) {
             status = RentStatus.COMPLETED;
         }
     }
 
-    function terminate(uint _penalty) public onlyOwnershipContract completed rentTimeOver {
+    function conclude(uint _penalty) public onlyLandlord completed rentTimeOver {
         require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
-        require(msg.sender == terms.realtyContract, "RentalAgreement: only Ownership contract can terminate the agreement");
-        status = RentStatus.TERMINATED;
-
         uint remaining = terms.securityDeposit - _penalty;
-
         if (remaining > 0) {
             IERC20(walletContractAddress()).transfer(tenant, remaining);
         }
-
         if (_penalty > 0) {
-            super.payFrom(address(this), _penalty);
+            super.collect();
         }
+        status = RentStatus.CONCLUDED;
     }
 
-    function dump() public onlyOwnershipContract active expired {
+    function evict() public onlyLandlord active expired {
         require(block.timestamp - terms.startDate >= 1 days, "RentalAgreement: cannot dump tenant on first day");
-        status = RentStatus.DUMPED;
-        super.payFrom(address(this), terms.securityDeposit); // security deposit splitted
+        status = RentStatus.EVICTED;
+        super.collect(); // security deposit splitted
     }
 
-    function reduceDuration(uint _periods) public active {
-        require(msg.sender == tenant || msg.sender == terms.realtyContract, "RentalAgreement: only tenant or landlords can reduce duration");
+    function reduceTerm(uint _periods) public active onlyParties {
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");
 
         terms.duration -= _periods;
@@ -131,14 +134,12 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function requestRenewal(uint _periods) public completed onlyParties { 
+    function proposeRenewal(uint _periods) public completed onlyLandlord { 
         renewalRequested = _periods;
-        renewalRequester = msg.sender;
     }
 
-    function approveRenewal() public onlyParties {
+    function acceptRenewal() public completed onlyTenant {
         require(renewalRequested > 0, "RentalAgreement: no renewal has been requested");
-        require(renewalRequester != msg.sender, "RentalAgreement: cannot approve own request");
         terms.duration += renewalRequested;
         status = RentStatus.ACTIVE;
         renewalRequested = 0;
@@ -159,5 +160,14 @@ contract RentalAgreement is PaymentSplitter {
 
     function getTerms() public view returns (RentalTerms memory) {
         return terms;
+    }
+
+    function collect() public override {
+        require(status != RentStatus.ACTIVE, "RentalAgreement: rent agreement is still active");
+        super.collect();
+    }
+
+    function pay(uint _amount) public pure override {
+        require(false, "RentalAgreement: payment is not allowed");
     }
 }

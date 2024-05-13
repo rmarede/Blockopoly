@@ -33,9 +33,6 @@ contract MortgageLoanFactory is Context {
         });
 
         MortgageLoan mortgageLoan = new MortgageLoan(cns_address, details);
-
-        //IERC20(walletContractAddress()).transferFrom(msg.sender, address(mortgageLoan), _principal);
-
         return address(mortgageLoan);
     }
     
