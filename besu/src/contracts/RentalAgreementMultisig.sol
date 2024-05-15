@@ -4,10 +4,13 @@ pragma solidity ^0.8.0;
 import "./finance/PaymentSplitter.sol";
 import "./Ownership.sol";
 import "./interface/IERC20.sol";
+import "./governance/SelfMultisig.sol";
+import "./interface/permissioning/IAccountRegistry.sol";
+import "./utils/Strings.sol";
 
 // TODO escrever as clausulas qualitativas do contrato em comentarios?
 
-contract RentalAgreement is PaymentSplitter {
+contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
 
     event RentalEnrolled(address indexed tenant, address indexed landlord, address indexed realty);
     event RentalConcluded(address indexed tenant, address indexed landlord, address indexed realty);
@@ -41,6 +44,16 @@ contract RentalAgreement is PaymentSplitter {
         _;
     }
 
+    modifier onlySelf() {
+        require(msg.sender == address(this), "RentalAgreement: this operation can only be invoked by consensus");
+        _;
+    }
+
+    modifier privileged() {
+        require(msg.sender == address(this) || isPrivileged(msg.sender), "SaleAgreement: only privileged entities can call this function");
+        _;
+    }
+
     enum RentStatus { PENDING, ACTIVE, COMPLETED, TERMINATED}
     enum Action { RENEW, TERMINATE }
     uint public constant PERIOD = 30 days;
@@ -65,12 +78,9 @@ contract RentalAgreement is PaymentSplitter {
 
     uint public penaltySum;
 
-    Action public tenantAction;
-    Action public landlordAction;
-    uint public actionParam;
-
     constructor(address _cns, address _tenant, RentalTerms memory _terms) 
         PaymentSplitter(_terms.payees, _terms.shares, _cns) 
+        SelfMultisig(_participants(_tenant, _terms.realtyContract), Policy.UNANIMOUS)
     {
         require(_terms.rentValue > 0, "RentalAgreement: rent value must be greater than 0");
         require(_terms.duration > 0, "RentalAgreement: duration must be greater than 0");
@@ -100,17 +110,9 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function terminate() public onlyParties active {
+    function terminate() public privileged active {
         require(block.timestamp >= terms.startDate  + (terms.duration * PERIOD), "RentalAgreement: rent time is not over");
-        if (msg.sender == tenant) {
-            tenantAction = Action.TERMINATE;
-        } else if (msg.sender == terms.realtyContract) {
-            landlordAction = Action.TERMINATE;
-        }
-
-        if (tenantAction == Action.TERMINATE && landlordAction == Action.TERMINATE) {
-            status = RentStatus.TERMINATED;
-        }
+        status = RentStatus.TERMINATED;
     }
 
     function evict() public onlyLandlord active {
@@ -130,27 +132,10 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function renewTerm(uint _periods) public completed onlyLandlord {
-        if (msg.sender == tenant) {
-            tenantAction = Action.RENEW;
-        } else if (msg.sender == terms.realtyContract) {
-            landlordAction = Action.RENEW;
-            actionParam = _periods;
-        }
-
-        if (tenantAction == Action.RENEW && landlordAction == Action.RENEW) {
-            terms.duration += actionParam;
-            status = RentStatus.ACTIVE;
-            actionParam = 0;
-        }
-    }
-
-    /*function acceptRenewal() public completed onlyTenant {
-        require(renewalRequested > 0, "RentalAgreement: no renewal has been requested");
-        terms.duration += renewalRequested;
+    function renewTerm(uint _periods) public completed onlySelf {
+        terms.duration += _periods;
         status = RentStatus.ACTIVE;
-        renewalRequested = 0;
-    }*/
+    }
 
     function paymentDueDate() public view returns (uint) {
         return terms.startDate + paymentCounter * PERIOD;
@@ -184,5 +169,16 @@ contract RentalAgreement is PaymentSplitter {
 
     function pay(uint _amount) public pure override {
         require(false, "RentalAgreement: payment is not allowed");
+    }
+
+    function _participants(address _tenant, address _realty) private pure returns (address[] memory) {
+        address[] memory res = new address[](2);
+        res[0] = _tenant;
+        res[1] = _realty;
+        return res;
+    }
+
+    function isPrivileged(address _address) private view returns (bool) {
+        return Strings.equals(IAccountRegistry(accountRegistryAddress()).orgOf(_address), "admin_org");
     }
 }
