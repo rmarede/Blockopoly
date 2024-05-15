@@ -13,8 +13,10 @@ import "./utils/Strings.sol";
 contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
 
     event RentalEnrolled(address indexed tenant, address indexed landlord, address indexed realty);
-    event RentalConcluded(address indexed tenant, address indexed landlord, address indexed realty);
+    event RentalComplete(address indexed tenant, address indexed landlord, address indexed realty);
     event RentalTerminated(address indexed tenant, address indexed landlord, address indexed realty);
+    event TermRenewed(address indexed tenant, address indexed landlord, address indexed realty);
+    event TermReduced(address indexed tenant, address indexed landlord, address indexed realty);
     event SecurityDepositReturned(address indexed tenant, address indexed landlord, address indexed realty, uint value);
     event RentPayment(address indexed tenant, address indexed landlord, address indexed realty, uint value);
 
@@ -24,8 +26,8 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
         _;
     }
 
-    modifier completed() {
-        require(status == RentStatus.COMPLETED, "RentalAgreement: rent agreement is terminated, cancelled or is not yet completed");
+    modifier complete() {
+        require(status == RentStatus.COMPLETE, "RentalAgreement: rent agreement is terminated, cancelled or is not yet completed");
         _;
     }
 
@@ -54,7 +56,7 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
         _;
     }
 
-    enum RentStatus { PENDING, ACTIVE, COMPLETED, TERMINATED}
+    enum RentStatus { PENDING, ACTIVE, COMPLETE, TERMINATED}
     enum Action { RENEW, TERMINATE }
     uint public constant PERIOD = 30 days;
     
@@ -97,33 +99,52 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
         require(status == RentStatus.PENDING, "RentalAgreement: rent agreement is not active");
         IERC20(walletContractAddress()).transferFrom(tenant, address(this), terms.securityDeposit);
         status = RentStatus.ACTIVE;
+        emit RentalEnrolled(tenant, terms.realtyContract, address(this));
         payRent();
     }
 
     function payRent() public active onlyTenant {
         require(paymentCounter == 0 || (block.timestamp >= terms.startDate + ((paymentCounter-1) * PERIOD)), "RentalAgreement: cannot pay rent yet");
         super.pay(terms.rentValue + penaltySum);
-        emit RentPayment(tenant, terms.realtyContract, address(this), terms.rentValue + penaltySum);
         penaltySum = 0;
+        emit RentPayment(tenant, terms.realtyContract, address(this), terms.rentValue + penaltySum);
         if (++paymentCounter == terms.duration) {
-            status = RentStatus.COMPLETED;
+            status = RentStatus.COMPLETE;
+            emit RentalComplete(tenant, terms.realtyContract, address(this));
         }
     }
 
     function terminate() public privileged active {
         require(block.timestamp >= terms.startDate  + (terms.duration * PERIOD), "RentalAgreement: rent time is not over");
-        status = RentStatus.TERMINATED;
+        status = RentStatus.COMPLETE;
+        emit RentalComplete(tenant, terms.realtyContract, address(this));
     }
 
     function evict() public onlyLandlord active {
         require(block.timestamp - paymentDueDate() >= PERIOD, "RentalAgreement: period has not passed since last payment");
+        status = RentStatus.COMPLETE;
+        emit RentalComplete(tenant, terms.realtyContract, address(this));
+    }
+
+    function returnDeposit(uint _penalty) public onlyLandlord complete returns (uint) {
+        require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
+        uint remaining = terms.securityDeposit - _penalty;
+        if (remaining > 0) {
+            IERC20(walletContractAddress()).transfer(tenant, remaining);
+        }
         status = RentStatus.TERMINATED;
+        if (_penalty > 0) {
+            super.collect();
+        }
+        emit SecurityDepositReturned(tenant, terms.realtyContract, address(this), remaining);
+        return remaining;
     }
 
     function reduceTerm(uint _periods) public active onlyParties {
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");
 
         terms.duration -= _periods;
+        emit TermReduced(tenant, terms.realtyContract, address(this));
 
         if (msg.sender == tenant) {
             super.pay(terms.earlyTerminationFee);
@@ -132,9 +153,10 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
         }
     }
 
-    function renewTerm(uint _periods) public completed onlySelf {
+    function renewTerm(uint _periods) public complete onlySelf {
         terms.duration += _periods;
         status = RentStatus.ACTIVE;
+        emit TermRenewed(tenant, terms.realtyContract, address(this));
     }
 
     function paymentDueDate() public view returns (uint) {
@@ -147,19 +169,6 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
 
     function getTerms() public view returns (RentalTerms memory) {
         return terms;
-    }
-
-    function returnDeposit(uint _penalty) public onlyLandlord completed returns (uint) {
-        require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
-        uint remaining = terms.securityDeposit - _penalty;
-        if (remaining > 0) {
-            IERC20(walletContractAddress()).transfer(tenant, remaining);
-        }
-        status = RentStatus.TERMINATED;
-        if (_penalty > 0) {
-            super.collect();
-        }
-        return remaining;
     }
 
     function collect() public override returns (uint) {
