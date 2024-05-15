@@ -2,13 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "./Multisignable.sol";
-import "../utils/Strings.sol";
-import "../utils/Context.sol";
 
-import "../interface/permissioning/IAccountRegistry.sol";
-import "../interface/permissioning/IOrganizationRegistry.sol";
-
-contract OrganizationVoter is Multisignable, Context {
+contract Multisig is Multisignable {
 
     modifier transactionExists(uint transactionId) {
         require(transactions[transactionId].destination != address(0));
@@ -20,18 +15,6 @@ contract OrganizationVoter is Multisignable, Context {
         _;
     }
 
-    modifier canVote() {
-        IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
-        require(participantExists(accounts.orgOf(msg.sender)), "OrganizationVoter: Participant's organization does not participate in voting");
-        require(accounts.isAdmin(msg.sender), "OrganizationVoter: Sender is not organization admin");
-        _;
-    }
-
-    modifier onlySelf() {
-        require(msg.sender == address(this), "OrganizationVoter: Permission denied");
-        _;
-    }
-
     struct Transaction {
         address destination;
         uint value;
@@ -39,21 +22,20 @@ contract OrganizationVoter is Multisignable, Context {
         bool executed;
     }
 
-    string[] public participants; 
+    address[] public participants; 
     mapping (uint => Transaction) public transactions;
-    mapping (uint => mapping (string => bool)) internal confirmations;
+    mapping (uint => mapping (address => bool)) internal confirmations;
     uint public transactionCount;
 
-    constructor(address _cns, string[] memory _participants, Policy _policy) Multisignable(_policy) Context(_cns) {
-        require(_participants.length > 0, "OrganizationVoter: No participants specified");
+    constructor(address[] memory _participants, Policy _policy) Multisignable(_policy)  {
+        require(_participants.length > 0, "Multisig: No participants specified");
         for (uint i=0; i<_participants.length; i++) {
-            require(IOrganizationRegistry(organizationRegistryAddress()).orgExists(_participants[i]), "OrganizationVoter: Organization does not exist");
             participants.push(_participants[i]);
         }
     }
 
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual canVote returns (uint transactionId) {
-        require(_isMultisignable(_destination), "OrganizationVoter: Target is not multisignable");
+    function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual returns (uint transactionId) {
+        require(_isMultisignable(_destination), "Multisig: Target is not multisignable");
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             destination: _destination,
@@ -65,9 +47,8 @@ contract OrganizationVoter is Multisignable, Context {
         confirmTransaction(transactionId);
     }
 
-    function confirmTransaction(uint _transactionId) public canVote transactionExists(_transactionId) {
-        IAccountRegistry accounts = IAccountRegistry(accountRegistryAddress());
-        confirmations[_transactionId][accounts.orgOf(msg.sender)] = true;
+    function confirmTransaction(uint _transactionId) public transactionExists(_transactionId) {
+        confirmations[_transactionId][msg.sender] = true;
         executeTransaction(_transactionId);
     }   
 
@@ -78,7 +59,7 @@ contract OrganizationVoter is Multisignable, Context {
             Transaction storage txn = transactions[_transactionId];
             (bool success, ) = txn.destination.call{value: txn.value}(txn.data);
             txn.executed = true;
-            require(success, "OrganizationVoter: Transaction failed");
+            require(success, "Multisig: Transaction failed");
         }
     }
 
@@ -101,30 +82,31 @@ contract OrganizationVoter is Multisignable, Context {
                 count += 1;
     }
 
-    function getParticipants() public view returns (string[] memory) {
+    function getParticipants() public view returns (address[] memory) {
         return participants;
     }
 
-    function addParticipant(string memory _participant) public onlySelf {
-        require(IOrganizationRegistry(organizationRegistryAddress()).orgExists(_participant), "OrganizationVoter: Organization does not exist");
-        require(!participantExists(_participant), "OrganizationVoter: Participant already exists");
+    function addParticipant(address _participant) internal virtual {
+        require(_participant != address(0), "Multisig: Invalid input");
+        require(!participantExists(_participant), "Multisig: Participant already exists");
         participants.push(_participant);
     }
 
-    function removeParticipant(string memory _participant) public onlySelf {
-        require(!Strings.equals(_participant, ""), "OrganizationVoter: Invalid input");
+    function removeParticipant(address _participant) internal virtual {
+        require(_participant != address(0), "Multisig: Invalid input");
         for (uint i=0; i<participants.length; i++) {
-            if (Strings.equals(participants[i], _participant)) {
+            if (participants[i] == _participant) {
                 participants[i] = participants[participants.length - 1];
                 participants.pop();
-                break;
+                return;
             }
         }
+        revert();
     }
 
-    function participantExists(string memory _participant) public view returns (bool) {
+    function participantExists(address _participant) public view returns (bool) {
         for (uint i=0; i<participants.length; i++) {
-            if (Strings.equals(participants[i], _participant)) {
+            if (participants[i] == _participant) {
                 return true;
             }
         }
@@ -136,7 +118,7 @@ contract OrganizationVoter is Multisignable, Context {
             return true;
         } catch {
             return false;
+        }
     }
-}
 
 }

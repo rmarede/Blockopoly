@@ -7,6 +7,8 @@ import "../Ownership.sol";
 
 contract RentalAgreementFactory {
 
+    event NewRentalAgreement(address indexed tenant, address indexed landlord, address indexed realty, address agreement);
+
     address private cns;
 
     mapping (address => address[]) public rentalsOf;
@@ -48,6 +50,7 @@ contract RentalAgreementFactory {
         RentalAgreement agreement = new RentalAgreement(cns, _tenant, terms);
         rentalsOf[_realtyContract].push(address(agreement));
         rentalsOf[_tenant].push(address(agreement));
+        emit NewRentalAgreement(_tenant, _realtyContract, address(agreement), address(agreement));
         return address(agreement);
     }
 

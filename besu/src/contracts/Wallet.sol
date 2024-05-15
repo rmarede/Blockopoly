@@ -54,6 +54,7 @@ contract Wallet is IERC20, Context {
     function approve(address spender, uint amount) public virtual returns (bool) {
         require(spender != address(0), "Wallet: invalid input");
         allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
         return true;
     }
 
@@ -68,6 +69,7 @@ contract Wallet is IERC20, Context {
         
         balances[from] = fromBalance - amount;
         balances[to] += amount;
+        emit Transfer(from, to, amount);
     }
 
     function _spendAllowance(address owner, address spender, uint amount) internal virtual {

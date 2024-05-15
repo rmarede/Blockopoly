@@ -45,15 +45,16 @@ contract PaymentSplitter is Context {
         }
     }
 
-    function collect() public virtual {
+    function collect() public virtual returns (uint){
         uint amount = IERC20(walletContractAddress()).balanceOf(address(this));
-        if(amount == 0) return;
+        if(amount == 0) return 0;
         for (uint i = 0; i < payees.length; i++) {
             address payee = payees[i];
             uint payment = amount * sharesOf(payee) / totalShares; 
             IERC20(walletContractAddress()).transfer(payee, payment);
             //emit PaymentReleased(payee, payment);
         }
+        return amount;
     }
 
     // In case ownership changes, it is necessary to update the payees

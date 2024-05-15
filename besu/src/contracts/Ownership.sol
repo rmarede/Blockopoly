@@ -42,6 +42,8 @@ contract Ownership is WeightedMultiSig {
     }
 
     function transferShares(address _from, address _to, uint _amount) public override {
+        // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
+        require(approvedOf(_from) == msg.sender || (approvedOf(_from) == address(0) && msg.sender == _from), "Ownership: Permission denied");
         super.transferShares(_from, _to, _amount);
         admin = address(0);
         if (shares[_from] == 0) {
@@ -65,17 +67,12 @@ contract Ownership is WeightedMultiSig {
         return super.isConfirmed(_transactionId);
     }
 
-    function _canTransferShares(address _from, address _operator) internal override view returns (bool) {
-        // if no approval, only the owner can transfer shares; if there is an approval, only the operator (approved address) can transfer
-        return approvedOf(_from) == _operator|| (approvedOf(_from) == address(0) && _operator == _from);
+    function addShares(address _to, uint _amount) public pure override {
+        require(false, "Ownership: Not allowed");
     }
 
-    function _canAddShares(address operator) internal pure override returns (bool) {
-        return false;
-    }
-
-    function _canRemoveShares(address operator) internal pure override returns (bool) {
-        return false;
+    function removeShares(address _from, uint _amount) public pure override {
+        require(false, "Ownership: Not allowed");
     }
 
 }

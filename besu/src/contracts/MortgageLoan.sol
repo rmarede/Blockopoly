@@ -152,13 +152,5 @@ contract MortgageLoan is WeightedMultiSig, Context {
         res[0] = _principal;
         return res;
     }
-
-    function _canTransferShares(address from, address operator) internal pure override returns (bool) {
-        return true;
-    }
-
-    function _canAddShares(address operator) internal pure override returns (bool) {
-        return true;
-    }
     
 }
