@@ -33,6 +33,7 @@ contract NodeRegistry is INodeRegistry, Context {
         NodeDetails memory node = NodeDetails(_enodeId, _ip, _port, _raftPort, _orgId, true);
         nodeList.push(node);
         indexOf[_enodeId] = nodeList.length - 1;
+        emit NodeAdded(_enodeId, _ip, _port, _raftPort, _orgId);
     }
 
     function nodeExists(string memory _enodeId) public view override returns (bool) {
@@ -57,10 +58,12 @@ contract NodeRegistry is INodeRegistry, Context {
 
     function deactivateNode(string memory _enodeId) public override onlyMain {
         nodeList[indexOf[_enodeId]].active = false;
+        emit NodeDeactivated(_enodeId);
     }
 
     function activateNode(string memory _enodeId) public override onlyMain {
         nodeList[indexOf[_enodeId]].active = true;
+        emit NodeActivated(_enodeId);
     }
 
     //  TODO funcoes para alterar IP e port, onlyMain e verificar autorizacao la

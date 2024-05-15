@@ -13,6 +13,7 @@ enum Permission {
 }
 
 interface IRoleRegistry {
+    event RoleAdded(string indexed roleName, string indexed orgId, uint privilege, Permission[] perms);
     function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) external;
     function roleExists(string memory _roleName) external view returns (bool);
     function privilegeOf(string memory _roleName) external view returns (uint);

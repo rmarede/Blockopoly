@@ -7,6 +7,8 @@ import "../interface/system/IContractNameService.sol";
 // alt: ERC-1820
 contract ContractNameService is IContractNameService {
 
+    event ContractAddressSet(string indexed name, address addr, uint version);
+
     ContractInstance[] internal registry;
     mapping(string => uint) internal indexOf;
 
@@ -48,6 +50,7 @@ contract ContractNameService is IContractNameService {
 
         registry.push(instance);
         indexOf[_name] = registry.length - 1;
+        emit ContractAddressSet(_name, _address, instance.version);
     }
 
     function getContractVersion(string calldata _name) public view override returns (uint) {

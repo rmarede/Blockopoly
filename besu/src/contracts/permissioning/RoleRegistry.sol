@@ -36,6 +36,7 @@ contract RoleRegistry is IRoleRegistry, Context {
         for (uint i = 0; i < _perms.length; i++) {
             rolePermission[roleName][_perms[i]] = true;
         }
+        emit RoleAdded(roleName, _orgId, _privilege, _perms);
     }
 
     function roleExists(string memory _roleName) public view override returns (bool) {

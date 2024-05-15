@@ -10,6 +10,12 @@ import "./interface/IERC20.sol";
 
 contract MortgageLoan is WeightedMultiSig, Context {
 
+    event LoanEnrolled(address indexed lender, address indexed borrower);
+    event LoanSecured(address indexed lender, address indexed borrower);
+    event LoanAmortized(address indexed borrower, address indexed lender);
+    event LoanTerminated(address indexed borrower, address indexed lender);
+    event LoanForeclosured(address indexed borrower, address indexed lender);
+
     modifier tbd() {
         require(state == State.TBD, "MortgageLoan: Loan process already initialized");
         _;
@@ -72,12 +78,14 @@ contract MortgageLoan is WeightedMultiSig, Context {
     function enroll() public onlyBorrower tbd {
         IERC20(walletContractAddress()).transferFrom(details.borrower, address(this), details.downPayment);
         state = State.PENDING;
+        emit LoanEnrolled(details.lender, details.borrower);
     }
 
     function secure() public onlyLender pending {
         IERC20(walletContractAddress()).transferFrom(details.lender, address(this), details.principal);
         super.addShares(details.lender, details.principal);
         state = State.ACTIVE;
+        emit LoanSecured(details.lender, details.borrower);
     }
 
     function amortization() public view returns (uint) { // currently min 1%
@@ -108,11 +116,13 @@ contract MortgageLoan is WeightedMultiSig, Context {
         }
         paymentCounter++;
         _balanceEquity();
+        emit LoanAmortized(details.borrower, details.lender);
     }
 
     function terminate(address _asset, uint _share) public completed {
         Ownership(_asset).transferShares(address(this), details.borrower, _share);
         state = State.TERMINATED;
+        emit LoanTerminated(details.borrower, details.lender);
     }
 
     function applyPenalty() public onlyLender active { // preciso ter cuidado para nao estragar a equity, aumentar o interest?
@@ -123,6 +133,7 @@ contract MortgageLoan is WeightedMultiSig, Context {
         require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + details.defaultDeadline, "MortgageLoan: Default deadline not reached");
         Ownership(_asset).transferShares(address(this), details.lender, _share);
         state = State.FORECLOSURED;
+        emit LoanForeclosured(details.borrower, details.lender);
     }
 
     function _balanceEquity() private {

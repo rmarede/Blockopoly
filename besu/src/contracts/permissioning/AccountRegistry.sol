@@ -26,10 +26,12 @@ contract AccountRegistry is IAccountRegistry, Context {
         AccountDetails memory account = AccountDetails(_account, _orgId, _role, _isAdmin, true);
         accountList.push(account);
         indexOf[_account] = accountList.length - 1;
+        emit AccountAdded(_account, _orgId, _role, _isAdmin);
     }
 
     function changeRoleOf(address _account, string memory _role) public override onlyMain {
         accountList[indexOf[_account]].role = _role;
+        emit AccountRoleChanged(_account, _role);
     }
 
     function roleOf(address _account) public view override returns (string memory) {
@@ -54,10 +56,12 @@ contract AccountRegistry is IAccountRegistry, Context {
 
     function deactivateAccount(address _account) public override onlyMain {
         accountList[indexOf[_account]].active = false;
+        emit AccountDeactivated(_account);
     }
 
     function activateAccount(address _account) public override onlyMain {
         accountList[indexOf[_account]].active = true;
+        emit AccountActivated(_account);
     }
 
 }

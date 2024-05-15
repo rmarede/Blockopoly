@@ -31,7 +31,8 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
         require(!orgExists(_orgId));
         OrganizationDetails memory org = OrganizationDetails(_orgId, true);
         orgList.push(org);
-        indexOf[_orgId] = orgList.length - 1;        
+        indexOf[_orgId] = orgList.length - 1;
+        emit OrganizationAdded(_orgId);    
     }
 
     function orgExists(string calldata _orgId) public view override returns (bool) {
@@ -46,12 +47,14 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = false;
+        emit OrganizationDeactivated(_orgId);
     }
 
     function reactivateOrg(string calldata _orgId) public override onlyMain {
         require(orgExists(_orgId));
         uint index = indexOf[_orgId];
         orgList[index].active = true;
+        emit OrganizationReactivated(_orgId);
     }
 
 

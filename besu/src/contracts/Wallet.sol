@@ -9,7 +9,6 @@ import "./interface/permissioning/IAccountRegistry.sol";
 // Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
 
 contract Wallet is IERC20, Context {
-
     mapping(address => uint) private balances;
     mapping(address => mapping(address => uint)) private allowances;
 
