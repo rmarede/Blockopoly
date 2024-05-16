@@ -76,6 +76,70 @@ describe("SaleAgreement", function () {
         });
     }); 
 
+    describe("Consent", function () {
+        it("Should not consent if not a party", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+        
+        it("Should not consent if not approved", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+        
+        it("Should not consent after already consented", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            // testar para quando estado esta AGREED e COMMITED e WITHDRAWN
+        });
+
+        it("Should hold assets in escrow when both consented", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+    }); 
+
+    describe("Commit", function () {
+        it("Should not commit if not yet consented by both parties", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should not commit if not a party", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+        
+        it("Should not commit if no allowance", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+        
+        it("Should not commit if not approved", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should not commit if already commited or withdrawn", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should commit and transfer assets", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+    }); 
+
+    describe("Withdraw", function () {
+        it("Should not withdraw if not a party", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should not withdraw if already commited", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should not withdraw if not consented", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+
+        it("Should withdraw and return assets", async function () {
+            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+        });
+    }); 
+
     /*
     describe("sign", function () {
         it("Should let buyer sign and hold funds", async function () {

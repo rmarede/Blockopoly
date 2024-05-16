@@ -26,6 +26,16 @@ contract SaleAgreementFactory is Context {
         return address(agreement);
     }
 
+    function createSaleAgreement(SaleAgreement.SaleDetails memory _details) public returns (address) {
+        require(IRoleRegistry(roleRegistryAddress()).canMintSaleAgreements(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "SaleAgreementFactory: only realtor can create sale agreement contracts");
+        SaleAgreement agreement = new SaleAgreement(cns_address, _details);
+        salesOf[_details.realty].push(address(agreement));
+        salesOf[_details.buyer].push(address(agreement));
+        salesOf[_details.seller].push(address(agreement));
+        emit NewSaleAgreement(_details.buyer, _details.seller, _details.realty, address(agreement));
+        return address(agreement);
+    }
+
     function getSalesOf(address _account) public view returns (address[] memory) {
         return salesOf[_account];
     }

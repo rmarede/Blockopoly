@@ -44,10 +44,13 @@ describe("RentalAgreement", function () {
 
         const terms = {
             realtyContract: ownership.target,
-            rentValue: 200,
-            securityDeposit: 100,
             startDate: Math.floor(new Date().getTime() / 1000),
             duration: 3, 
+            rentValue: 200,
+            securityDeposit: 100,
+            securityReturnDueDate: 15,
+            paymentDueDate: 1,
+            latePaymentFee: 10,
             earlyTerminationFee: 50, 
             earlyTerminationNotice: 1,
             extra: 'extra terms', 
@@ -83,10 +86,13 @@ describe("RentalAgreement", function () {
 
         const terms = {
             realtyContract: ownership.target,
-            rentValue: 200,
-            securityDeposit: 100,
             startDate: Math.floor(new Date().getTime() / 1000) - 60*60*24*30*12,
             duration: 3, 
+            rentValue: 200,
+            securityDeposit: 100,
+            securityReturnDueDate: 15,
+            paymentDueDate: 1,
+            latePaymentFee: 10,
             earlyTerminationFee: 50, 
             earlyTerminationNotice: 1,
             extra: 'extra terms', 
@@ -109,18 +115,82 @@ describe("RentalAgreement", function () {
           });
     });
 
+    describe("Enroll", function () {
+        it("Should not enroll if not tenant", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+            
+            await expect(wallet.mint(acc3.address, 2000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc3).enroll()).to.be.reverted;
+        });
+
+        it("Should not enroll if not enough allowance", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
+            const [acc1, acc2] = await ethers.getSigners();
+            
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 100)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).to.be.reverted;
+        });
+
+        it("Should not enroll twice", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
+            const [acc1, acc2] = await ethers.getSigners();
+            
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).to.be.reverted;
+          });
+
+        it("Should enroll", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
+            const [acc1, acc2] = await ethers.getSigners();
+            
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
+        });
+    });
+
     describe("Pay", function () {
-        it("Should pay the first and second months, but not third", async function () {
+        it("Should not pay if not tenant", async function () {
+        });
+
+        it("Should not pay in advance", async function () {
             const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePresent);
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
             await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
-            await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
-            await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
-            await expect(rentalAgreement.connect(acc2).pay(200)).to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).payRent()).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).payRent()).to.be.reverted;
             expect(await wallet.balanceOf(acc1.address)).to.equal(400);
-            expect(await wallet.balanceOf(acc2.address)).to.equal(1600);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(1500);
+          });
+
+          it("Should not pay more than duration", async function () {
+          });
+
+          it("Should conclude after paying everything", async function () {
+            const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePast);
+            const [acc1, acc2] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
+            await expect(wallet.mint(rentalAgreement.target, 100)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('terminate', [5]))).to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
+            await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('terminate', [5]))).not.to.be.reverted;
+            expect(await wallet.balanceOf(acc1.address)).to.equal(605);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(1495);
+          });
+
+          it("Should apply the late payment fee", async function () {
           });
     });
 
@@ -132,7 +202,7 @@ describe("RentalAgreement", function () {
             await expect(wallet.mint(acc2.address, 2000)).not.to.be.reverted;
             await expect(wallet.mint(rentalAgreement.target, 100)).not.to.be.reverted;
             await expect(wallet.connect(acc2).approve(rentalAgreement.target, 2000)).not.to.be.reverted;
-            await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
+            await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
             await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('terminate', [5]))).to.be.reverted;
             await expect(rentalAgreement.connect(acc2).pay(200)).not.to.be.reverted;
@@ -142,7 +212,7 @@ describe("RentalAgreement", function () {
           });
     });
 
-    describe("Default", function () {
+    describe("Evict", function () {
         it("Should dump when expired", async function () {
             const { rentalAgreement, wallet, ownership } = await loadFixture(deployRentalAgreementFixturePast);
             const [acc1, acc2] = await ethers.getSigners();
@@ -165,6 +235,9 @@ describe("RentalAgreement", function () {
             await expect(ownership.connect(acc1).submitTransaction(rentalAgreement.target, 0, abi.encodeRentalAgreementData('dump', []))).to.be.reverted;
             expect(await rentalAgreement.status()).to.equal(0);
           });
+    });
+
+    describe("reduceTerm", function () {
     });
 
 

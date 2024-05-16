@@ -102,7 +102,7 @@ describe("PermissionEndpoints", function () {
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
 
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [])).not.to.be.reverted;
             expect(await accountRegistry.roleOf(acc1.address)).to.be.equal("org1_admin");
         });
 
@@ -110,16 +110,7 @@ describe("PermissionEndpoints", function () {
             const [orgVoter, acc1, acc2] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
 
-            await expect(permissionEndpoints.connect(orgVoter).addRole("user", "org1", 1, [])).to.be.reverted;
-        });
-
-        it("Should not add role if not from same organization", async function () {
-            const [orgVoter, acc1, acc2] = await ethers.getSigners();
-            const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
-            await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(orgVoter).addOrganization("org2", acc2.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org2", 1, [])).to.be.reverted;
+            await expect(permissionEndpoints.connect(orgVoter).addRole("user", 1, [])).to.be.reverted;
         });
 
         it("Should not add role if has no permission", async function () {
@@ -130,7 +121,7 @@ describe("PermissionEndpoints", function () {
             expect(await roleRegistry.canCreateRoles("org1_admin")).to.be.false;
             expect(await accountRegistry.roleOf(acc1.address)).to.be.equal("org1_admin");
 
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [])).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [])).to.be.reverted;
         });
 
         it("Should not add role with permissions that dont have", async function () {
@@ -138,7 +129,7 @@ describe("PermissionEndpoints", function () {
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6])).not.to.be.reverted;
 
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [7])).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [7])).to.be.reverted;
         });
 
         it("Should not add role with more privilege (lower privilege number)", async function () {
@@ -146,10 +137,10 @@ describe("PermissionEndpoints", function () {
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
 
-            await expect(permissionEndpoints.connect(acc1).addRole("privilege1", "org1", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2, "org1", "org1_privilege1", true)).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("privilege1", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2, "org1_privilege1", true)).not.to.be.reverted;
 
-            await expect(permissionEndpoints.connect(acc2).addRole("privilege0", "org1", 0, [0,1,2,3,4,5,6,7])).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc2).addRole("privilege0", 0, [0,1,2,3,4,5,6,7])).to.be.reverted;
         });
 
     });
@@ -160,8 +151,8 @@ describe("PermissionEndpoints", function () {
             const [orgVoter, acc1, acc2] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1", "org1_user", false)).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1_user", false)).not.to.be.reverted;
             expect(await accountRegistry.accountExists(acc2.address)).to.be.true;
             expect(await accountRegistry.roleOf(acc2.address)).to.be.equal("org1_user");
         });
@@ -171,47 +162,47 @@ describe("PermissionEndpoints", function () {
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org2", acc2.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1", "org1_user", false)).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1_user", false)).to.be.reverted;
         });
 
         it("Should not add account for not existing organization", async function () {
             const [orgVoter, acc1, acc2, acc3] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
-            await expect(permissionEndpoints.connect(orgVoter).addAccount(acc1.address, "org1", "org1_user", false)).to.be.reverted;
+            await expect(permissionEndpoints.connect(orgVoter).addAccount(acc1.address, "org1_user", false)).to.be.reverted;
         });
 
         it("Should not add account for not existing role", async function () {
             const [orgVoter, acc1, acc2, acc3] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1", "org1_user", false)).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1_user", false)).to.be.reverted;
         });
 
         it("Should not add account of role with higher privilege (lower privilege number)", async function () {
             const [orgVoter, acc1, acc2, acc3] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1", "org1_user", true)).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1", "org1_admin", false)).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1_user", true)).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1_admin", false)).to.be.reverted;
         });
         
         it("Should not add account if has no permission", async function () {
             const [orgVoter, acc1, acc2, acc3] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1", "org1_user", false)).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1_user", false)).to.be.reverted;
         });
 
         it("Should not add admin if sender is not admin", async function () {
             const [orgVoter, acc1, acc2, acc3] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addRole("user", "org1", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1", "org1_user", false)).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1", "org1_user", true)).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addRole("user", 1, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addAccount(acc2.address, "org1_user", false)).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc2).addAccount(acc3.address, "org1_user", true)).to.be.reverted;
         });
     });
 
@@ -221,29 +212,21 @@ describe("PermissionEndpoints", function () {
             const [orgVoter, acc1, acc2] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addNode("enodeid1", "192.158.1.38", 8080, 8081, "org1")).not.to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addNode("enodeid1", "192.158.1.38", 8080, 8081)).not.to.be.reverted;
             expect(await nodeRegistry.nodeExists("enodeid1")).to.be.true;
-        });
-
-        it("Should not add node for other organization", async function () {
-            const [orgVoter, acc1, acc2] = await ethers.getSigners();
-            const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
-            await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(orgVoter).addOrganization("org2", acc2.address, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addNode("enodeid1", "192.158.1.38", 8080, 8081, "org2")).to.be.reverted;
         });
 
         it("Should not add node for not existing organization", async function () {
             const [orgVoter, acc1, acc2] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
-            await expect(permissionEndpoints.connect(orgVoter).addNode("enodeid1", "192.158.1.38", 8080, 8081, "org1")).to.be.reverted;
+            await expect(permissionEndpoints.connect(orgVoter).addNode("enodeid1", "192.158.1.38", 8080, 8081)).to.be.reverted;
         });
         
         it("Should not add node if has no permission", async function () {
             const [orgVoter, acc1, acc2] = await ethers.getSigners();
             const {permissionEndpoints, organizationRegistry, roleRegistry, accountRegistry, nodeRegistry} = await loadFixture(deployPermissionEndpointsFixture);
             await expect(permissionEndpoints.connect(orgVoter).addOrganization("org1", acc1.address, [0,1,3,4,5,6,7])).not.to.be.reverted;
-            await expect(permissionEndpoints.connect(acc1).addNode("enodeid1", "192.158.1.38", 8080, 8081, "org1")).to.be.reverted;
+            await expect(permissionEndpoints.connect(acc1).addNode("enodeid1", "192.158.1.38", 8080, 8081)).to.be.reverted;
         });
 
     });

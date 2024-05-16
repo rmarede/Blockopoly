@@ -67,16 +67,6 @@ contract WeightedMultiSig is Multisignable {
         return participants;
     }
 
-    function changePolicy(string memory _policy) public onlySelf {
-        if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("MAJORITY"))) {
-            policy = Policy.MAJORITY;
-        } else if (keccak256(abi.encodePacked(_policy)) == keccak256(abi.encodePacked("UNANIMOUS"))) {
-            policy = Policy.UNANIMOUS;
-        } else {
-            revert("WeightedMultiSig: Invalid policy");
-        }
-    }
-
     function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual isOwner(msg.sender) returns (uint _transactionId) {
         _transactionId = transactionCount;
         transactions[_transactionId] = Transaction({
@@ -176,6 +166,10 @@ contract WeightedMultiSig is Multisignable {
                 }
             }
         }
+    }
+
+    function setMultisigPolicy(Policy _policy) public override onlySelf {
+        super.setMultisigPolicy(_policy);
     }
 
 }

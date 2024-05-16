@@ -56,7 +56,7 @@ describe("PaymentSplitter", function () {
             
             await expect(wallet.connect(acc1).mint(acc4.address, 1000)).not.to.be.reverted;
             await expect(wallet.connect(acc4).approve(paymentSplitter.target, 1000)).not.to.be.reverted;
-            await expect(paymentSplitter.connect(acc4).payFrom(acc4.address, 1000)).not.to.be.reverted;
+            await expect(paymentSplitter.connect(acc4).pay(1000)).not.to.be.reverted;
             expect(await wallet.balanceOf(paymentSplitter.target)).to.equal(0);
             expect(await wallet.balanceOf(acc1.address)).to.equal(500);
             expect(await wallet.balanceOf(acc2.address)).to.equal(250);

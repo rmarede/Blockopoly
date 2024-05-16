@@ -15,4 +15,8 @@ contract Multisignable is IMultisignable {
         return policy;
     }
 
+    function setMultisigPolicy(Policy _policy) public virtual {
+        policy = _policy;
+    }
+
 }
