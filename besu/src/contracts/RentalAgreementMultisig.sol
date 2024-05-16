@@ -115,7 +115,6 @@ contract RentalAgreementMultisig is PaymentSplitter, SelfMultisig {
     }
 
     function terminate() public privileged active {
-        require(block.timestamp >= terms.startDate  + (terms.duration * PERIOD), "RentalAgreement: rent time is not over");
         status = RentStatus.COMPLETE;
         emit RentalComplete(tenant, terms.realtyContract, address(this));
     }

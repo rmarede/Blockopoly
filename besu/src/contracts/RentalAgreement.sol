@@ -49,10 +49,13 @@ contract RentalAgreement is PaymentSplitter {
     
     struct RentalTerms {
         address realtyContract;
-        uint rentValue;
-        uint securityDeposit;
         uint startDate;
         uint duration; // in periods
+        uint rentValue;
+        uint securityDeposit;
+        uint securityReturnDueDate; // in days
+        uint paymentDueDate; // in days (nth day of the month)
+        uint latePaymentFee; // for each late day
         uint earlyTerminationFee;
         uint earlyTerminationNotice; // in periods
         string extra;
@@ -64,8 +67,6 @@ contract RentalAgreement is PaymentSplitter {
     address public tenant;
     RentStatus public status;
     uint public paymentCounter;
-
-    uint public penaltySum;
 
     Action public tenantAction;
     Action public landlordAction;
@@ -95,8 +96,11 @@ contract RentalAgreement is PaymentSplitter {
 
     function payRent() public active onlyTenant {
         require(paymentCounter == 0 || (block.timestamp >= terms.startDate + ((paymentCounter-1) * PERIOD)), "RentalAgreement: cannot pay rent yet");
+        uint penaltySum = 0;
+        if (block.timestamp > paymentDueDate()) {
+            penaltySum = terms.latePaymentFee * daysSince(paymentDueDate());
+        }
         super.pay(terms.rentValue + penaltySum);
-        penaltySum = 0;
         emit RentPayment(tenant, terms.realtyContract, address(this), terms.rentValue + penaltySum);
         if (++paymentCounter == terms.duration) {
             status = RentStatus.COMPLETE;
@@ -105,13 +109,11 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     function terminate() public onlyParties active {
-        require(block.timestamp >= terms.startDate  + (terms.duration * PERIOD), "RentalAgreement: rent time is not over");
         if (msg.sender == tenant) {
             tenantAction = Action.TERMINATE;
         } else if (msg.sender == terms.realtyContract) {
             landlordAction = Action.TERMINATE;
         }
-
         if (tenantAction == Action.TERMINATE && landlordAction == Action.TERMINATE) {
             status = RentStatus.COMPLETE;
             emit RentalComplete(tenant, terms.realtyContract, address(this));
@@ -119,13 +121,17 @@ contract RentalAgreement is PaymentSplitter {
     }
 
     function evict() public onlyLandlord active {
-        require(block.timestamp - paymentDueDate() >= PERIOD, "RentalAgreement: period has not passed since last payment");
-        status = RentStatus.COMPLETE;
+        require(block.timestamp >= paymentDueDate(), "RentalAgreement: period has not passed since last payment");
+        status = RentStatus.TERMINATED;
+        super.collect();
         emit RentalComplete(tenant, terms.realtyContract, address(this));
     }
 
-    function returnDeposit(uint _penalty) public onlyLandlord completed returns (uint) {
+    function returnDeposit(uint _penalty) public onlyParties completed returns (uint) {
         require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
+        if(daysSince(paymentExpiration()) < terms.securityReturnDueDate) {
+            require(msg.sender == terms.realtyContract, "RentalAgreement: only landlord can return deposit before due date");
+        }
         uint remaining = terms.securityDeposit - _penalty;
         if (remaining > 0) {
             IERC20(walletContractAddress()).transfer(tenant, remaining);
@@ -175,8 +181,12 @@ contract RentalAgreement is PaymentSplitter {
         renewalRequested = 0;
     }*/
 
-    function paymentDueDate() public view returns (uint) {
+    function paymentExpiration() public view returns (uint) {
         return terms.startDate + paymentCounter * PERIOD;
+    }
+
+    function paymentDueDate() public view returns (uint) {
+        return paymentExpiration() + terms.paymentDueDate * 1 days;
     }
 
     function _canEditPayees(address _operator) internal override view returns (bool) {
@@ -194,5 +204,11 @@ contract RentalAgreement is PaymentSplitter {
 
     function pay(uint _amount) public pure override {
         require(false, "RentalAgreement: payment is not allowed");
+    }
+
+    function daysSince(uint date) private view returns (uint) {
+        require(block.timestamp >= date, "Internal Error: Specified date is in the future");
+        uint timeDiff = block.timestamp - date;
+        return timeDiff / 60 / 60 / 24; // seconds to days
     }
 }
