@@ -6,11 +6,11 @@ const jsonContent = JSON.parse(fs.readFileSync(file_path, 'utf8'))
 
 const CNS_ADDRESS = jsonContent['ContractNameServiceModule#ContractNameService'];
 
-module.exports = buildModule("NodeRegistryModule", (m) => {
+module.exports = buildModule("OrganizationVoterModule", (m) => {
 
 const cnsAddress = m.getParameter("_cns", CNS_ADDRESS);
 
-  const contract = m.contract("NodeRegistry", [cnsAddress], {});
+  const contract = m.contract("OrganizationVoter", [cnsAddress], {});
 
   return { contract };
 });

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../utils/Strings.sol";
 import "../utils/Context.sol";
 import "../interface/permissioning/IOrganizationRegistry.sol";
 
@@ -28,6 +27,7 @@ contract OrganizationRegistry is IOrganizationRegistry, Context {
     }
 
     function addOrg(string calldata _orgId) public override onlyMain {
+        require(bytes(_orgId).length > 0, "OrganizationRegistry: Organization ID cannot be empty");
         require(!orgExists(_orgId));
         OrganizationDetails memory org = OrganizationDetails(_orgId, true);
         orgList.push(org);

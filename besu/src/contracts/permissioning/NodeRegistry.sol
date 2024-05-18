@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../utils/Strings.sol";
 import "../utils/Context.sol";
 import "../interface/permissioning/INodeRegistry.sol";
 
@@ -29,6 +28,7 @@ contract NodeRegistry is INodeRegistry, Context {
     }
 
     function addNode(string memory _enodeId, string memory _ip, uint16 _port, uint16 _raftPort, string memory _orgId) public override onlyMain {
+        require(bytes(_enodeId).length > 0, "NodeRegistry: Enode ID cannot be empty");
         require(!nodeExists(_enodeId), "NodeRegistry: Node already exists");
         NodeDetails memory node = NodeDetails(_enodeId, _ip, _port, _raftPort, _orgId, true);
         nodeList.push(node);

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "../interface/permissioning/IRoleRegistry.sol";
-import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
 contract RoleRegistry is IRoleRegistry, Context {
@@ -27,7 +26,7 @@ contract RoleRegistry is IRoleRegistry, Context {
     }
 
     function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) public override onlyMain {
-        require(!Strings.equals(_roleName, "RoleRegistry: Role name cannot be empty"));
+        require(bytes(_roleName).length > 0, "RoleRegistry: Role name cannot be empty");
         string memory roleName = string(abi.encodePacked(_orgId, "_", _roleName));
         require(!roleExists(roleName), "RoleRegistry: Role already exists");
         Role memory role = Role(roleName, _orgId, _privilege);

@@ -33,17 +33,20 @@ done
 
 rmdir ../cryptogen/keys
 
+
 # generate tessera keys
+echo -e "${BLUE}[INFO] Generating tessera keys for $NODE_COUNT nodes...${NC}"
 for dir in ../cryptogen/*/ ; do
   if [ -d "$dir" ]; then
     mkdir -p "$dir/tessera"
     cd "$dir/tessera"
-    tessera -keygen -filename nodeKey
+    echo | tessera -keygen -filename nodeKey
     cd ../../../scripts
   fi
 done
 
 # GENESIS FILE
+echo -e "${BLUE}[INFO] Generating genesis files...${NC}"
 mkdir ../genesis
 mv ../cryptogen/genesis.json ../genesis/genesis.json
 
