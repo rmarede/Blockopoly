@@ -12,9 +12,16 @@ const CNS_ABI = JSON.parse(fs.readFileSync('../artifacts/contracts/system/Contra
 const DEPLOYED_ADDRESSES_PATH = '../ignition/deployments/chain-1337/deployed_addresses.json'; 
 const jsonContent = JSON.parse(fs.readFileSync(DEPLOYED_ADDRESSES_PATH, 'utf8'))
 const CNS_ADDRESS = jsonContent['ContractNameServiceModule#ContractNameService'];
-const ERC20_ADDRESS = jsonContent['ERC20Module#ERC20'];
-const ERC721_ADDRESS =  jsonContent['ERC721Module#ERC721'];
-const MARKETPLACE_ADDRESS =  jsonContent['MarketplaceModule#Marketplace'];
+const ORG_REGISTRY_ADDRESS = jsonContent['OrganizationRegistryModule#OrganizationRegistry'];
+const ACC_REGISTRY_ADDRESS = jsonContent['AccountRegistryModule#AccountRegistry'];
+const ROLE_REGISTRY_ADDRESS = jsonContent['RoleRegistryModule#RoleRegistry'];
+const NODE_REGISTRY_ADDRESS = jsonContent['NodeRegistryModule#NodeRegistry'];
+const PERM_ENDPOINTS_ADDRESS = jsonContent['PermissionEndpointsModule#PermissionEndpoints'];
+const SALE_FACTORY_ADDRESS = jsonContent['SaleAgreementFactoryModule#SaleAgreementFactory'];
+const RENTAL_FACTORY_ADDRESS = jsonContent['RentalAgreementFactoryModule#RentalAgreementFactory'];
+const MORTGAGE_FACTORY_ADDRESS = jsonContent['MortgageLoanFactoryModule#MortgageLoanFactory'];
+const WALLET_ADDRESS = jsonContent['WalletModule#ERC20'];
+const REALTIES_ADDRESS = jsonContent['RealtiesModule#Realties'];
 
 const cns = new ethers.Contract(CNS_ADDRESS, CNS_ABI, signer);
 
@@ -23,15 +30,27 @@ function sleep(ms) {
 }
 
 (async () => {
-    await cns.setContractAddress("Wallet", ERC20_ADDRESS);
+    await cns.setContractAddress("OrganizationRegistry", ORG_REGISTRY_ADDRESS);
     await sleep(1000);
-    await cns.setContractAddress("Realties", ERC721_ADDRESS);
+    await cns.setContractAddress("AccountRegistry", ACC_REGISTRY_ADDRESS);
     await sleep(1000);
-    await cns.setContractAddress("Marketplace", MARKETPLACE_ADDRESS);
-    
+    await cns.setContractAddress("RoleRegistry", ROLE_REGISTRY_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("NodeRegistry", NODE_REGISTRY_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("PermissionEndpoints", PERM_ENDPOINTS_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("SaleAgreementFactory", SALE_FACTORY_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("RentalAgreementFactory", RENTAL_FACTORY_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("MortgageLoanFactory", MORTGAGE_FACTORY_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("Wallet", WALLET_ADDRESS);
+    await sleep(1000);
+    await cns.setContractAddress("Realties", REALTIES_ADDRESS);
     await sleep(2000);
     console.log("CNS populated with addresses:");
-
     console.log(await cns.getContractHistory());
   })();
 

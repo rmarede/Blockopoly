@@ -16,6 +16,7 @@ To deploy the network you will need the following technologies:
 5. **Node** - Check ... run `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash` and `nvm install node`
 6. **JDK 17+** - Check ... run `sudo apt install openjdk-17-jdk -y`
 7. **Besu Binaries** - Run `wget https://github.com/hyperledger/besu/releases/download/24.3.0/besu-24.3.0.tar.gz` and then `tar -xvf besu-24.3.0.tar.gz`. This will extract the binaries to the current directory.
+8. **Tessera Binaries** - Run `wget https://s01.oss.sonatype.org/service/local/repositories/releases/content/net/consensys/quorum/tessera/tessera-dist/24.4.1/tessera-dist-24.4.1.tar` and then `tar -xvf tessera-dist-24.4.1.tar`. This will extract the binaries to the current directory.
 
 Add the following lines to your `.bashrc` or `.bash_profile` file, replacing `yourusername` with your actual username:
 
@@ -27,6 +28,7 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
 
 export PATH=$PATH:~/besu-24.3.0/bin
+export PATH=$PATH:~/tessera-24.4.1/bin
 ```
   
 Afterwards, clone this repository to your working directory. If using WSL, ensure the directory is within the WSL filesystem.

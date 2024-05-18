@@ -20,17 +20,15 @@ const account_permissions = new ethers.Contract(ACCOUNT_PERMISSIONS_ADDRESS, ACC
 const DEPLOYED_ADDRESSES_PATH = '../ignition/deployments/chain-1337/deployed_addresses.json'; 
 const jsonContent = JSON.parse(fs.readFileSync(DEPLOYED_ADDRESSES_PATH, 'utf8'))
 
-const NODE_RULES_ADDRESS = jsonContent['TODOModule#TODO']; 
-const ACCOUNT_RULES_ADDRESS = jsonContent['TODOModule#TODO']; 
+const CNS_ADDRESS = jsonContent['ContractNameServiceModule#ContractNameService'];
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 (async () => {
-    await node_permissions.boot(NODE_RULES_ADDRESS);
+    await node_permissions.boot(CNS_ADDRESS);
     await sleep(1000);
-    await account_permissions.boot(ACCOUNT_RULES_ADDRESS);
-
+    //await account_permissions.boot(CNS_ADDRESS);
   })();
 
