@@ -9,6 +9,12 @@ if ! [ -x "$(command -v besu)" ]; then
   exit 1
 fi
 
+# Check if tessera binary is installed
+if ! [ -x "$(command -v tessera)" ]; then
+  echo -e "${RED}Error: tessera is not installed.${NC}" >&2
+  exit 1
+fi
+
 NODE_COUNT=$(jq '.blockchain.nodes.count' ../config/ibftConfigFile.json)
 echo -e "${BLUE}[INFO] Generating cryptographic material for $NODE_COUNT nodes...${NC}"
 
@@ -26,6 +32,16 @@ for dir in ../cryptogen/keys/*/ ; do
 done
 
 rmdir ../cryptogen/keys
+
+# generate tessera keys
+for dir in ../cryptogen/*/ ; do
+  if [ -d "$dir" ]; then
+    mkdir -p "$dir/tessera"
+    cd "$dir/tessera"
+    tessera -keygen -filename nodeKey
+    cd ../../../scripts
+  fi
+done
 
 # GENESIS FILE
 mkdir ../genesis

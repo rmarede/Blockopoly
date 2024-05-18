@@ -11,6 +11,10 @@ NC='\033[0m'
 # curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://67e61faee5458a3a626627ae0e54c2e9e44f87ac60ba36c85a4595791fab94dffd812cba156cdd65c6c2fbbc3687cf4d49c9731681b8be7a1dc42e0908cd5953@127.0.0.1:30303"],"id":1}' http://127.0.0.1:8546
 
 
+
+# TODO In each Tessera directory, start tessera node:
+# tessera -configfile tessera.conf
+
 if ! docker network ls | grep -q besu_network; then
   docker network create besu_network
 fi
