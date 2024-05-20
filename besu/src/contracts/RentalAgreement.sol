@@ -4,10 +4,12 @@ pragma solidity ^0.8.0;
 import "./finance/PaymentSplitter.sol";
 import "./Ownership.sol";
 import "./interface/IERC20.sol";
+import "./governance/SelfMultisig.sol";
+import "./utils/Strings.sol";
 
 // TODO escrever as clausulas qualitativas do contrato em comentarios?
 
-contract RentalAgreement is PaymentSplitter {
+contract RentalAgreement is PaymentSplitter, SelfMultisig {
 
     event RentalEnrolled(address indexed tenant, address indexed landlord, address indexed realty);
     event RentalComplete(address indexed tenant, address indexed landlord, address indexed realty);
@@ -23,8 +25,8 @@ contract RentalAgreement is PaymentSplitter {
         _;
     }
 
-    modifier completed() {
-        require(status == RentStatus.COMPLETE, "RentalAgreement: rent agreement is terminated, cancelled or is not yet completed");
+    modifier complete() {
+        require(status == RentStatus.COMPLETE, "RentalAgreement: rent agreement is terminated, cancelled or is not yet complete");
         _;
     }
 
@@ -40,6 +42,16 @@ contract RentalAgreement is PaymentSplitter {
 
     modifier onlyParties() {
         require(msg.sender == terms.realtyContract || msg.sender == tenant, "Only landlord or tenant can call this operation.");
+        _;
+    }
+
+    modifier onlySelf() {
+        require(msg.sender == address(this), "RentalAgreement: this operation can only be invoked by consensus");
+        _;
+    }
+
+    modifier privileged() {
+        require(msg.sender == address(this) || isPrivileged(msg.sender), "SaleAgreement: only privileged entities can call this function");
         _;
     }
 
@@ -68,12 +80,9 @@ contract RentalAgreement is PaymentSplitter {
     RentStatus public status;
     uint public paymentCounter;
 
-    Action public tenantAction;
-    Action public landlordAction;
-    uint public actionParam;
-
     constructor(address _cns, address _tenant, RentalTerms memory _terms) 
         PaymentSplitter(_terms.payees, _terms.shares, _cns) 
+        SelfMultisig(_participants(_tenant, _terms.realtyContract), Policy.UNANIMOUS)
     {
         require(_terms.rentValue > 0, "RentalAgreement: rent value must be greater than 0");
         require(_terms.duration > 0, "RentalAgreement: duration must be greater than 0");
@@ -108,16 +117,9 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function terminate() public onlyParties active {
-        if (msg.sender == tenant) {
-            tenantAction = Action.TERMINATE;
-        } else if (msg.sender == terms.realtyContract) {
-            landlordAction = Action.TERMINATE;
-        }
-        if (tenantAction == Action.TERMINATE && landlordAction == Action.TERMINATE) {
-            status = RentStatus.COMPLETE;
-            emit RentalComplete(tenant, terms.realtyContract, address(this));
-        }
+    function terminate() public privileged active {
+        status = RentStatus.COMPLETE;
+        emit RentalComplete(tenant, terms.realtyContract, address(this));
     }
 
     function evict() public onlyLandlord active {
@@ -127,7 +129,7 @@ contract RentalAgreement is PaymentSplitter {
         emit RentalComplete(tenant, terms.realtyContract, address(this));
     }
 
-    function returnDeposit(uint _penalty) public onlyParties completed returns (uint) {
+    function returnDeposit(uint _penalty) public onlyParties complete returns (uint) {
         require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
         if(daysSince(paymentExpiration()) < terms.securityReturnDueDate) {
             require(msg.sender == terms.realtyContract, "RentalAgreement: only landlord can return deposit before due date");
@@ -158,28 +160,11 @@ contract RentalAgreement is PaymentSplitter {
         }
     }
 
-    function renewTerm(uint _periods) public completed onlyLandlord {
-        if (msg.sender == tenant) {
-            tenantAction = Action.RENEW;
-        } else if (msg.sender == terms.realtyContract) {
-            landlordAction = Action.RENEW;
-            actionParam = _periods;
-        }
-
-        if (tenantAction == Action.RENEW && landlordAction == Action.RENEW) {
-            terms.duration += actionParam;
-            status = RentStatus.ACTIVE;
-            actionParam = 0;
-            emit TermRenewed(tenant, terms.realtyContract, address(this));
-        }
-    }
-
-    /*function acceptRenewal() public completed onlyTenant {
-        require(renewalRequested > 0, "RentalAgreement: no renewal has been requested");
-        terms.duration += renewalRequested;
+    function renewTerm(uint _periods) public complete onlySelf {
+        terms.duration += _periods;
         status = RentStatus.ACTIVE;
-        renewalRequested = 0;
-    }*/
+        emit TermRenewed(tenant, terms.realtyContract, address(this));
+    }
 
     function paymentExpiration() public view returns (uint) {
         return terms.startDate + paymentCounter * PERIOD;
@@ -210,5 +195,16 @@ contract RentalAgreement is PaymentSplitter {
         require(block.timestamp >= date, "Internal Error: Specified date is in the future");
         uint timeDiff = block.timestamp - date;
         return timeDiff / 60 / 60 / 24; // seconds to days
+    }
+
+    function _participants(address _tenant, address _realty) private pure returns (address[] memory) {
+        address[] memory res = new address[](2);
+        res[0] = _tenant;
+        res[1] = _realty;
+        return res;
+    }
+
+    function isPrivileged(address _address) private view returns (bool) {
+        return Strings.equals(IAccountRegistry(accountRegistryAddress()).orgOf(_address), "admin_org");
     }
 }
