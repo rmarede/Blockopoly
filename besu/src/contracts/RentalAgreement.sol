@@ -6,6 +6,7 @@ import "./Ownership.sol";
 import "./interface/IERC20.sol";
 import "./governance/SelfMultisig.sol";
 import "./utils/Strings.sol";
+import "./interface/permissioning/IAccountRegistry.sol";
 
 // TODO escrever as clausulas qualitativas do contrato em comentarios?
 

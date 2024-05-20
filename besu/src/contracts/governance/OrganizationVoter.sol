@@ -11,7 +11,7 @@ import "../interface/permissioning/IOrganizationRegistry.sol";
 contract OrganizationVoter is Multisignable, Context {
 
     modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].destination != address(0));
+        require(transactionId < transactionCount, "Multisig: Transaction does not exist");
         _;
     }
 

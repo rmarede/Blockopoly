@@ -6,6 +6,12 @@ function encodeRentalAgreementData(functionToCall, params) {
     return data;
 }
 
+function encodeSaleAgreementData(functionToCall, params) {
+  let interface = new ethers.Interface(getAbi.saleAgreementAbi());
+  let data = interface.encodeFunctionData(functionToCall, params);
+  return data;
+}
+
 function encodeOwnershipData(functionToCall, params) {
     letinterface = new ethers.Interface(getAbi.ownershipAbi());
     let data = interface.encodeFunctionData(functionToCall, params);
@@ -44,5 +50,5 @@ function encodeRentalFactoryData(functionToCall, params) {
 
 
 module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeOrganizationVoterData, encodeWalletData, encodePermissionEndpointsData,
-  encodeRentalFactoryData
+  encodeRentalFactoryData, encodeSaleAgreementData
 };

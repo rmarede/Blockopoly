@@ -15,7 +15,7 @@ contract WeightedMultiSig is Multisignable {
     }
 
     modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].destination != address(0), "WeightedMultiSig: Transaction does not exist");
+        require(transactionId < transactionCount, "Multisig: Transaction does not exist");
         _;
     }
 

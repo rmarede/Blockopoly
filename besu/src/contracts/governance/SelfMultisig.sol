@@ -6,12 +6,12 @@ import "./Multisignable.sol";
 contract SelfMultisig {
 
     modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].value != 0);
+        require(transactionId < transactionCount, "Multisig: Transaction does not exist");
         _;
     }
 
     modifier notExecuted(uint transactionId) {
-        require(!transactions[transactionId].executed);
+        require(!transactions[transactionId].executed, "Multisig: Transaction already executed");
         _;
     }
 

@@ -5,6 +5,7 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const getAbi = require('../scripts/utils/get-abi');
+const abi_encoder = require('../scripts/utils/abi-data-encoder');
 
 const textEncoder = new TextEncoder();
   
@@ -44,7 +45,7 @@ describe("SaleAgreement", function () {
 
         const realty_details = {
             name: "foo",
-            ownership: acc1.address,
+            ownership: acc1.address, // placeholder, is replaced upon ownership creation
             district: "lisbon",
             postalCode: 2725455,
             street: "central route",
@@ -54,7 +55,7 @@ describe("SaleAgreement", function () {
 
         await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
         await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
-        await expect(realties.mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
+        await expect(realties.connect(acc1).mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
 
         const ownershipAbi = getAbi.ownershipAbi(); 
         const assetAddr = await realties.registry(0);
@@ -80,160 +81,242 @@ describe("SaleAgreement", function () {
 
     describe("Deployment", function () {
         it("Should deploy SaleAgreement", async function () {
+            const [acc1, acc2, acc3] = await ethers.getSigners();
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
             expect(await saleAgreement.details()).to.exist;
+            expect(await saleAgreement.participantExists(acc1.address)).to.be.false;
+            expect(await saleAgreement.participantExists(acc2.address)).to.be.true;
+            expect(await saleAgreement.participantExists(acc3.address)).to.be.true;
         });
     }); 
 
     describe("Consent", function () {
-        it("Should not consent if not a party", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-        });
         
         it("Should not consent if not approved", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).to.be.reverted;
         });
         
         it("Should not consent after already consented", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
             // testar para quando estado esta AGREED e COMMITED e WITHDRAWN
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(1)).to.be.reverted;
         });
 
         it("Should hold assets in escrow when both consented", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+
+            expect(await saleAgreement.status()).to.equal(0);
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            expect(await saleAgreement.status()).to.equal(1);
+
+            expect(await wallet.balanceOf(acc3.address)).to.equal(9900);
+            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(100);
+            expect(await ownership.shareOf(saleAgreement.target)).to.equal(3000);
         });
     }); 
 
     describe("Commit", function () {
         it("Should not commit if not yet consented by both parties", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-        });
+            const [acc1, acc2, acc3] = await ethers.getSigners();
 
-        it("Should not commit if not a party", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).to.be.reverted;
         });
         
         it("Should not commit if no allowance", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-        });
-        
-        it("Should not commit if not approved", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 100)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).to.be.reverted;
         });
 
-        it("Should not commit if already commited or withdrawn", async function () {
+        it("Should not commit if already commited", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(2)).to.be.reverted;  
         });
 
         it("Should commit and transfer assets", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+
+            expect(await saleAgreement.status()).to.equal(2);
+            expect(await wallet.balanceOf(acc1.address)).to.equal(5);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(9995);
+            expect(await wallet.balanceOf(acc3.address)).to.equal(0);
+            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(0);
+            expect(await ownership.shareOf(saleAgreement.target)).to.equal(0);
+            expect(await ownership.shareOf(acc3.address)).to.equal(3000);
         });
 
     }); 
 
     describe("Withdraw", function () {
-        it("Should not withdraw if not a party", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-        });
 
         it("Should not withdraw if already commited", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('commit', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(2)).to.be.reverted;
         });
 
         it("Should not withdraw if not consented", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
+            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
+            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(0)).to.be.reverted;
         });
 
         it("Should withdraw and return assets", async function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-        });
-    }); 
-
-    /*
-    describe("sign", function () {
-        it("Should let buyer sign and hold funds", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).sign()).not.to.be.reverted;
-            expect(await wallet.balanceOf(acc3.address)).to.equal(0);
-            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(10000);
-        });
-
-        it("Should not let seller sign if buyer has not", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-            const [acc1, acc2, acc3] = await ethers.getSigners();
-            await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
-            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).sign()).to.be.reverted;
-        });
-
-        it("Should let seller sign if buyer has signed", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-            const [acc1, acc2, acc3] = await ethers.getSigners();
-
-            await expect(wallet.connect(acc1).mint(acc3.address, 10000)).not.to.be.reverted;
-            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).sign()).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).sign()).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc2).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('consent', []))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+
+            await expect(saleAgreement.connect(acc3).submitTransaction(
+                0, 
+                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
+            ).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+
+            expect(await saleAgreement.status()).to.equal(3);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(50);
+            expect(await wallet.balanceOf(acc3.address)).to.equal(9950);
+            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(0);
+            expect(await ownership.shareOf(saleAgreement.target)).to.equal(0);
+            expect(await ownership.shareOf(acc2.address)).to.equal(10000);
+            expect(await ownership.shareOf(acc3.address)).to.equal(0);
         });
     }); 
-
-    describe("transfer", function () {
-        it("Should transfer automatically when both parties signed", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-            const [acc1, acc2, acc3] = await ethers.getSigners();
-            
-            await expect(wallet.connect(acc1).mint(acc3.address, 10000)).not.to.be.reverted;
-            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).sign()).not.to.be.reverted;
-            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).sign()).not.to.be.reverted;
-
-            // price = 10000 (100$) , comission = 5 (0.05%) 
-
-            expect(await wallet.balanceOf(acc3.address)).to.equal(0);
-            expect(await wallet.balanceOf(acc1.address)).to.equal(5); // 10000 * 0.0005 (0.05%)
-            expect(await wallet.balanceOf(acc2.address)).to.equal(9995);
-            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(0);
-            expect(await ownership.shareOf(acc2.address)).to.equal(7000);
-            expect(await ownership.shareOf(acc3.address)).to.equal(3000);
-
-        });
-    });
-
-    describe("widthdraw", function () {
-        it("Should let seller widthdraw unsigned agreement", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-            const [acc1, acc2, acc3] = await ethers.getSigners();
-            
-            await expect(wallet.connect(acc1).mint(acc3.address, 10000)).not.to.be.reverted;
-            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).sign()).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).widthdraw()).not.to.be.reverted;
-            expect(await wallet.balanceOf(acc3.address)).to.equal(10000);
-            expect(await wallet.balanceOf(saleAgreement.target)).to.equal(0);
-
-            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).sign()).to.be.reverted;
-        });
-
-        it("Should not let widthdraw if already signed", async function () {
-            const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
-            const [acc1, acc2, acc3] = await ethers.getSigners();
-            
-            await expect(wallet.connect(acc1).mint(acc3.address, 10000)).not.to.be.reverted;
-            await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).sign()).not.to.be.reverted;
-            await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).sign()).not.to.be.reverted;
-
-            await expect(saleAgreement.connect(acc1).widthdraw()).to.be.reverted;
-            await expect(saleAgreement.connect(acc2).widthdraw()).to.be.reverted;
-        });
-    });
-    */
 });
