@@ -4,7 +4,6 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-const abi = require('../scripts/utils/abi-data-encoder');
 const getAbi = require('../scripts/utils/get-abi');
 
 const textEncoder = new TextEncoder();
@@ -43,11 +42,21 @@ describe("SaleAgreement", function () {
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
+        const realty_details = {
+            name: "foo",
+            ownership: acc1.address,
+            district: "lisbon",
+            postalCode: 2725455,
+            street: "central route",
+            number: 1,
+            totalArea: 100
+        }
+
         await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
         await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
-        await expect(realties.mint("foo", "faa", [acc2.address], [10000])).not.to.be.reverted;
+        await expect(realties.mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
 
-        const ownershipAbi = getAbi.getOwnershipAbi(); 
+        const ownershipAbi = getAbi.ownershipAbi(); 
         const assetAddr = await realties.registry(0);
         const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 

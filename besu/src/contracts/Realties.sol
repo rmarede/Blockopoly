@@ -10,31 +10,30 @@ import "./interface/permissioning/IAccountRegistry.sol";
 // Ownership Factory
 contract Realties is Context {
 
-    struct Realty {
+    struct RealtyDetails {
         string name; 
-        string description;
         address ownership;
-        // TODO evey information relative to the realty here? ou document stuff? acho melhor mandar para fora deste contrato
+        string district;
+        uint postalCode;
+        string street;
+        uint number;
+        uint totalArea;
     }
 
     address[] public registry;
-    mapping(address => Realty) public realties;
+    mapping(address => RealtyDetails) public realties;
     mapping(address => address[]) public realtiesOf;
 
     constructor(address _cns) Context(_cns) {}
 
-    function mint(string memory _name, string memory _description, address[] memory _owners, uint[] memory _shares) public returns (address) {
+    function mint(RealtyDetails memory _details, address[] memory _owners, uint[] memory _shares) public returns (address) {
         require(IRoleRegistry(roleRegistryAddress()).canMintRealties(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Realties: sender does not have permission to mint");
 
         Ownership newOwnershipContract = new Ownership(_owners, _shares);
         address addr = address(newOwnershipContract);
-
+        _details.ownership = addr;
         registry.push(addr);
-        realties[addr] = Realty({
-            name: _name,
-            description: _description,
-            ownership: addr
-        });
+        realties[addr] = _details;
 
         for (uint i = 0; i < _owners.length; i++) {
             realtiesOf[_owners[i]].push(addr);

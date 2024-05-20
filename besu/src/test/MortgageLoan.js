@@ -5,6 +5,8 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const abi = require('../scripts/utils/abi-data-encoder');
+const timeHelper = require('../scripts/utils/time-helper');
+
   
 describe("MortgageLoan", function () {
 
@@ -40,10 +42,10 @@ describe("MortgageLoan", function () {
             downPayment: 100,  
             interestRate: 24, 
             loanTerm: 3, 
-            startDate: Math.floor(new Date().getTime() / 1000),
+            startDate: timeHelper.toSolidityTime(Date.now()),
             gracePeriod: 1000, 
             latePaymentFee: 5, 
-            defaultDeadline: Math.floor(new Date().getTime() / 1000) + 100
+            defaultDeadline: timeHelper.toSolidityTime(Date.now()) + 100
         };
 
         const contract = await ethers.getContractFactory("MortgageLoan");

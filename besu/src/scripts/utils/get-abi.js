@@ -2,37 +2,51 @@ const fs = require('fs');
 
 const CONTRACTS_PATH = './artifacts/contracts/';
 
-function getERC20Abi() {
-  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'interface/IERC20.sol/IERC20.json', 'utf8')).abi;
+function cnsAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'system/ContractNameService.sol/ContractNameService.json', 'utf8')).abi;
 }
 
-function getWalletAbi() {
+function walletAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Wallet.sol/Wallet.json', 'utf8')).abi;
 }
 
-function getMarketplaceAbi() {
-  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Marketplace.sol/Marketplace.json', 'utf8')).abi;
+function realtiesAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Realties.sol/Realties.json', 'utf8')).abi;
 }
 
-function getOwnershipAbi() {
+function ownershipAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Ownership.sol/Ownership.json', 'utf8')).abi;
 }
 
-function getRentalAgreementAbi() {
+function rentalAgreementAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'RentalAgreement.sol/RentalAgreement.json', 'utf8')).abi;
 }
 
-function getWeightedMultiSigAbi() {
+function rentalFactoryAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'factory/RentalAgreementFactory.sol/RentalAgreementFactory.json', 'utf8')).abi;
+}
+
+function saleFactoryAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'factory/SaleAgreementFactory.sol/SaleAgreementFactory.json', 'utf8')).abi;
+}
+
+function mortgageFactoryAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'factory/MortgageLoanFactory.sol/MortgageLoanFactory.json', 'utf8')).abi;
+}
+
+function weightedMultiSigAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/WeightedMultiSig.sol/WeightedMultiSig.json', 'utf8')).abi;
 }
 
-function getOrganizationVoterAbi() {
+function organizationVoterAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/OrganizationVoter.sol/OrganizationVoter.json', 'utf8')).abi;
 }
 
-function getPermissionEndpointsAbi() {
+function permissionEndpointsAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'permissioning/PermissionEndpoints.sol/PermissionEndpoints.json', 'utf8')).abi;
 }
 
 
-module.exports = { getERC20Abi, getWalletAbi, getMarketplaceAbi, getOwnershipAbi, getRentalAgreementAbi, getWeightedMultiSigAbi, getOrganizationVoterAbi, getPermissionEndpointsAbi };
+module.exports = { walletAbi, realtiesAbi, ownershipAbi, rentalAgreementAbi, rentalFactoryAbi, 
+  weightedMultiSigAbi, organizationVoterAbi, permissionEndpointsAbi, cnsAbi, saleFactoryAbi, mortgageFactoryAbi
+};

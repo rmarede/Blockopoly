@@ -16,9 +16,7 @@ contract MortgageLoanFactory is Context {
     uint _gracePeriod, uint _latePaymentFee, uint _defaultDeadline) public returns (address) { 
 
         require(IRoleRegistry(roleRegistryAddress()).canMintLoans(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "MortgageLoanFactory: sender does not have permission to mint");
-        //require(IERC20(walletContractAddress()).allowance(msg.sender, address(this)) >= _principal , "MortgageLoanFactory: insufficient funds to create mortgage loan agreement");
-        // TODO para se criar um mortgage loan, é necessario fazer approve da factory para ela criar um mortgage loan ja com o dinheiro -> assim init() deixa de ser necessario
-
+  
         MortgageLoan.LoanDetails memory details = MortgageLoan.LoanDetails({
             lender: msg.sender,
             borrower:_borrower,
@@ -33,6 +31,14 @@ contract MortgageLoanFactory is Context {
         });
 
         MortgageLoan mortgageLoan = new MortgageLoan(cns_address, details);
+        return address(mortgageLoan);
+    }
+
+
+    function createMortgageLoan(MortgageLoan.LoanDetails memory _details) public returns (address) { 
+        require(IRoleRegistry(roleRegistryAddress()).canMintLoans(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "MortgageLoanFactory: sender does not have permission to mint");
+        _details.lender = msg.sender;
+        MortgageLoan mortgageLoan = new MortgageLoan(cns_address, _details);
         return address(mortgageLoan);
     }
     

@@ -5,6 +5,7 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const abi = require('../scripts/utils/abi-data-encoder');
+const timeHelper = require('../scripts/utils/time-helper');
   
 describe("RentalAgreement", function () {
 
@@ -44,7 +45,7 @@ describe("RentalAgreement", function () {
 
         const terms = {
             realtyContract: ownership.target,
-            startDate: Math.floor(new Date().getTime() / 1000),
+            startDate: timeHelper.toSolidityTime(Date.now()),
             duration: 3, 
             rentValue: 200,
             securityDeposit: 100,
@@ -86,7 +87,7 @@ describe("RentalAgreement", function () {
 
         const terms = {
             realtyContract: ownership.target,
-            startDate: Math.floor(new Date().getTime() / 1000) - 60*60*24*30*12,
+            startDate: timeHelper.toSolidityTime(Date.now() - timeHelper.year()),
             duration: 3, 
             rentValue: 200,
             securityDeposit: 100,

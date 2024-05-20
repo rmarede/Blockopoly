@@ -62,16 +62,26 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            const details = {
+                name: "foo",
+                ownership: acc1.address,
+                district: "lisbon",
+                postalCode: 2725455,
+                street: "central route",
+                number: 1,
+                totalArea: 100
+            }
+
+            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);
 
             expect(asset[0]).to.equal("foo");
-            expect(asset[1]).to.equal("faa");
-            expect(asset[2]).to.equal(assetAddr);
+            expect(asset[1]).to.equal(assetAddr);
+            expect(asset[2]).to.equal("lisbon");
 
-            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
             expect(await ownership.shareOf(acc1.address)).to.equal(4000);
@@ -91,12 +101,22 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
-            await expect(realties.connect(acc2).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
-            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
-            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
-            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
-            await expect(realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
-            await expect(realties.connect(acc1).mint("foo", "faa", [], [])).to.be.reverted;
+            const details = {
+                name: "foo",
+                ownership: acc1.address,
+                district: "lisbon",
+                postalCode: 2725455,
+                street: "central route",
+                number: 1,
+                totalArea: 100
+            }
+
+            await expect(realties.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
+            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
+            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
+            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
+            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
+            await expect(realties.connect(acc1).mint(details, [], [])).to.be.reverted;
         });
     });
 
@@ -107,16 +127,26 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            const details = {
+                name: "foo",
+                ownership: acc1.address,
+                district: "lisbon",
+                postalCode: 2725455,
+                street: "central route",
+                number: 1,
+                totalArea: 100
+            }
+
+            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);
 
             expect(asset[0]).to.equal("foo");
-            expect(asset[1]).to.equal("faa");
-            expect(asset[2]).to.equal(assetAddr);
+            expect(asset[1]).to.equal(assetAddr);
+            expect(asset[2]).to.equal("lisbon");
 
-            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
             await expect(ownership.connect(acc1).transferShares(acc1.address, acc4.address, 2000)).not.to.be.reverted;
@@ -139,16 +169,22 @@ describe("Realties", function () {
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
-            await realties.connect(acc1).mint("foo", "faa", [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            const details = {
+                name: "foo",
+                ownership: acc1.address,
+                district: "lisbon",
+                postalCode: 2725455,
+                street: "central route",
+                number: 1,
+                totalArea: 100
+            }
+
+            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realties.registry(0);
             const asset = await realties.realties(assetAddr);
 
-            expect(asset[0]).to.equal("foo");
-            expect(asset[1]).to.equal("faa");
-            expect(asset[2]).to.equal(assetAddr);
-
-            const ownershipAbi = getAbi.getOwnershipAbi(); 
+            const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
             await expect(ownership.connect(acc1).transferShares(acc1.address, acc2.address, 4000)).not.to.be.reverted;
