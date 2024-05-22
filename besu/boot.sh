@@ -15,8 +15,40 @@ cat << "EOF"
 EOF
 echo -e "${NC}"
 
-cd scripts
-. clean.sh
-. cryptogen.sh
-. up.sh
-cd ..
+case $1 in
+  "clean")
+      cd scripts
+      . clean.sh
+      cd ..
+      ;;
+  "up")
+      cd scripts
+      . clean.sh
+      . cryptogen.sh
+      . up.sh
+      cd ..
+      ;;
+  "deploy")
+      cd scripts
+      . clean.sh
+      . cryptogen.sh
+      . up.sh
+      . deploy.sh
+      cd ..
+      ;;
+  "populate")
+      cd scripts
+      . clean.sh
+      . cryptogen.sh
+      . up.sh
+      . deploy.sh
+      cd ../src/scripts
+      node populate-cns.js
+      # node populate-state.js
+      # node boot-permissioning.js
+      # cd ../..
+      ;;
+  *)
+      echo "Invalid command. Usage: . boot.sh <clean|up|deploy|populate>"
+      ;;
+esac
