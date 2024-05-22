@@ -25,11 +25,11 @@ contract SelfMultisig {
     mapping (uint => Transaction) public transactions;
     mapping (uint => mapping (address => bool)) internal confirmations;
     uint public transactionCount;
-    Policy public policy;
+    Policy public confirmationPolicy;
 
     constructor(address[] memory _participants, Policy _policy)  {
         require(_participants.length > 0, "Multisig: No participants specified");
-        policy = _policy;
+        confirmationPolicy = _policy;
         for (uint i=0; i<_participants.length; i++) {
             participants.push(_participants[i]);
         }
@@ -63,9 +63,9 @@ contract SelfMultisig {
     }
 
     function isConfirmed(uint _transactionId) public view returns (bool) {
-        if (policy == Policy.MAJORITY || policy == Policy.MAJORITY_OR_ADMIN) {
+        if (confirmationPolicy == Policy.MAJORITY || confirmationPolicy == Policy.MAJORITY_OR_ADMIN) {
             return getConfirmationCount(_transactionId) > participants.length / 2;
-        } else if (policy == Policy.UNANIMOUS || policy == Policy.UNANIMOUS_OR_ADMIN) {
+        } else if (confirmationPolicy == Policy.UNANIMOUS || confirmationPolicy == Policy.UNANIMOUS_OR_ADMIN) {
             for (uint i=0; i<participants.length; i++)
                 if (!confirmations[_transactionId][participants[i]])
                     return false;

@@ -138,6 +138,21 @@ describe("MortgageLoan", function () {
             await expect(mortgageLoan.connect(acc2).amortize()).not.to.be.reverted;
         });
 
+        it("Should amortize with leftovers", async function () {
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const [acc1, acc2, acc3] = await ethers.getSigners();
+
+            await expect(wallet.mint(acc1.address, 1000)).not.to.be.reverted;
+            await expect(wallet.mint(acc2.address, 1000)).not.to.be.reverted;
+            await expect(wallet.connect(acc1).approve(mortgageLoan.target, 500)).not.to.be.reverted;
+            await expect(wallet.connect(acc2).approve(mortgageLoan.target, 100)).not.to.be.reverted;
+
+            await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc1).secure()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc2).amortize()).not.to.be.reverted;
+            expect(await wallet.balanceOf(mortgageLoan.target)).to.be.lessThan(600);
+        });
+
         it("Should not amortize if already paid off", async function () {
             const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
             const [acc1, acc2, acc3] = await ethers.getSigners();

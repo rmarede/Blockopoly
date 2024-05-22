@@ -118,13 +118,43 @@ async function mintSaleAgreement(signer, buyer, seller, realty, share, price, ea
     price: price,
     earnest: earnest,
     realtor: realtor,
-    comission: commission,
+    comission: comission,
     contengencyPeriod: contengencyPeriod,
     contengencyClauses: contengencyClauses
   }
 
   const contract = SaleAgreementFactory.connect(signer);
   await contract.createSaleAgreement(details);
+}
+
+async function submitSaleTransaction(signer, contractAddress, data) {
+  const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
+  const contract = SaleAgreement.connect(signer);
+  return await contract.submitTransaction(0, data);
+}
+
+async function confirmSaleTransaction(signer, contractAddress, transactionId) {
+  const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
+  const contract = SaleAgreement.connect(signer);
+  await contract.confirmTransaction(transactionId);
+}
+
+async function getSaleTransactionCount(signer, contractAddress) {
+  const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
+  const contract = SaleAgreement.connect(signer);
+  return await contract.transactionCount();
+}
+
+function consentData() {
+  return abiEncoder.encodeSaleAgreementData('consent', []);
+}
+
+function commitData() {
+  return abiEncoder.encodeSaleAgreementData('commit', []);
+}
+
+function withdrawData(penalty) {
+  return abiEncoder.encodeSaleAgreementData('withdraw', [penalty]);
 }
 
 

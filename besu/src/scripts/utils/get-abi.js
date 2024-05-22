@@ -1,6 +1,6 @@
 const fs = require('fs');
-
-const CONTRACTS_PATH = './artifacts/contracts/';
+const path = require('path');
+const CONTRACTS_PATH = path.join(__dirname, '../../artifacts/contracts/');
 
 function cnsAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'system/ContractNameService.sol/ContractNameService.json', 'utf8')).abi;

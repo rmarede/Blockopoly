@@ -1,5 +1,6 @@
 const ethers = require('ethers');
-const getAddress = require('./utils/get-address');
+const getls
+Address = require('./utils/get-address');
 const getAbi = require('./utils/get-abi');
 
 const PRIVATE_KEY_1 = '0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63';

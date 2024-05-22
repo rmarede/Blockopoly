@@ -5,14 +5,16 @@ import "./interface/IERC20.sol";
 import "./utils/Context.sol";
 import "./interface/permissioning/IRoleRegistry.sol";
 import "./interface/permissioning/IAccountRegistry.sol";
+import "./governance/Multisignable.sol";
+
 
 // Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
 
-contract Wallet is IERC20, Context {
+contract Wallet is IERC20, Context, Multisignable {
     mapping(address => uint) private balances;
     mapping(address => mapping(address => uint)) private allowances;
 
-    constructor(address _cns) Context(_cns) {}
+    constructor(address _cns) Context(_cns) Multisignable(Policy.UNANIMOUS_OR_ADMIN) {}
 
     function decimals() public view virtual override returns (uint8) {
         return 2;

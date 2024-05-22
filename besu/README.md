@@ -81,6 +81,11 @@ The default network is composed of ...
 
   ## 5. Testing the Network
 
+  ```
+  npm install --only=prod @hyperledger/caliper-cli@0.6.1
+  
+  ```
+
 
 
 ---

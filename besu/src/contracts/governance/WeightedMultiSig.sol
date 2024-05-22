@@ -102,10 +102,10 @@ contract WeightedMultiSig is Multisignable {
     }
 
     function isConfirmed(uint _transactionId) public view virtual returns (bool) {
-        // TODO Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
-        if (policy == Policy.MAJORITY || policy == Policy.MAJORITY_OR_ADMIN) {
+        Policy targetPolicy = Multisignable(transactions[_transactionId].destination).getMultisigPolicy();
+        if (targetPolicy == Policy.MAJORITY || targetPolicy == Policy.MAJORITY_OR_ADMIN) {
             return getConfirmationCount(_transactionId) > totalShares / 2;
-        } else if (policy == Policy.UNANIMOUS || policy == Policy.UNANIMOUS_OR_ADMIN) {
+        } else if (targetPolicy == Policy.UNANIMOUS || targetPolicy == Policy.UNANIMOUS_OR_ADMIN) {
             for (uint i=0; i<participants.length; i++)
                 if (!confirmations[_transactionId][participants[i]])
                     return false;

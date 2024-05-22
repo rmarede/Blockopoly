@@ -55,7 +55,7 @@ cd ../src
 npx hardhat compile
 cd ../scripts
 
-echo -e "${BLUE}[INFO] Pre-deploying permissioning contracts...${NC}"
+echo -e "${BLUE}[INFO] Fetching permissioning contracts bytecode for pre-deployment...${NC}"
 NODE_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/NodePermissions.sol/NodePermissions.json)
 ACCOUNT_PERMISSIONS_CODE=$(jq -r '.deployedBytecode' ../src/artifacts/contracts/permissioning/AccountPermissions.sol/AccountPermissions.json)
 

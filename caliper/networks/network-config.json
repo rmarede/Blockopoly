@@ -1,0 +1,19 @@
+{
+    "caliper": {
+        "blockchain": "ethereum",
+        "command" : {
+            "start": "echo starting",
+            "end" : "echo ending"
+          }
+    },
+    "ethereum": {
+        "url": "ws://localhost:6100",
+        "contractDeployerAddress": "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
+        "contractDeployerAddressPrivateKey": "0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
+        "fromAddress": "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
+        "fromAddressPrivateKey": "0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
+        "transactionConfirmationBlocks": 12,
+        "contracts": {
+        }
+    }
+}

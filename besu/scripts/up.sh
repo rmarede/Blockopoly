@@ -22,7 +22,7 @@ fi
 echo -e "${BLUE}[INFO] Deploying bootnode besu-node-0...${NC}"
 docker-compose -f ../compose/docker-compose-bootnode.yml up -d
 
-echo "Fetching bootnode ENODE address. Please wait..."
+echo -e "${BLUE}[INFO] Fetching bootnode ENODE address. Please wait...${NC}"
 MAX_RETRIES=30 
 for ((i=0; i<$MAX_RETRIES; i++)); do
   export ENODE=$(curl -s -X POST --data '{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}' http://127.0.0.1:8500 | jq -r '.result')
@@ -44,7 +44,7 @@ echo "E_ADDRESS: $E_ADDRESS"
 export DOCKER_NODE_1_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' besu-node-0)
 echo "DOCKER_NODE_1_ADDRESS: $DOCKER_NODE_1_ADDRESS"
 export E_ADDRESS=$(echo $E_ADDRESS | sed -e "s/127.0.0.1/$DOCKER_NODE_1_ADDRESS/g")
-echo "E_ADDRESS: $E_ADDRESS"
+echo "FINAL E_ADDRESS: $E_ADDRESS"
 
 sed "s/<ENODE>/enode:\/\/$E_ADDRESS/g" ../compose/templates/docker-compose.yml > ../compose/docker-compose-nodes.yml
 

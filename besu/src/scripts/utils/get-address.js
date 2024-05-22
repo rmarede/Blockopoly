@@ -1,5 +1,6 @@
 const fs = require('fs');
-const file_path = './ignition/deployments/chain-1337/deployed_addresses.json';
+const path = require('path');
+const file_path = path.join(__dirname, '../../ignition/deployments/chain-1337/deployed_addresses.json');
 const jsonContent = JSON.parse(fs.readFileSync(file_path, 'utf8'))
 
 function walletAddress() {

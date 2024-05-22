@@ -8,7 +8,6 @@ import "./Realties.sol";
 contract Ownership is WeightedMultiSig {
 
     mapping(address => address) private approvals;
-    mapping(address => bool) private blacklist; // TODO ou é melhor uma whitelist? 
     address private REALTIES_ADDRESS;
 
     address public admin;
@@ -24,7 +23,6 @@ contract Ownership is WeightedMultiSig {
         require(totalShares == 10000, "Ownership: Total shares must be equal to 10000 (100%)");
 
         REALTIES_ADDRESS = msg.sender;
-        blacklist[REALTIES_ADDRESS] = true; // TODO ou passar blacklist no contrutor?
     }
 
     function approvedOf(address _addr) public view returns (address) {
@@ -55,7 +53,6 @@ contract Ownership is WeightedMultiSig {
     }
 
     function submitTransaction(address _destination, uint _value, bytes memory _data) public override returns (uint transactionId) {
-        require(!blacklist[_destination], "Ownership: Blacklisted address");
         return super.submitTransaction(_destination, _value, _data);
     }
 
