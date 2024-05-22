@@ -11,7 +11,9 @@ docker rm $(docker ps -a -f status=exited -q) 2> /dev/null
 
 echo -e "${BLUE}[INFO] Cleaning project directories and cryptographic material...${NC}"
 
-sudo rm -r ../cryptogen ../genesis ../compose/docker-compose-nodes.yml 2> /dev/null
+sudo rm -r ../cryptogen ../genesis 2> /dev/null
+
+sudo rm -r ../compose/docker-compose-node-*.yml 2> /dev/null
 
 sudo rm -r ../src/ignition/deployments 2> /dev/null
 

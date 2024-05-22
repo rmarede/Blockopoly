@@ -21,7 +21,7 @@ case $1 in
       . clean.sh
       cd ..
       ;;
-  "up")
+  "boot")
       cd scripts
       . clean.sh
       . cryptogen.sh

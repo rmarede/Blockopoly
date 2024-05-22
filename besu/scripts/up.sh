@@ -10,8 +10,6 @@ NC='\033[0m'
 
 # curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://67e61faee5458a3a626627ae0e54c2e9e44f87ac60ba36c85a4595791fab94dffd812cba156cdd65c6c2fbbc3687cf4d49c9731681b8be7a1dc42e0908cd5953@127.0.0.1:30303"],"id":1}' http://127.0.0.1:8546
 
-
-
 # TODO In each Tessera directory, start tessera node:
 # tessera -configfile tessera.conf
 
@@ -23,31 +21,22 @@ echo -e "${BLUE}[INFO] Deploying bootnode besu-node-0...${NC}"
 docker-compose -f ../compose/docker-compose-bootnode.yml up -d
 
 echo -e "${BLUE}[INFO] Fetching bootnode ENODE address. Please wait...${NC}"
-MAX_RETRIES=30 
-for ((i=0; i<$MAX_RETRIES; i++)); do
-  export ENODE=$(curl -s -X POST --data '{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}' http://127.0.0.1:8500 | jq -r '.result')
-  if [ -n "$ENODE" ] && [ "$ENODE" != "null" ]; then
-    break
-  else
-    sleep 3
-  fi
+. fetch-enodeid.sh 0
+
+export ENODE=$(head -n 1 "../cryptogen/enodeIds.txt")
+
+for (( i=1; i<$NODE_COUNT; i++ )); do
+  cp ../compose/templates/docker-compose.yml ../compose/docker-compose-node-$i.yml
+  # Replace bootnode enode's localhost address with the docker besu-node-0 container's address
+  export E_ADDRESS="${ENODE#enode://}"
+  echo "e_address: $E_ADDRESS"
+  export DOCKER_NODE_0_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' besu-node-0)
+  echo "docker_node_address: $DOCKER_NODE_0_ADDRESS"
+  export E_ADDRESS=$(echo $E_ADDRESS | sed -e "s/127.0.0.1/$DOCKER_NODE_0_ADDRESS/g")
+  echo "FINAL E_ADDRESS: $E_ADDRESS"
+  sed -i "s/<ENODE>/enode:\/\/$E_ADDRESS/g" ../compose/docker-compose-node-$i.yml
+  sed -i 's/<NODENUM>/'$i'/g' ../compose/docker-compose-node-$i.yml
 done
-
-if [ $i -eq $((MAX_RETRIES - 1)) ] && ([ -z "$ENODE" ] || [ "$ENODE" == "null" ]); then
-  echo -e "${RED}[ERROR] Max retries reached. Unable to retrieve ENODE. ${NC}"
-fi
-echo -e "${BLUE}[SUCCESS] ENODE: $ENODE ${NC}"
-
-# Replace bootnode enode's localhost address with the docker besu-node-0 container's address
-export E_ADDRESS="${ENODE#enode://}"
-echo "E_ADDRESS: $E_ADDRESS"
-export DOCKER_NODE_1_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' besu-node-0)
-echo "DOCKER_NODE_1_ADDRESS: $DOCKER_NODE_1_ADDRESS"
-export E_ADDRESS=$(echo $E_ADDRESS | sed -e "s/127.0.0.1/$DOCKER_NODE_1_ADDRESS/g")
-echo "FINAL E_ADDRESS: $E_ADDRESS"
-
-sed "s/<ENODE>/enode:\/\/$E_ADDRESS/g" ../compose/templates/docker-compose.yml > ../compose/docker-compose-nodes.yml
-
 
 NODE_COUNT=$(jq '.blockchain.nodes.count' ../config/ibftConfigFile.json)
 
@@ -55,5 +44,10 @@ echo -e "${BLUE}[INFO] Deploying remaining $((NODE_COUNT-1)) nodes...${NC}"
 
 for (( i=1; i<$NODE_COUNT; i++ ))
 do
-  docker-compose -f ../compose/docker-compose-nodes.yml up -d "besu-node-$i"
+  docker-compose -f ../compose/docker-compose-node-$i.yml up -d "besu-node"
+done
+
+echo -e "${BLUE}[INFO] Fetching ENODE addresses from remaining $((NODE_COUNT-1)) nodes. Please wait...${NC}"
+for (( i=1; i<$NODE_COUNT; i++ )); do
+  . fetch-enodeid.sh $i
 done

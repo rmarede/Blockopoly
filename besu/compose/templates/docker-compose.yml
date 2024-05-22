@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
 
-  besu-node-1:
-    container_name: besu-node-1
+  besu-node:
+    container_name: besu-node-<NODENUM>
     image: hyperledger/besu:latest
     user: root
     environment:
@@ -14,8 +14,8 @@ services:
       BESU_HOST_ALLOWLIST: "*"
       BESU_RPC_HTTP_CORS_ORIGINS: "all"
       BESU_MIN_GAS_PRICE: 0
-      BESU_RPC_HTTP_PORT: 8501
-      BESU_P2P_PORT: 30301
+      BESU_RPC_HTTP_PORT: 8500
+      BESU_P2P_PORT: 30300
       BESU_BOOTNODES: <ENODE>
       BESU_PERMISSIONS_NODES_CONTRACT_ENABLED: true
       BESU_PERMISSIONS_NODES_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000001111"
@@ -26,50 +26,14 @@ services:
       BESU_RPC_WS_ENABLED: true
       BESU_RPC_WS_API: ADMIN,CLIQUE,DEBUG,EEA,ETH,IBFT,MINER,NET,PERM,PLUGINS,PRIV,QBFT,TRACE,TXPOOL,WEB3
       BESU_RPC_WS_MAX_ACTIVE_CONNECTIONS: 100
-      BESU_RPC_WS_PORT: 6101
+      BESU_RPC_WS_PORT: 6100
     volumes:
       - ../cryptogen/node1/data:/var/lib/besu/data
       - ../genesis:/var/lib/besu/genesis
     ports:
-      - 8501:8501
-      - 30301:30301
-      - 6101:6101
-    networks:
-      besu_network:
-    restart: always
-
-  besu-node-2:
-    container_name: besu-node-2
-    image: hyperledger/besu:latest
-    user: root
-    environment:
-      BESU_DATA_PATH: /var/lib/besu/data
-      BESU_GENESIS_FILE: /var/lib/besu/genesis/genesis.json
-      BESU_RPC_HTTP_ENABLED: true
-      BESU_RPC_HTTP_API: ADMIN,CLIQUE,DEBUG,EEA,ETH,IBFT,MINER,NET,PERM,PLUGINS,PRIV,QBFT,TRACE,TXPOOL,WEB3
-      BESU_HOST_ALLOWLIST: "*"
-      BESU_RPC_HTTP_CORS_ORIGINS: "all"
-      BESU_MIN_GAS_PRICE: 0
-      BESU_RPC_HTTP_PORT: 8502
-      BESU_P2P_PORT: 30302
-      BESU_BOOTNODES: <ENODE>
-      BESU_PERMISSIONS_NODES_CONTRACT_ENABLED: true
-      BESU_PERMISSIONS_NODES_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000001111"
-      BESU_PERMISSIONS_NODES_CONTRACT_VERSION: 2
-      BESU_PERMISSIONS_ACCOUNTS_CONTRACT_ENABLED: true
-      BESU_PERMISSIONS_ACCOUNTS_CONTRACT_ADDRESS: "0x0000000000000000000000000000000000002222"
-      BESU_TX_POOL_MAX_FUTURE_BY_SENDER: 1000
-      BESU_RPC_WS_ENABLED: true
-      BESU_RPC_WS_API: DMIN,CLIQUE,DEBUG,EEA,ETH,IBFT,MINER,NET,PERM,PLUGINS,PRIV,QBFT,TRACE,TXPOOL,WEB3
-      BESU_RPC_WS_MAX_ACTIVE_CONNECTIONS: 100
-      BESU_RPC_WS_PORT: 6102
-    volumes:
-      - ../cryptogen/node2/data:/var/lib/besu/data
-      - ../genesis:/var/lib/besu/genesis
-    ports:
-      - 8502:8502
-      - 30302:30302
-      - 6102:6102
+      - 850<NODENUM>:8500
+      - 3030<NODENUM>:30300
+      - 610<NODENUM>:6100
     networks:
       besu_network:
     restart: always
