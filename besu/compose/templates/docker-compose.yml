@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  besu-node:
+  besu-node-<NODENUM>:
     container_name: besu-node-<NODENUM>
     image: hyperledger/besu:latest
     user: root
@@ -28,7 +28,7 @@ services:
       BESU_RPC_WS_MAX_ACTIVE_CONNECTIONS: 100
       BESU_RPC_WS_PORT: 6100
     volumes:
-      - ../cryptogen/node1/data:/var/lib/besu/data
+      - ../cryptogen/node<NODENUM>/data:/var/lib/besu/data
       - ../genesis:/var/lib/besu/genesis
     ports:
       - 850<NODENUM>:8500

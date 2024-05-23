@@ -44,7 +44,7 @@ echo -e "${BLUE}[INFO] Deploying remaining $((NODE_COUNT-1)) nodes...${NC}"
 
 for (( i=1; i<$NODE_COUNT; i++ ))
 do
-  docker-compose -f ../compose/docker-compose-node-$i.yml up -d "besu-node"
+  docker-compose -f ../compose/docker-compose-node-$i.yml up -d "besu-node-$i"
 done
 
 echo -e "${BLUE}[INFO] Fetching ENODE addresses from remaining $((NODE_COUNT-1)) nodes. Please wait...${NC}"
