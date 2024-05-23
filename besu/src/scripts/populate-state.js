@@ -97,7 +97,7 @@ function sleep(ms) {
     await RealtyFactory.connect(signer1).mint(realty3, [PUBLIC_KEY_3, PUBLIC_KEY_4], [4000, 6000])
 
     console.log("Issuing Mortgage Loans...")
-   const details1 = {
+    const details1 = {
         lender: PUBLIC_KEY_1,
         borrower: PUBLIC_KEY_3,
         principal: 200000,
@@ -122,8 +122,8 @@ function sleep(ms) {
         defaultDeadline: 3
     }
     
-    await MortgageLoanFactory.createMortgageLoan(details1);
-    await MortgageLoanFactory.createMortgageLoan(details2);
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
     console.log("Done!") 
   

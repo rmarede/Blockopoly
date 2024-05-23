@@ -27,8 +27,7 @@ const MortgageLoanFactory = new ethers.Contract(getAddress.mortgageFactoryAddres
 // ------------------------------------------------ PERMISSIONING ------------------------------------------------
 
 async function addOrganization(signer, orgId, admin, perms) {
-  const contract = PermissionEndpoints.connect(signer);
-  return await contract.addOrganization(orgId, admin, [0,1,2,3,4,5,6,7]);
+  return await PermissionEndpoints.connect(signer).addOrganization(orgId, admin, [0,1,2,3,4,5,6,7]);
 }
 
 function encodeAddOrganization(orgId, admin, perms) {
@@ -36,84 +35,70 @@ function encodeAddOrganization(orgId, admin, perms) {
 }
 
 async function addRole(signer, roleId, privilege, perms) {
-  const contract = PermissionEndpoints.connect(signer);
-  return await contract.addRole(roleId, privilege, [0,1,2,3,4,5,6,7]);
+  return await PermissionEndpoints.connect(signer).addRole(roleId, privilege, [0,1,2,3,4,5,6,7]);
 }
 
 async function addAccount(signer, accountAdress, role, isAdmin) {
-  const contract = PermissionEndpoints.connect(signer);
-  return await contract.addAccount(accountAdress, role, isAdmin);
+  return await PermissionEndpoints.connect(signer).addAccount(accountAdress, role, isAdmin);
 }
 
 async function addNode(signer, enodeId, id, port, raftPort) {
-  const contract = PermissionEndpoints.connect(signer);
-  return await contract.addNode(enodeId, id, port, raftPort);
+  return await PermissionEndpoints.connect(signer).addNode(enodeId, id, port, raftPort);
 }
 
 // ------------------------------------------------ WALLET ------------------------------------------------
 
 async function mintCurrency(signer, recipient, amount) {
-  const contract = Wallet.connect(signer);
-  return await contract.mint(recipient, amount);
+  return await Wallet.connect(signer).mint(recipient, amount);
 }
 
 async function balanceOf(signer, account) {
-  const contract = Wallet.connect(signer);
-  return await contract.balanceOf(account);
+  return await Wallet.connect(signer).balanceOf(account);
 }
 
 async function walletApprove(signer, spender, amount) {
-  const contract = Wallet.connect(signer);
-  return await contract.approve(spender, amount);
+  return await Wallet.connect(signer).approve(spender, amount);
 }
 
 async function transfer(signer, recipient, amount) {
-  const contract = Wallet.connect(signer);
-  return await contract.transfer(recipient, amount);
+  return await Wallet.connect(signer).transfer(recipient, amount);
 }
 
 // ------------------------------------------------ REALTY FACTORY ------------------------------------------------
 
 async function mintRealty(signer, name, owners, shares) {
-  const contract = RealtyFactory.connect(signer);
-  return await contract.mint(name, "description123", owners, shares);
+  return await RealtyFactory.connect(signer).mint(name, "description123", owners, shares);
 }
 
 async function realtiesOf(signer, account) {
-  const contract = RealtyFactory.connect(signer);
-  return await contract.realtiesOf(account);
+  return await RealtyFactory.connect(signer).realtiesOf(account);
 }
 
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
 
 async function ownershipApprove(signer, contractAddress, spender) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
-  const contract = Ownership.connect(signer);
-  return await contract.approve(spender, tokenId);
+  return await Ownership.connect(signer).approve(spender, tokenId);
 }
 
 async function submitTransaction(signer, contractAddress, destination, data) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
-  const contract = Ownership.connect(signer);
-  return await contract.submitTransaction(destination, 0, data);
+  return await Ownership.connect(signer).submitTransaction(destination, 0, data);
 }
 
 async function confirmTransaction(signer, contractAddress, transactionId) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
-  const contract = Ownership.connect(signer);
-  return await contract.confirmTransaction(transactionId);
+  return await Ownership.connect(signer).confirmTransaction(transactionId);
 }
 
 async function getParticipants(signer, contractAddress) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
-  const contract = Ownership.connect(signer);
-  return await contract.getParticipants();
+  return await Ownership.connect(signer).getParticipants();
 }
 
 async function getTransactionCount(signer, contractAddress) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
-  const contract = Ownership.connect(signer);
-  return await contract.transactionCount();
+  return await Ownership.connect(signer).transactionCount();
 }
 
 // ------------------------------------------------ SALE AGREEMENTS ------------------------------------------------
@@ -132,26 +117,22 @@ async function mintSaleAgreement(signer, buyer, seller, realty, share, price, ea
     contengencyClauses: contengencyClauses
   }
 
-  const contract = SaleAgreementFactory.connect(signer);
-  return await contract.createSaleAgreement(details);
+  return await SaleAgreementFactory.connect(signer).createSaleAgreement(details);
 }
 
 async function submitSaleTransaction(signer, contractAddress, data) {
   const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
-  const contract = SaleAgreement.connect(signer);
-  return await contract.submitTransaction(0, data);
+  return await SaleAgreement.connect(signer).submitTransaction(0, data);
 }
 
 async function confirmSaleTransaction(signer, contractAddress, transactionId) {
   const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
-  const contract = SaleAgreement.connect(signer);
-  return await contract.confirmTransaction(transactionId);
+  return await SaleAgreement.connect(signer).confirmTransaction(transactionId);
 }
 
 async function getSaleTransactionCount(signer, contractAddress) {
   const SaleAgreement = new ethers.Contract(contractAddress, getAbi.saleAgreementAbi(), provider);
-  const contract = SaleAgreement.connect(signer);
-  return await contract.transactionCount();
+  return await SaleAgreement.connect(signer).transactionCount();
 }
 
 function consentData() {
@@ -205,8 +186,7 @@ async function mintMortgageLoan(signer, borrower, principal, downPayment, intere
     latePaymentFee: latePaymentFee, 
     defaultDeadline: defaultDeadline
   };
-  const contract = MortgageLoanFactory.connect(signer);
-  return await contract.createMortgageLoan(details);
+  return await MortgageLoanFactory.connect(signer).createMortgageLoan(details);
 }
 
 

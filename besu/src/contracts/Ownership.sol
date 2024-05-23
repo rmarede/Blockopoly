@@ -8,7 +8,7 @@ import "./RealtyFactory.sol";
 contract Ownership is WeightedMultiSig {
 
     mapping(address => address) private approvals;
-    address private REALTIES_ADDRESS;
+    address private REALTY_FACTORY_ADDRESS;
 
     address public admin;
 
@@ -22,7 +22,7 @@ contract Ownership is WeightedMultiSig {
         }
         require(totalShares == 10000, "Ownership: Total shares must be equal to 10000 (100%)");
 
-        REALTIES_ADDRESS = msg.sender;
+        REALTY_FACTORY_ADDRESS = msg.sender;
     }
 
     function approvedOf(address _addr) public view returns (address) {
@@ -45,10 +45,10 @@ contract Ownership is WeightedMultiSig {
         super.transferShares(_from, _to, _amount);
         admin = address(0);
         if (shares[_from] == 0) {
-            RealtyFactory(REALTIES_ADDRESS).removeOwnership(address(this), _from);
+            RealtyFactory(REALTY_FACTORY_ADDRESS).removeOwnership(address(this), _from);
         }
         if (shares[_to] == _amount) {
-            RealtyFactory(REALTIES_ADDRESS).addOwnership(address(this), _to);
+            RealtyFactory(REALTY_FACTORY_ADDRESS).addOwnership(address(this), _to);
         }
     }
 

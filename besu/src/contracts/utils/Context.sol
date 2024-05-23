@@ -19,7 +19,7 @@ contract Context {
         cns = IContractNameService(_cns);
     }
 
-    function realtyContractAddress() internal view returns (address) {
+    function realtyFactoryContractAddress() internal view returns (address) {
         return cns.getContractAddress("RealtyFactory");
     }
 
