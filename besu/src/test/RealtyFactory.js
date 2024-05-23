@@ -3,7 +3,7 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const getAbi = require('../scripts/utils/get-abi');
 
-describe("Realties", function () {
+describe("RealtyFactory", function () {
 
     async function deployCNSFixture() {
         const contract = await ethers.getContractFactory("ContractNameService");
@@ -11,18 +11,18 @@ describe("Realties", function () {
         return { cns };
     }
 
-    async function deployRealtiesFixture() {  
+    async function deployRealtyFactoryFixture() {  
         const [acc1] = await ethers.getSigners();
         const { cns } = await loadFixture(deployCNSFixture);  
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
 
-        const Realties = await ethers.getContractFactory("Realties", {
+        const RealtyFactory = await ethers.getContractFactory("RealtyFactory", {
             libraries: {
                 Arraysz: arrays.target
             }
         });
-        const realties = await Realties.deploy(cns.target);
+        const realtyFactory = await RealtyFactory.deploy(cns.target);
 
         const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
         const accountRegistry = await AccountRegistry.deploy(cns.target);
@@ -30,7 +30,7 @@ describe("Realties", function () {
         const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
         const roleRegistry = await RoleRegistry.deploy(cns.target);
 
-        await cns.setContractAddress("Realties", realties.target);
+        await cns.setContractAddress("RealtyFactory", realtyFactory.target);
         await cns.setContractAddress("AccountRegistry", accountRegistry.target);
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
@@ -38,27 +38,27 @@ describe("Realties", function () {
         await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
         await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
 
-        return {realties, accountRegistry, roleRegistry};
+        return {realtyFactory, accountRegistry, roleRegistry};
     }
 
     describe("Deployment", function () {
 
-        it("Should deploy Realties contract", async function () {
+        it("Should deploy RealtyFactory contract", async function () {
             const [acc1] = await ethers.getSigners();
 
-            const {realties, accountRegistry, roleRegistry} = await loadFixture(deployRealtiesFixture);
+            const {realtyFactory, accountRegistry, roleRegistry} = await loadFixture(deployRealtyFactoryFixture);
 
             expect(await accountRegistry.orgOf(acc1.address)).to.equal("landregi");
             expect(await accountRegistry.roleOf(acc1.address)).to.equal("landregi_admin");
             
-            expect(await roleRegistry.canMintRealties("landregi_admin")).to.be.true;
+            expect(await roleRegistry.canMintRealtyFactory("landregi_admin")).to.be.true;
 
         });
     });
 
     describe("Mint Asset", function () {
         it("Should mint asset's Ownership contract", async function () {
-            const {realties} = await loadFixture(deployRealtiesFixture);
+            const {realtyFactory} = await loadFixture(deployRealtyFactoryFixture);
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
@@ -72,10 +72,10 @@ describe("Realties", function () {
                 totalArea: 100
             }
 
-            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
-            const assetAddr = await realties.registry(0);
-            const asset = await realties.realties(assetAddr);
+            const assetAddr = await realtyFactory.registry(0);
+            const asset = await realtyFactory.realtyFactory(assetAddr);
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
@@ -88,16 +88,16 @@ describe("Realties", function () {
             expect(await ownership.shareOf(acc2.address)).to.equal(3000);
             expect(await ownership.shareOf(acc3.address)).to.equal(3000);
 
-            const realtiesOf1 = await realties.getRealtiesOf(acc1.address);
-            const realtiesOf2 = await realties.getRealtiesOf(acc2.address);
-            const realtiesOf3 = await realties.getRealtiesOf(acc3.address);
-            expect(realtiesOf1[0]).to.equal(assetAddr);
-            expect(realtiesOf2[0]).to.equal(assetAddr);
-            expect(realtiesOf3[0]).to.equal(assetAddr);
+            const realtyFactoryOf1 = await realtyFactory.getRealtiesOf(acc1.address);
+            const realtyFactoryOf2 = await realtyFactory.getRealtiesOf(acc2.address);
+            const realtyFactoryOf3 = await realtyFactory.getRealtiesOf(acc3.address);
+            expect(realtyFactoryOf1[0]).to.equal(assetAddr);
+            expect(realtyFactoryOf2[0]).to.equal(assetAddr);
+            expect(realtyFactoryOf3[0]).to.equal(assetAddr);
         });
 
         it("Should not mint asset's Ownership contract", async function () {
-            const {realties} = await loadFixture(deployRealtiesFixture);
+            const {realtyFactory} = await loadFixture(deployRealtyFactoryFixture);
 
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
@@ -111,19 +111,19 @@ describe("Realties", function () {
                 totalArea: 100
             }
 
-            await expect(realties.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
-            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
-            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
-            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
-            await expect(realties.connect(acc1).mint(details, [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
-            await expect(realties.connect(acc1).mint(details, [], [])).to.be.reverted;
+            await expect(realtyFactory.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
+            await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
+            await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
+            await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
+            await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address], [4000, 3000, 3000])).to.be.reverted;
+            await expect(realtyFactory.connect(acc1).mint(details, [], [])).to.be.reverted;
         });
     });
 
     describe("Add Ownership", function () {
 
         it("Should add ownership to new owner", async function () {
-            const {realties} = await loadFixture(deployRealtiesFixture);
+            const {realtyFactory} = await loadFixture(deployRealtyFactoryFixture);
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
@@ -137,10 +137,10 @@ describe("Realties", function () {
                 totalArea: 100
             }
 
-            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
-            const assetAddr = await realties.registry(0);
-            const asset = await realties.realties(assetAddr);
+            const assetAddr = await realtyFactory.registry(0);
+            const asset = await realtyFactory.realtyFactory(assetAddr);
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
@@ -154,18 +154,18 @@ describe("Realties", function () {
             expect(await ownership.shareOf(acc1.address)).to.equal(2000);
             expect(await ownership.shareOf(acc4.address)).to.equal(2000);
 
-            const realtiesOf1 = await realties.getRealtiesOf(acc1.address);
-            const realtiesOf4 = await realties.getRealtiesOf(acc4.address);
+            const realtyFactoryOf1 = await realtyFactory.getRealtiesOf(acc1.address);
+            const realtyFactoryOf4 = await realtyFactory.getRealtiesOf(acc4.address);
 
-            expect(realtiesOf1[0]).to.equal(assetAddr);
-            expect(realtiesOf4[0]).to.equal(assetAddr);
+            expect(realtyFactoryOf1[0]).to.equal(assetAddr);
+            expect(realtyFactoryOf4[0]).to.equal(assetAddr);
         });
     });
 
     describe("Remove Ownership", function () {
 
         it("Should remove ownership from previous owner", async function () {
-            const {realties} = await loadFixture(deployRealtiesFixture);
+            const {realtyFactory} = await loadFixture(deployRealtyFactoryFixture);
 
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
@@ -179,10 +179,10 @@ describe("Realties", function () {
                 totalArea: 100
             }
 
-            await realties.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
+            await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
-            const assetAddr = await realties.registry(0);
-            const asset = await realties.realties(assetAddr);
+            const assetAddr = await realtyFactory.registry(0);
+            const asset = await realtyFactory.realtyFactory(assetAddr);
 
             const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
@@ -192,11 +192,11 @@ describe("Realties", function () {
             expect(await ownership.shareOf(acc1.address)).to.equal(0);
             expect(await ownership.shareOf(acc2.address)).to.equal(7000);
 
-            const realtiesOf1 = await realties.getRealtiesOf(acc1.address);
-            const realtiesOf2 = await realties.getRealtiesOf(acc2.address);
+            const realtyFactoryOf1 = await realtyFactory.getRealtiesOf(acc1.address);
+            const realtyFactoryOf2 = await realtyFactory.getRealtiesOf(acc2.address);
 
-            expect(realtiesOf1).to.be.empty;
-            expect(realtiesOf2[0]).to.equal(assetAddr);
+            expect(realtyFactoryOf1).to.be.empty;
+            expect(realtyFactoryOf2[0]).to.equal(assetAddr);
 
         });
     });

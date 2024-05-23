@@ -20,7 +20,7 @@ contract Context {
     }
 
     function realtyContractAddress() internal view returns (address) {
-        return cns.getContractAddress("Realties");
+        return cns.getContractAddress("RealtyFactory");
     }
 
     function walletContractAddress() internal view returns (address) {

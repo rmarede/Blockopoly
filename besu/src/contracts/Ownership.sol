@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./governance/WeightedMultiSig.sol"; 
-import "./Realties.sol"; 
+import "./RealtyFactory.sol"; 
 
 // Multisig wallet (pattern) + fractional ownership
 contract Ownership is WeightedMultiSig {
@@ -45,10 +45,10 @@ contract Ownership is WeightedMultiSig {
         super.transferShares(_from, _to, _amount);
         admin = address(0);
         if (shares[_from] == 0) {
-            Realties(REALTIES_ADDRESS).removeOwnership(address(this), _from);
+            RealtyFactory(REALTIES_ADDRESS).removeOwnership(address(this), _from);
         }
         if (shares[_to] == _amount) {
-            Realties(REALTIES_ADDRESS).addOwnership(address(this), _to);
+            RealtyFactory(REALTIES_ADDRESS).addOwnership(address(this), _to);
         }
     }
 

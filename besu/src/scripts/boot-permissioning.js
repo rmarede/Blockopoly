@@ -29,7 +29,7 @@ function sleep(ms) {
 // TODO deploy organization voter
 
 (async () => {
-    //console.log(await node_permissions.boot(CNS_ADDRESS));
+    console.log(await node_permissions.boot(CNS_ADDRESS));
     await sleep(1000);
     console.log(await account_permissions.boot(CNS_ADDRESS));
   })();

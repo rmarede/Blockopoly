@@ -7,20 +7,20 @@ function walletAddress() {
   return jsonContent['WalletModule#Wallet'];
 }
 
-function realtiesAddress() {
-    return jsonContent['RealtiesModule#Realties'];
+function realtyFactoryAddress() {
+    return jsonContent['FactoryModule#RealtyFactory'];
 }
 
 function saleFactoryAddress() {
-    return jsonContent['SaleAgreementFactoryModule#SaleAgreementFactory'];
+    return jsonContent['FactoryModule#SaleAgreementFactory'];
 }
 
 function mortgageFactoryAddress() {
-    return jsonContent['MortgageLoanFactoryModule#MortgageLoanFactory'];
+    return jsonContent['FactoryModule#MortgageLoanFactory'];
 }
 
 function rentalFactoryAddress() {
-    return jsonContent['RentalAgreementFactoryModule#RentalAgreementFactory'];
+    return jsonContent['FactoryModule#RentalAgreementFactory'];
 }
 
 function organizationVoterAddress() {
@@ -28,7 +28,7 @@ function organizationVoterAddress() {
 }
 
 function permissionEndpointsAddress() {
-    return jsonContent['PermissionEndpointsModule#PermissionEndpoints'];
+    return jsonContent['PermissioningModule#PermissionEndpoints'];
 }
 
 function contractNameServiceAddress() {
@@ -36,22 +36,22 @@ function contractNameServiceAddress() {
 }
 
 function organizationRegistryAddress() {
-    return jsonContent['OrganizationRegistryModule#OrganizationRegistry'];
+    return jsonContent['PermissioningModule#OrganizationRegistry'];
 }
 
 function accountRegistryAddress() {
-    return jsonContent['AccountRegistryModule#AccountRegistry'];
+    return jsonContent['PermissioningModule#AccountRegistry'];
 }
 
 function roleRegistryAddress() {
-    return jsonContent['RoleRegistryModule#RoleRegistry'];
+    return jsonContent['PermissioningModule#RoleRegistry'];
 }
 
 function nodeRegistryAddress() {
-    return jsonContent['NodeRegistryModule#NodeRegistry'];
+    return jsonContent['PermissioningModule#NodeRegistry'];
 }
 
-module.exports = { walletAddress, realtiesAddress, saleFactoryAddress, mortgageFactoryAddress, rentalFactoryAddress, organizationVoterAddress, 
+module.exports = { walletAddress, realtyFactoryAddress, saleFactoryAddress, mortgageFactoryAddress, rentalFactoryAddress, organizationVoterAddress, 
     permissionEndpointsAddress, contractNameServiceAddress, organizationRegistryAddress, accountRegistryAddress, roleRegistryAddress, 
     nodeRegistryAddress 
 };

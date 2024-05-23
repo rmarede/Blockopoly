@@ -18,7 +18,7 @@ const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer2 = wallet2.connect(provider);
 
 const Wallet = new ethers.Contract(getAddress.walletAddress(), getAbi.walletAbi(), provider);
-const Realties = new ethers.Contract(getAddress.realtiesAddress(), getAbi.realtiesAbi(), provider);
+const RealtyFactory = new ethers.Contract(getAddress.realtyFactoryAddress(), getAbi.realtyFactoryAbi(), provider);
 const PermissionEndpoints = new ethers.Contract(getAddress.permissionEndpointsAddress(), getAbi.permissionEndpointsAbi(), provider);
 const RentalAgreementFactory = new ethers.Contract(getAddress.rentalFactoryAddress(), getAbi.rentalFactoryAbi(), provider);
 const SaleAgreementFactory = new ethers.Contract(getAddress.saleFactoryAddress(), getAbi.saleFactoryAbi(), provider);
@@ -75,12 +75,12 @@ async function transfer(signer, recipient, amount) {
 // ------------------------------------------------ REALTY FACTORY ------------------------------------------------
 
 async function mintRealty(signer, name, owners, shares) {
-  const contract = Realties.connect(signer);
+  const contract = RealtyFactory.connect(signer);
   return await contract.mint(name, "description123", owners, shares);
 }
 
 async function realtiesOf(signer, account) {
-  const contract = Realties.connect(signer);
+  const contract = RealtyFactory.connect(signer);
   return await contract.realtiesOf(account);
 }
 

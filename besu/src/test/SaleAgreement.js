@@ -24,12 +24,12 @@ describe("SaleAgreement", function () {
         const wallet = await Wallet.deploy(cns.target);
         const Arrays = await ethers.getContractFactory("Arraysz");
         const arrays = await Arrays.deploy();
-        const Realties = await ethers.getContractFactory("Realties", {
+        const RealtyFactory = await ethers.getContractFactory("RealtyFactory", {
             libraries: {
                 Arraysz: arrays.target
             }
         });
-        const realties = await Realties.deploy(cns.target);
+        const realtyFactory = await RealtyFactory.deploy(cns.target);
 
         const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
         const accountRegistry = await AccountRegistry.deploy(cns.target);
@@ -38,7 +38,7 @@ describe("SaleAgreement", function () {
         const roleRegistry = await RoleRegistry.deploy(cns.target);
 
         await cns.setContractAddress("Wallet", wallet.target);
-        await cns.setContractAddress("Realties", realties.target);
+        await cns.setContractAddress("RealtyFactory", realtyFactory.target);
         await cns.setContractAddress("AccountRegistry", accountRegistry.target);
         await cns.setContractAddress("RoleRegistry", roleRegistry.target);
         await cns.setContractAddress("PermissionEndpoints", acc1.address);
@@ -55,10 +55,10 @@ describe("SaleAgreement", function () {
 
         await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
         await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
-        await expect(realties.connect(acc1).mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
+        await expect(realtyFactory.connect(acc1).mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
 
         const ownershipAbi = getAbi.ownershipAbi(); 
-        const assetAddr = await realties.registry(0);
+        const assetAddr = await realtyFactory.registry(0);
         const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
 
         const details = {
@@ -76,7 +76,7 @@ describe("SaleAgreement", function () {
 
         const contract = await ethers.getContractFactory("SaleAgreement");
         const saleAgreement = await contract.deploy(cns.target, details);
-        return {saleAgreement, wallet, ownership, realties};
+        return {saleAgreement, wallet, ownership, realtyFactory};
     }
 
     describe("Deployment", function () {

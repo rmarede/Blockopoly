@@ -12,7 +12,7 @@ contract MortgageLoanFactory is Context {
     constructor(address _cns) Context(_cns) {}
     
     
-    function createMortgageLoan(address _borrower, uint _principal, uint _downPayment, uint _interestRate, uint _loanTerm, uint _startDate, 
+    /*function createMortgageLoan(address _borrower, uint _principal, uint _downPayment, uint _interestRate, uint _loanTerm, uint _startDate, 
     uint _gracePeriod, uint _latePaymentFee, uint _defaultDeadline) public returns (address) { 
 
         require(IRoleRegistry(roleRegistryAddress()).canMintLoans(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "MortgageLoanFactory: sender does not have permission to mint");
@@ -32,7 +32,7 @@ contract MortgageLoanFactory is Context {
 
         MortgageLoan mortgageLoan = new MortgageLoan(cns_address, details);
         return address(mortgageLoan);
-    }
+    }*/
 
 
     function createMortgageLoan(MortgageLoan.LoanDetails memory _details) public returns (address) { 

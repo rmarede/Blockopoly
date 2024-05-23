@@ -8,7 +8,7 @@ import "./interface/permissioning/IRoleRegistry.sol";
 import "./interface/permissioning/IAccountRegistry.sol";
 
 // Ownership Factory
-contract Realties is Context {
+contract RealtyFactory is Context {
 
     struct RealtyDetails {
         string name; 

@@ -44,7 +44,7 @@ case $1 in
       . deploy.sh
       cd ../src/scripts
       node populate-cns.js
-      # node populate-state.js
+      node populate-state.js
       # node boot-permissioning.js
       # cd ../..
       ;;

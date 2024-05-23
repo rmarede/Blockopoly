@@ -38,17 +38,21 @@ contract RoleRegistry is IRoleRegistry, Context {
         emit RoleAdded(roleName, _orgId, _privilege, _perms);
     }
 
+    function getRoles() public view returns (Role[] memory) {
+        return roleList;
+    }
+
     function roleExists(string memory _roleName) public view override returns (bool) {
         return indexOf[_roleName] != 0;
     }
 
     function privilegeOf(string memory _roleName) public view override returns (uint) {
-        require(roleExists(_roleName));
+        require(roleExists(_roleName), "RoleRegistry: Role does not exist");
         return roleList[indexOf[_roleName]].privilege;
     }
 
     function orgOf(string memory _roleName) public view returns (string memory) {
-        require(roleExists(_roleName));
+        require(roleExists(_roleName), "RoleRegistry: Role does not exist");
         return roleList[indexOf[_roleName]].orgId;
     }
 

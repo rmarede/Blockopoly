@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./utils/Strings.sol";
-import "./Realties.sol";
+import "./RealtyFactory.sol";
 import "./Ownership.sol";
 import "./Wallet.sol";
 import "./SaleAgreement.sol";

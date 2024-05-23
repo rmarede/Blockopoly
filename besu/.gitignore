@@ -1,4 +1,4 @@
 
 /cryptogen
 /genesis
-/compose/docker-compose-nodes.yml
+/compose/docker-compose-node-*

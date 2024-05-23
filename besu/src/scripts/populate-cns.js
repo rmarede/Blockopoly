@@ -35,7 +35,7 @@ console.log("[INFO] Populating CNS...");
     await sleep(1000);
     await cns.setContractAddress("Wallet", getAddress.walletAddress());
     await sleep(1000);
-    await cns.setContractAddress("Realties", getAddress.realtiesAddress());
+    await cns.setContractAddress("RealtyFactory", getAddress.realtyFactoryAddress());
     await sleep(2000);
     console.log("[INFO] CNS populated with addresses:");
     console.log(await cns.getContractHistory());
