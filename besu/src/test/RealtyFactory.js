@@ -51,7 +51,7 @@ describe("RealtyFactory", function () {
             expect(await accountRegistry.orgOf(acc1.address)).to.equal("landregi");
             expect(await accountRegistry.roleOf(acc1.address)).to.equal("landregi_admin");
             
-            expect(await roleRegistry.canMintRealtyFactory("landregi_admin")).to.be.true;
+            expect(await roleRegistry.canMintRealties("landregi_admin")).to.be.true;
 
         });
     });
@@ -75,7 +75,7 @@ describe("RealtyFactory", function () {
             await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realtyFactory.registry(0);
-            const asset = await realtyFactory.realtyFactory(assetAddr);
+            const asset = await realtyFactory.realties(assetAddr);
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
@@ -140,7 +140,7 @@ describe("RealtyFactory", function () {
             await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realtyFactory.registry(0);
-            const asset = await realtyFactory.realtyFactory(assetAddr);
+            const asset = await realtyFactory.realties(assetAddr);
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
@@ -182,7 +182,7 @@ describe("RealtyFactory", function () {
             await realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000]);
 
             const assetAddr = await realtyFactory.registry(0);
-            const asset = await realtyFactory.realtyFactory(assetAddr);
+            const asset = await realtyFactory.realties(assetAddr);
 
             const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
