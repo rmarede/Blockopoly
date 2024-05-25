@@ -85,6 +85,10 @@ async function realtiesOf(signer, account) {
   return await RealtyFactory.connect(signer).getRealtiesOf(account);
 }
 
+async function testMethod(signer) {
+  return await RealtyFactory.connect(signer).testMethod();
+}
+
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
 
 async function ownershipApprove(signer, contractAddress, spender) {
@@ -233,7 +237,8 @@ const commands = {
   submitTransaction: (signer, ...args) => submitTransaction(signer, ...args),
   confirmTransaction: (signer, ...args) => confirmTransaction(signer, ...args),
   getParticipants: (signer, ...args) => getParticipants(signer, ...args),
-  getTransactionCount: (signer, ...args) => getTransactionCount(signer, ...args)
+  getTransactionCount: (signer, ...args) => getTransactionCount(signer, ...args),
+  testMethod: (signer, ...args) => testMethod(signer, ...args)
 };
 
 rl.on('line', async (input) => {

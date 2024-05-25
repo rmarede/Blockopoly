@@ -17,8 +17,9 @@
             "RealtyFactory": {
                 "path": "contracts/RealtyFactoryDefinition.json",
                 "gas": {
-                    "mint": 100000,
-                    "getRealtiesOf": 100000
+                    "mint": 1000000,
+                    "getRealtiesOf": 1000000,
+                    "testMethod": 1000000
                 },
                 "address": "0x664D6EbAbbD5cf656eD07A509AFfBC81f9615741"
             }

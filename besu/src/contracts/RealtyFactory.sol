@@ -41,6 +41,11 @@ contract RealtyFactory is Context {
         return addr;
     }
 
+    function testMethod() public returns (address) {
+        realtiesOf[msg.sender].push(address(this));
+        return msg.sender;
+    }
+
     function getRealtiesOf(address _user) public view returns (address[] memory) {
         return realtiesOf[_user];
     }

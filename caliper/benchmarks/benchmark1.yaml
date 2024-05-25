@@ -1,6 +1,6 @@
 test:
   workers:
-    number: 5
+    number: 1
   rounds:
     - label: create-and-read-asset
       txNumber: 10

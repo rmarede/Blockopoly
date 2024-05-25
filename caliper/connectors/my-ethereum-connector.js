@@ -269,6 +269,9 @@ class EthereumConnector extends ConnectorBase {
                 params.gas = 1000 + await contractInfo.contract.methods[request.verb](...request.args).estimateGas();
             }
 
+            logger.info(`Invoking ${request.verb}(${request.args}) on ${request.contract} with gas ${params.gas}`);
+            logger.info(`Params: ${JSON.stringify(params)}`);
+
             try {
                 receipt = await contractInfo.contract.methods[request.verb](...request.args)[methodType](params);
                 onSuccess(receipt);
