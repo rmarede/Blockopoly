@@ -3,16 +3,16 @@ test:
     number: 5
   rounds:
     - label: create-and-read-asset
-      txNumber: 500
+      txNumber: 10
       rateControl:
         type: fixed-rate
         opts:
-          tps: 25
+          tps: 10
       workload:
         module: ./workload/createReadAsset.js
-        //arguments:
-            //assets: 10
-            //contractId: basic
+        #arguments:
+            #assets: 10
+            #contractId: basic
 monitors:
   transaction:
   - module: prometheus

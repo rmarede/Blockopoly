@@ -67,7 +67,18 @@ async function transfer(signer, recipient, amount) {
 // ------------------------------------------------ REALTY FACTORY ------------------------------------------------
 
 async function mintRealty(signer, name, owners, shares) {
-  return await RealtyFactory.connect(signer).mint(name, "description123", owners, shares);
+
+  const details = {
+    name: name,
+    ownership: PUBLIC_KEY_1,
+    district: "lisbon",
+    postalCode: 2725455,
+    street: "central route",
+    number: 1,
+    totalArea: 100
+  }
+
+  return await RealtyFactory.connect(signer).mint(details, owners, shares);
 }
 
 async function realtiesOf(signer, account) {
