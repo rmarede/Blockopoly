@@ -54,7 +54,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
 
         const details = {
             name: "foo",
-            ownership: acc1,
+            ownership: '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73',
             district: "lisbon",
             postalCode: 2725455,
             street: "central route",
@@ -85,9 +85,9 @@ class ReadAssetWorkload extends WorkloadModuleBase {
 
         let requestsSettings = [{
             contract: 'RealtyFactory',
-            verb: 'mint',
+            verb: 'testMethod',
             value: 0,
-            args: [details, [acc1], [10000]]
+            args: []
         }];
         
         await this.sutAdapter.sendRequests(requestsSettings);

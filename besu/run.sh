@@ -46,7 +46,7 @@ case $1 in
       node populate-cns.js
       node populate-state.js
       # node boot-permissioning.js
-      # cd ../..
+      cd ../..
       ;;
   *)
       echo "Invalid command. Usage: . boot.sh <clean|up|deploy|populate>"

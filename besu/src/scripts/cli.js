@@ -89,6 +89,10 @@ async function testMethod(signer) {
   return await RealtyFactory.connect(signer).testMethod();
 }
 
+async function mintt(signer, name, desc, ina) {
+  return await RealtyFactory.connect(signer).mintt(name, desc, ina);
+}
+
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
 
 async function ownershipApprove(signer, contractAddress, spender) {
@@ -238,7 +242,8 @@ const commands = {
   confirmTransaction: (signer, ...args) => confirmTransaction(signer, ...args),
   getParticipants: (signer, ...args) => getParticipants(signer, ...args),
   getTransactionCount: (signer, ...args) => getTransactionCount(signer, ...args),
-  testMethod: (signer, ...args) => testMethod(signer, ...args)
+  testMethod: (signer, ...args) => testMethod(signer, ...args),
+  mintt: (signer, ...args) => mintt(signer, ...args)
 };
 
 rl.on('line', async (input) => {
