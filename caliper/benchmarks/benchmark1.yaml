@@ -1,0 +1,34 @@
+test:
+  workers:
+    number: 5
+  rounds:
+    - label: create-and-read-asset
+      txNumber: 500
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 25
+      workload:
+        module: ../workload/createReadAsset.js
+        //arguments:
+            //assets: 10
+            //contractId: basic
+monitors:
+  transaction:
+  - module: prometheus
+  resource:
+  - module: docker
+    options:
+      interval: 1
+      containers: ['all']
+  - module: prometheus
+    options:
+      url: "http://prometheus:9090"
+      metrics:
+        include: [dev-.*, couch, peer, orderer]
+        queries:
+        - name: Endorse Time (s)
+          query: rate(endorser_propsal_duration_sum{chaincode="marbles:v0"}[5m])/rate(endorser_propsal_duration_count{chaincode="marbles:v0"}[5m])
+          step: 1
+          label: instance
+          statistic: avg

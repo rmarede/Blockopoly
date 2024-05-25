@@ -1,10 +1,10 @@
 {
     "caliper": {
         "blockchain": "ethereum",
-        "command" : {
-            "start": "echo starting",
-            "end" : "echo ending"
-          }
+        "command": {
+            "start": "echo %%%%%%%% Benchmarking is starting %%%%%%%% ; pwd",
+            "end": "echo %%%%%%%% Benchmarking is ending %%%%%%%%"
+        }
     },
     "ethereum": {
         "url": "ws://localhost:6100",
@@ -14,6 +14,14 @@
         "fromAddressPrivateKey": "0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
         "transactionConfirmationBlocks": 12,
         "contracts": {
+            "RealtyFactory": {
+                "path": "contracts/RealtyFactoryDefinition.json",
+                "gas": {
+                    "mint": 100000,
+                    "getRealtiesOf": 100000
+                },
+                "address": "0x664D6EbAbbD5cf656eD07A509AFfBC81f9615741"
+            }
         }
     }
 }
