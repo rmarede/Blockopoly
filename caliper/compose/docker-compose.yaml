@@ -12,3 +12,9 @@ services:
         - CALIPER_NETWORKCONFIG=networks/network-config.json
         volumes:
         - ../:/hyperledger/caliper/workspace
+        networks:
+            besu_network:
+
+networks:
+  besu_network:
+    external: true

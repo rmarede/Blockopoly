@@ -9,7 +9,7 @@ test:
         opts:
           tps: 25
       workload:
-        module: ../workload/createReadAsset.js
+        module: ./workload/createReadAsset.js
         //arguments:
             //assets: 10
             //contractId: basic
