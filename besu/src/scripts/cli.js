@@ -71,7 +71,7 @@ async function mintRealty(signer, name, owners, shares) {
 }
 
 async function realtiesOf(signer, account) {
-  return await RealtyFactory.connect(signer).realtiesOf(account);
+  return await RealtyFactory.connect(signer).getRealtiesOf(account);
 }
 
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
