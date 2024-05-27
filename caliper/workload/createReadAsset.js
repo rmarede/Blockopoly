@@ -62,8 +62,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             totalArea: 100
         }
 
-        /*
-        {
+        let requestsSettings = [{
             contract: 'RealtyFactory',
             verb: 'mint',
             value: 0,
@@ -74,20 +73,6 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             verb: 'getRealtiesOf',
             value: 0,
             args: [acc1]
-        }
-        {
-            contract: 'RealtyFactory',
-            verb: 'testMethod',
-            value: 0,
-            args: []
-        }
-        */
-
-        let requestsSettings = [{
-            contract: 'RealtyFactory',
-            verb: 'testMethod',
-            value: 0,
-            args: []
         }];
         
         await this.sutAdapter.sendRequests(requestsSettings);

@@ -3,11 +3,11 @@ test:
     number: 1
   rounds:
     - label: create-and-read-asset
-      txNumber: 10
+      txNumber: 1000
       rateControl:
         type: fixed-rate
         opts:
-          tps: 10
+          tps: 100
       workload:
         module: ./workload/createReadAsset.js
         #arguments:

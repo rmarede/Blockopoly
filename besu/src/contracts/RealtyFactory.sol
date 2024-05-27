@@ -41,12 +41,6 @@ contract RealtyFactory is Context {
         return addr;
     }
 
-    function testMethod() public returns (address) {
-        new Ownership(makeArray(msg.sender), makeArray2());
-        realtiesOf[msg.sender].push(address(this));
-        return msg.sender;
-    }
-
     function getRealtiesOf(address _user) public view returns (address[] memory) {
         return realtiesOf[_user];
     }
@@ -60,18 +54,6 @@ contract RealtyFactory is Context {
     function removeOwnership(address _assetId, address _user) public {
         require(msg.sender == realties[_assetId].ownership, "RealtyFactory: function restricted to ownership contract");
         realtiesOf[_user] = Arraysz.remove(realtiesOf[_user], _assetId);
-    }
-
-    function makeArray(address addr) internal returns (address[] memory) {
-        address[] memory arr = new address[](1);
-        arr[0] = addr;
-        return arr;
-    }
-
-    function makeArray2() internal returns (uint[] memory) {
-        uint[] memory arr = new uint[](1);
-        arr[0] = 10000;
-        return arr;
     }
 
 
