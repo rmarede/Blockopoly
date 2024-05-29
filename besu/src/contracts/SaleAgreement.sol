@@ -54,7 +54,9 @@ contract SaleAgreement is Context, SelfMultisig {
     }
 
     constructor(address _cns, SaleDetails memory _details) Context(_cns) SelfMultisig(_participants(_details.buyer, _details.seller), Policy.UNANIMOUS) {
+        require(_details.buyer != address(0) && _details.seller != address(0) && _details.realty != address(0), "SaleAgreement: invalid input");
         require(_details.price > 0 && _details.earnest > 0 && _details.share > 0, "SaleAgreement: invalid input");
+        //require(_details.buyer != _details.seller, "SaleAgreement: buyer and seller can not be the same");
         require(_details.earnest <= _details.price, "SaleAgreement: earnest can not be more than price");
         require(_details.comission < 10000, "SaleAgreement: comission can not be more than 10000 (100.00%)");
         require(Ownership(_details.realty).shareOf(_details.seller) >= _details.share, "SaleAgreement: seller does not have enough shares");

@@ -16,39 +16,50 @@ EOF
 echo -e "${NC}"
 
 case $1 in
-  "clean")
-      cd scripts
-      . clean.sh
-      cd ..
-      ;;
-  "boot")
-      cd scripts
-      . clean.sh
-      . cryptogen.sh
-      . up.sh
-      cd ..
-      ;;
-  "deploy")
-      cd scripts
-      . clean.sh
-      . cryptogen.sh
-      . up.sh
-      . deploy.sh
-      cd ..
-      ;;
-  "populate")
-      cd scripts
-      . clean.sh
-      . cryptogen.sh
-      . up.sh
-      . deploy.sh
-      cd ../src/scripts
-      node populate-cns.js
-      node populate-state.js
-      # node boot-permissioning.js
-      cd ../..
-      ;;
-  *)
-      echo "Invalid command. Usage: . boot.sh <clean|up|deploy|populate>"
-      ;;
+    "clean")
+        cd scripts
+        . clean.sh
+        cd ..
+        ;;
+    "boot")
+        cd scripts
+        . clean.sh
+        . cryptogen.sh
+        . up.sh
+        cd ..
+        ;;
+    "deploy")
+        cd scripts
+        . clean.sh
+        . cryptogen.sh
+        . up.sh
+        . deploy.sh
+        cd ..
+        ;;
+    "populate")
+        cd scripts
+        . clean.sh
+        . cryptogen.sh
+        . up.sh
+        . deploy.sh
+        cd ../src/scripts
+        node populate-cns.js
+        node populate-state.js
+        cd ../..
+        ;;
+    "prod")
+        cd scripts
+        . clean.sh
+        . cryptogen.sh
+        . up.sh
+        . deploy.sh
+        cd ../src/scripts
+        node populate-cns.js
+        node populate-state.js
+        node boot-permissioning.js
+        cd ../..
+        ;;
+    *)
+        echo "Invalid command. Usage: . boot.sh <clean|boot|deploy|populate|prod>"
+        ;;
 esac

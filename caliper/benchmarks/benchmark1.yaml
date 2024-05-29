@@ -3,13 +3,13 @@ test:
     number: 1
   rounds:
     - label: create-and-read-asset
-      txNumber: 1000
+      txNumber: 3
       rateControl:
         type: fixed-rate
         opts:
-          tps: 100
+          tps: 1
       workload:
-        module: ./workload/createReadAsset.js
+        module: ./workload/saleAgreementFlow.js
         #arguments:
             #assets: 10
             #contractId: basic

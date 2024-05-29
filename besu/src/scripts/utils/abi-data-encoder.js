@@ -13,7 +13,7 @@ function encodeSaleAgreementData(functionToCall, params) {
 }
 
 function encodeOwnershipData(functionToCall, params) {
-    letinterface = new ethers.Interface(getAbi.ownershipAbi());
+    let interface = new ethers.Interface(getAbi.ownershipAbi());
     let data = interface.encodeFunctionData(functionToCall, params);
     return data;
 }

@@ -72,7 +72,8 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             contract: 'RealtyFactory',
             verb: 'getRealtiesOf',
             value: 0,
-            args: [acc1]
+            args: [acc1],
+            readOnly: true
         }];
         
         await this.sutAdapter.sendRequests(requestsSettings);

@@ -8,14 +8,20 @@ const PUBLIC_KEY_1 = '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73';
 const PRIVATE_KEY_1 = '0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63';
 const PUBLIC_KEY_2 = '0xFcCf97710dfdfBFe80ad627A6c10104A61b3C93C';
 const PRIVATE_KEY_2 = '0x6c6fd860efa48e8f07e85482f06ddb6a989ac962dcb13f8d30fa85c104a0219b';
-const PUBLIC_KEY_3 = '0x627306090abaB3A6e1400e9345bC60c78a8BEf57';
-const PRIVATE_KEY_3 = '0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
+const PUBLIC_KEY_3 = '0xC195057Fdd4eF1BB3022f5F1157D30b6468c84c8';
+const PRIVATE_KEY_3 = '0x5d13d769309b9ab2de1cf46b1cb1f76ddea3702d285eb7deb77de225ac118240';
+const PUBLIC_KEY_4 = '0xB0263c245533d3Eb188F6F6C57DF48C3B3f39631';
+const PRIVATE_KEY_4 = '0x9d5876523ecdf5723f447f8049ff1492fdf83f1c0edd5770b4805fcfc67bd14d';
 
 const provider = new ethers.JsonRpcProvider("http://localhost:8500");
 const wallet1 = new ethers.Wallet(PRIVATE_KEY_1, provider);
 const signer1 = wallet1.connect(provider);
 const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer2 = wallet2.connect(provider);
+const wallet3 = new ethers.Wallet(PRIVATE_KEY_3, provider);
+const signer3 = wallet3.connect(provider);
+const wallet4 = new ethers.Wallet(PRIVATE_KEY_4, provider);
+const signer4 = wallet4.connect(provider);
 
 const Wallet = new ethers.Contract(getAddress.walletAddress(), getAbi.walletAbi(), provider);
 const RealtyFactory = new ethers.Contract(getAddress.realtyFactoryAddress(), getAbi.realtyFactoryAbi(), provider);
@@ -85,14 +91,6 @@ async function realtiesOf(signer, account) {
   return await RealtyFactory.connect(signer).getRealtiesOf(account);
 }
 
-async function testMethod(signer) {
-  return await RealtyFactory.connect(signer).testMethod();
-}
-
-async function mintt(signer, name, desc, ina) {
-  return await RealtyFactory.connect(signer).mintt(name, desc, ina);
-}
-
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
 
 async function ownershipApprove(signer, contractAddress, spender) {
@@ -137,6 +135,10 @@ async function mintSaleAgreement(signer, buyer, seller, realty, share, price, ea
   }
 
   return await SaleAgreementFactory.connect(signer).createSaleAgreement(details);
+}
+
+async function salesOf(signer, account) {
+  return await SaleAgreementFactory.connect(signer).getSalesOf(account);
 }
 
 async function submitSaleTransaction(signer, contractAddress, data) {
@@ -242,15 +244,17 @@ const commands = {
   confirmTransaction: (signer, ...args) => confirmTransaction(signer, ...args),
   getParticipants: (signer, ...args) => getParticipants(signer, ...args),
   getTransactionCount: (signer, ...args) => getTransactionCount(signer, ...args),
-  testMethod: (signer, ...args) => testMethod(signer, ...args),
-  mintt: (signer, ...args) => mintt(signer, ...args)
+  salesOf: (signer, ...args) => salesOf(signer, ...args),
 };
 
 rl.on('line', async (input) => {
   console.log(`You entered: ${input}`);
   const [command, ...args] = input.split(' ');
 
-  const signer = args[0] === '1' ? signer1 : signer2;
+  let signer = signer1;
+  signer = args[0] === '2' ? signer2 : signer;
+  signer = args[0] === '3' ? signer3 : signer;
+  signer = args[0] === '4' ? signer4 : signer;
 
   if (command in commands) {
     try {

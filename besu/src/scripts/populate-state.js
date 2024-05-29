@@ -6,6 +6,8 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 
+const textEncoder = new TextEncoder();
+
 const PUBLIC_KEY_1 = '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73';
 const PRIVATE_KEY_1 = '0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63';
 const PUBLIC_KEY_2 = '0xFcCf97710dfdfBFe80ad627A6c10104A61b3C93C';
@@ -20,6 +22,10 @@ const wallet1 = new ethers.Wallet(PRIVATE_KEY_1, provider);
 const signer1 = wallet1.connect(provider);
 const wallet2 = new ethers.Wallet(PRIVATE_KEY_2, provider);
 const signer2 = wallet2.connect(provider);
+const wallet3 = new ethers.Wallet(PRIVATE_KEY_3, provider);
+const signer3 = wallet3.connect(provider);
+const wallet4 = new ethers.Wallet(PRIVATE_KEY_4, provider);
+const signer4 = wallet4.connect(provider);
 
 const Wallet = new ethers.Contract(getAddress.walletAddress(), getAbi.walletAbi(), provider);
 const RealtyFactory = new ethers.Contract(getAddress.realtyFactoryAddress(), getAbi.realtyFactoryAbi(), provider);
@@ -92,9 +98,35 @@ function sleep(ms) {
         totalArea: 68
     }
 
+    await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_1], [10000])
     await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_3], [10000])
     await RealtyFactory.connect(signer1).mint(realty2, [PUBLIC_KEY_4], [10000])
     await RealtyFactory.connect(signer1).mint(realty3, [PUBLIC_KEY_3, PUBLIC_KEY_4], [4000, 6000])
+
+    await sleep(1000);
+
+    console.log("Issuing Sale Agrements...");
+    const realties = await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3);
+    console.log('realties of 3: '+ await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3));
+
+    const saleDetails = {
+        buyer: PUBLIC_KEY_1,
+        seller: PUBLIC_KEY_3,
+        realty: realties[0],
+        share: 3000,
+        price: 1000,
+        earnest: 100,
+        realtor: PUBLIC_KEY_1,
+        comission: 0,
+        contengencyPeriod: 10,
+        contengencyClauses:  textEncoder.encode("foo")
+    }
+
+    //await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails);
+
+    await sleep(1000);
+    console.log('sales of 3: '+ await SaleAgreementFactory.connect(signer1).getSalesOf(PUBLIC_KEY_3));
+
 
     console.log("Issuing Mortgage Loans...")
     const details1 = {
@@ -122,8 +154,8 @@ function sleep(ms) {
         defaultDeadline: 3
     }
     
-    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
-    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
+    //await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
+    //await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
     console.log("Done!") 
   

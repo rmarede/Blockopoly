@@ -152,7 +152,7 @@
                     </tr>
 
                     <tr>
-                         <td>create-and-read-asset</td> <td>1000</td> <td>0</td> <td>100.4</td> <td>31.06</td> <td>10.54</td> <td>20.42</td> <td>25.3</td>
+                         <td>create-and-read-asset</td> <td>12</td> <td>6</td> <td>4.4</td> <td>2.11</td> <td>0.01</td> <td>1.41</td> <td>3.1</td>
                     </tr>
                 </table>
             </div>
@@ -162,7 +162,7 @@
                 <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">rateControl:
   type: fixed-rate
   opts:
-    tps: 100
+    tps: 1
 </pre>
                         <h3>Performance metrics for create-and-read-asset</h3>
                             <table style="min-width: 100%;">
@@ -170,7 +170,7 @@
                                      <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
                                 </tr>
                                 <tr>
-                                     <td>create-and-read-asset</td> <td>1000</td> <td>0</td> <td>100.4</td> <td>31.06</td> <td>10.54</td> <td>20.42</td> <td>25.3</td>
+                                     <td>create-and-read-asset</td> <td>12</td> <td>6</td> <td>4.4</td> <td>2.11</td> <td>0.01</td> <td>1.41</td> <td>3.1</td>
                                 </tr>
                             </table>
                         <h3>Resource utilization for create-and-read-asset</h3>
@@ -183,13 +183,13 @@
   number: 1
 rounds:
   - label: create-and-read-asset
-    txNumber: 1000
+    txNumber: 3
     rateControl:
       type: fixed-rate
       opts:
-        tps: 100
+        tps: 1
     workload:
-      module: .&#x2F;workload&#x2F;createReadAsset.js
+      module: .&#x2F;workload&#x2F;saleAgreementFlow.js
 </pre>
                 <h3>SUT</h3>
                 <pre id="sutdetails">not provided</pre>

@@ -233,6 +233,11 @@ class EthereumConnector extends ConnectorBase {
         }
         let contractInfo = context.contracts[request.contract];
 
+        if (request.hasOwnProperty('address')) {
+            //contractInfo.contract = new context.web3.eth.Contract(contractInfo.contract.options.jsonInterface, request.address);
+            contractInfo.contract.options.address = request.address;
+        }
+
         let receipt = null;
         let methodType = 'send';
         if (request.readOnly) {
