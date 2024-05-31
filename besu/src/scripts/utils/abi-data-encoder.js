@@ -1,4 +1,5 @@
 const getAbi = require('./get-abi');
+const ethers = require('ethers');
 
 function encodeRentalAgreementData(functionToCall, params) {
     let interface = new ethers.Interface(getAbi.rentalAgreementAbi());

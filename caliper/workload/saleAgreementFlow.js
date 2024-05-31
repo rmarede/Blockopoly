@@ -4,6 +4,7 @@ const functionEncoder = require('../scripts/abi-data-encoder');
 const textEncoder = new TextEncoder();
 const emptyAddr = "0x0000000000000000000000000000000000000000"; 
 const acc1 = "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"; // TODO talvez de para acessar atraves do sutContext (vem do connector):
+const acc2 = "0xFcCf97710dfdfBFe80ad627A6c10104A61b3C93C";
 
 /*
 let context = {
@@ -17,11 +18,22 @@ let context = {
 
 // ou atraves do sutAdapter: connector usa isto this.ethereumConfig.fromAddress
 
+const assetDetails = {
+    name: "foo",
+    ownership: emptyAddr,
+    district: "lisbon",
+    postalCode: 2725455,
+    street: "central route",
+    number: 1,
+    totalArea: 100
+}
+
 class ReadAssetWorkload extends WorkloadModuleBase {
 
     constructor() {
         super();
-        this.assetAddr = undefined;
+        this.assetNr = 0;
+        this.assets = undefined;
         this.txCounter = 0;
     }
 
@@ -30,32 +42,24 @@ class ReadAssetWorkload extends WorkloadModuleBase {
 
         console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Round arguments: ${JSON.stringify(roundArguments)}`);
 
-        const details = {
-            name: "foo",
-            ownership: '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73',
-            district: "lisbon",
-            postalCode: 2725455,
-            street: "central route",
-            number: 1,
-            totalArea: 100
-        }
+        this.assetNr = roundArguments.assets;
 
-        let requestsSettings = [{
-            contract: 'RealtyFactory',
-            verb: 'mint',
-            value: 0,
-            args: [details, [acc1], [10000]]
-        },
-        {
+        for (let i=0; i<this.assetNr; i++) {
+            const request = {
+                contract: 'RealtyFactory',
+                verb: 'mint',
+                value: 0,
+                args: [assetDetails, [acc1], [10000]]
+            };
+            await this.sutAdapter.sendRequests(request);
+        }
+        
+        const request = [{
             contract: 'Wallet',
             verb: 'mint',
             value: 0,
-            args: [acc1, 100000000]
-        }];
-        
-        await this.sutAdapter.sendRequests(requestsSettings);
-
-        requestsSettings = [{
+            args: [acc1, 900000000]
+        },{
             contract: 'RealtyFactory',
             verb: 'getRealtiesOf',
             value: 0,
@@ -63,22 +67,25 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             readOnly: true
         }];
 
-        // TODO com mais nos é capaz de ser preciso dar um sleep aqui
-        const result = await this.sutAdapter.sendRequests(requestsSettings);;
-        this.assetAddr = result[0].GetResult()[0];
+        const result = await this.sutAdapter.sendRequests(request);;
+        this.assets = result[1].GetResult();
+        console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Assets: ${this.assets}`);
     }
 
     async submitTransaction() {
+        let txid = this.txCounter++;
 
-        const details = {
+        const assetAddr = this.assets[txid % this.assets.length];
+
+        const saleDetails = {
             buyer: acc1,
             seller: acc1,
-            realty: this.assetAddr,
+            realty: assetAddr,
             share: 3000,
             price: 1000,
             earnest: 100,
-            realtor: acc1,
-            comission: 0,
+            realtor: acc2,
+            comission: 500,
             contengencyPeriod: 10,
             contengencyClauses: textEncoder.encode("foo")
         }
@@ -87,7 +94,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             contract: 'SaleAgreementFactory',
             verb: 'createSaleAgreement',
             value: 0,
-            args: [details]
+            args: [saleDetails]
         }];
 
         await this.sutAdapter.sendRequests(requestsSettings);
@@ -100,9 +107,9 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             readOnly: true
         }];
         const result = await this.sutAdapter.sendRequests(requestsSettings);
-        const saleAddr = result[0].GetResult()[this.txCounter++];
+        const saleAddr = result[0].GetResult()[2*txid];
         
-        console.log(`$$$$$$$$$$$$$$$$$$$$$$$$$$ Sale Agreement ${this.txCounter-1} created at ${saleAddr}`);
+        console.log(`$$$$$$$$$$$$$$$$$$$$$$$$$$ Sale Agreement ${txid} created at ${saleAddr} for asset ${assetAddr} $$$$$$$$$$$$$$$$$$$$$$$$$$`);
 
 
         requestsSettings = [{
@@ -110,7 +117,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             verb: 'approve',
             value: 0,
             args: [saleAddr],
-            address: this.assetAddr
+            address: assetAddr
         },
         {
             contract: 'Wallet',
@@ -123,35 +130,21 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             verb: 'submitTransaction',
             value: 0,
             args: [0, functionEncoder.encodeSaleAgreementData('consent', [])],
-            address: this.assetAddr
+            address: saleAddr
         },
         {
             contract: 'SaleAgreement',
             verb: 'submitTransaction',
             value: 0,
             args: [0, functionEncoder.encodeSaleAgreementData('commit', [])],
-            address: this.assetAddr
+            address: saleAddr
         }];
 
         await this.sutAdapter.sendRequests(requestsSettings);
 
-        console.log(`++++++++++++++++++++++++++++++++++++++++++++++++++++++11111111111111111111111111111111111`);
+        console.log(`+++++++++++++++++++++++++++++++++++ FINISHED TRANSACTION ${txid} +++++++++++++++++++++++++++++++++++`);
     }
 
-    async cleanupWorkloadModule() {
-        /*for (let i=0; i<this.roundArguments.assets; i++) {
-            const assetID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting asset ${assetID}`);
-            const request = {
-                contract: 'RealtyFactory',
-                verb: 'deleteAsset',
-                value: 0,
-                args: ['sfogliatella', 1000]
-            };
-
-            await this.sutAdapter.sendRequests(request);
-        }*/
-    }
 }
 
 function createWorkloadModule() {

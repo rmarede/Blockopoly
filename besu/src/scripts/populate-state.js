@@ -1,5 +1,6 @@
 const ethers = require('ethers');
 const getAbi = require('./utils/get-abi');
+const abiEncoder = require('./utils/abi-data-encoder');
 const getAddress = require('./utils/get-address');
 const timeHelper = require('./utils/time-helper');
 const fs = require('fs');
@@ -42,8 +43,9 @@ function sleep(ms) {
 (async () => {
     console.log("Adding organizations...")
     await PermissionEndpoints.connect(signer1).addOrganization("gov", PUBLIC_KEY_1, [0,1,2,3,4,5,6,7])
+    await sleep(1000);
     await PermissionEndpoints.connect(signer1).addOrganization("users", PUBLIC_KEY_2, [0,1,6])
-    await sleep(3000);
+    await sleep(2000);
     
     console.log("Adding nodes...") 
     const rl = readline.createInterface({
@@ -58,15 +60,19 @@ function sleep(ms) {
 
     console.log("Adding users...")
     await PermissionEndpoints.connect(signer2).addRole("user", 1, [])
-    await sleep(3000);
+    await sleep(2000);
     //console.log(await RoleRegistry.connect(signer1).getRoles())
     await PermissionEndpoints.connect(signer2).addAccount(PUBLIC_KEY_3, "users_user", false)
+    await sleep(1000);
     await PermissionEndpoints.connect(signer2).addAccount(PUBLIC_KEY_4, "users_user", false)
 
     console.log("Minting funds...")
     await Wallet.connect(signer1).mint(PUBLIC_KEY_1, 100000000)
+    await sleep(1000);
     await Wallet.connect(signer1).mint(PUBLIC_KEY_3, 100000)
+    await sleep(1000);
     await Wallet.connect(signer1).mint(PUBLIC_KEY_4, 100000)
+    await sleep(1000);
 
     console.log("Minting realties...")
     const realty1 = {
@@ -99,18 +105,19 @@ function sleep(ms) {
     }
 
     await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_1], [10000])
+    await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_3], [10000])
+    await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty2, [PUBLIC_KEY_4], [10000])
+    await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty3, [PUBLIC_KEY_3, PUBLIC_KEY_4], [4000, 6000])
-
     await sleep(1000);
 
     console.log("Issuing Sale Agrements...");
     const realties = await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3);
-    console.log('realties of 3: '+ await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3));
 
-    const saleDetails = {
-        buyer: PUBLIC_KEY_1,
+    const saleDetails1 = {
+        buyer: PUBLIC_KEY_4,
         seller: PUBLIC_KEY_3,
         realty: realties[0],
         share: 3000,
@@ -122,11 +129,26 @@ function sleep(ms) {
         contengencyClauses:  textEncoder.encode("foo")
     }
 
-    //await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails);
+    const saleDetails2 = {
+        buyer: PUBLIC_KEY_3,
+        seller: PUBLIC_KEY_3,
+        realty: realties[0],
+        share: 3000,
+        price: 1000,
+        earnest: 100,
+        realtor: PUBLIC_KEY_1,
+        comission: 0,
+        contengencyPeriod: 10,
+        contengencyClauses:  textEncoder.encode("foo")
+    }
 
+    await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails1);
     await sleep(1000);
-    console.log('sales of 3: '+ await SaleAgreementFactory.connect(signer1).getSalesOf(PUBLIC_KEY_3));
-
+    await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails2);
+    await sleep(1000);
+    //Wallet.connect(signer4).approve('0x19f91B8C15200aC3536510496758367dfe9120a5', 100000);
+    //await sleep(1000);
+    //Wallet.connect(signer3).approve('0x19f91B8C15200aC3536510496758367dfe9120a5', 100000);
 
     console.log("Issuing Mortgage Loans...")
     const details1 = {
@@ -154,9 +176,26 @@ function sleep(ms) {
         defaultDeadline: 3
     }
     
-    //await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
-    //await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
+    await sleep(1000);
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
+
+
+    
+
+
+
+    /*const abiEncoder2 = require('../../../caliper/scripts/abi-data-encoder');
+
+    //const Ownership = new ethers.Contract('0x3503EB9F5bA58D321A15D812fa2C8F22dC2eB100', getAbi.ownershipAbi(), provider);
+    //await Ownership.connect(signer3).approve('0x19f91B8C15200aC3536510496758367dfe9120a5');
+
+    const SaleAgreement = new ethers.Contract('0x19f91B8C15200aC3536510496758367dfe9120a5', getAbi.saleAgreementAbi(), provider);
+    //console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder.encodeSaleAgreementData('consent', [])));
+    //console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder2.encodeSaleAgreementData('consent', [])));
+    console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder2.encodeSaleAgreementData('commit', [])));
+*/
     console.log("Done!") 
   
 })();

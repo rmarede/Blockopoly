@@ -66,6 +66,10 @@ async function walletApprove(signer, spender, amount) {
   return await Wallet.connect(signer).approve(spender, amount);
 }
 
+async function allowance(signer, owner, spender) {
+  return await Wallet.connect(signer).allowance(owner, spender);
+}
+
 async function transfer(signer, recipient, amount) {
   return await Wallet.connect(signer).transfer(recipient, amount);
 }
@@ -93,9 +97,19 @@ async function realtiesOf(signer, account) {
 
 // ------------------------------------------------ OWNERSHIP ------------------------------------------------
 
+async function sharesOf(signer, contractAddress, account) {
+  const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
+  return await Ownership.connect(signer).shareOf(account);
+}
+
 async function ownershipApprove(signer, contractAddress, spender) {
   const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
   return await Ownership.connect(signer).approve(spender, tokenId);
+}
+
+async function approvedOf(signer, contractAddress, account) {
+  const Ownership = new ethers.Contract(contractAddress, getAbi.ownershipAbi(), provider);
+  return await Ownership.connect(signer).approvedOf(account);
 }
 
 async function submitTransaction(signer, contractAddress, destination, data) {
@@ -245,6 +259,9 @@ const commands = {
   getParticipants: (signer, ...args) => getParticipants(signer, ...args),
   getTransactionCount: (signer, ...args) => getTransactionCount(signer, ...args),
   salesOf: (signer, ...args) => salesOf(signer, ...args),
+  sharesOf: (signer, ...args) => sharesOf(signer, ...args),
+  approvedOf: (signer, ...args) => approvedOf(signer, ...args),
+  allowance: (signer, ...args) => allowance(signer, ...args),
 };
 
 rl.on('line', async (input) => {

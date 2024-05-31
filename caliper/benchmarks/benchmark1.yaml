@@ -3,16 +3,15 @@ test:
     number: 1
   rounds:
     - label: create-and-read-asset
-      txNumber: 3
+      txNumber: 10
       rateControl:
         type: fixed-rate
         opts:
-          tps: 1
+          tps: 10
       workload:
         module: ./workload/saleAgreementFlow.js
-        #arguments:
-            #assets: 10
-            #contractId: basic
+        arguments:
+            assets: 10
 monitors:
   transaction:
   - module: prometheus
