@@ -46,15 +46,6 @@ fs.writeFileSync(SALE_FACTORY_DEF_PATH, updated_sfd);
 fs.writeFileSync(OWNERSHIP_DEF_PATH, updated_od);
 fs.writeFileSync(SALE_AGREEMENT_DEF_PATH, updated_sad);
 
-
-const NETWORK_CONFIG_PATH = path.join(__dirname, '../networks/network-config.json');
-let network_config = JSON.parse(fs.readFileSync(NETWORK_CONFIG_PATH, 'utf8'));
-network_config.ethereum.contracts.RealtyFactory.address = getAddress.realtyFactoryAddress();
-network_config.ethereum.contracts.Wallet.address = getAddress.walletAddress();
-network_config.ethereum.contracts.SaleAgreementFactory.address = getAddress.saleFactoryAddress();
-fs.writeFileSync(NETWORK_CONFIG_PATH, JSON.stringify(network_config, null, 4));
-
-
 const ABIS_PATH = path.join(__dirname, '../deployment/abis.json');
 let abis = JSON.parse(fs.readFileSync(ABIS_PATH, 'utf8'));
 abis['saleAgreementAbi'] = saleAgreement_definition.abi;

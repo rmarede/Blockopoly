@@ -16,32 +16,28 @@
                     "mint": 9000000000000000,
                     "getRealtiesOf": 9000000000000000,
                     "testMethod": 9000000000000000
-                },
-                "address": "0x664D6EbAbbD5cf656eD07A509AFfBC81f9615741"
+                }
             },
             "Wallet": {
                 "path": "contracts/WalletDefinition.json",
                 "gas": {
                     "mint": 9000000000000000,
                     "approve": 9000000000000000
-                },
-                "address": "0xfeae27388A65eE984F452f86efFEd42AaBD438FD"
+                }
             },
             "SaleAgreementFactory": {
                 "path": "contracts/SaleAgreementFactoryDefinition.json",
                 "gas": {
                     "createSaleAgreement": 9000000000000000,
                     "getSalesOf": 9000000000000000
-                },
-                "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20"
+                }
             },
             "SaleAgreement": {
                 "path": "contracts/SaleAgreementDefinition.json",
                 "gas": {
                     "submitTransaction": 9000000000000000,
                     "confirmTransaction": 9000000000000000
-                },
-                "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20"
+                }
             },
             "Ownership": {
                 "path": "contracts/OwnershipDefinition.json",
@@ -49,8 +45,7 @@
                     "submitTransaction": 9000000000000000,
                     "confirmTransaction": 9000000000000000,
                     "approve": 9000000000000000
-                },
-                "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20"
+                }
             }
         }
     }

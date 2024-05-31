@@ -114,12 +114,12 @@ class EthereumConnector extends ConnectorBase {
             }
 
             this.ethereumConfig.contracts[key].abi = contractData.abi;
-            if (contract.address) {
-                self.ethereumConfig.contracts[key].address = contract.address;
+            if (contractData.address) {
+                logger.info(`Using pre-deployed contract ${contractData.name} at ${contractData.address}`);
+                self.ethereumConfig.contracts[key].address = contractData.address;
                 self.ethereumConfig.contracts[key].gas = contractGas;
                 self.ethereumConfig.contracts[key].estimateGas = estimateGas;
             } else {
-                logger.info(JSON.stringify(contract, null, 2))
                 promises.push(new Promise(async function(resolve, reject) {
                     let contractInstance;
                     try {
@@ -234,7 +234,6 @@ class EthereumConnector extends ConnectorBase {
         let contractInfo = context.contracts[request.contract];
 
         if (request.hasOwnProperty('address')) {
-            //contractInfo.contract = new context.web3.eth.Contract(contractInfo.contract.options.jsonInterface, request.address);
             contractInfo.contract.options.address = request.address;
         }
 

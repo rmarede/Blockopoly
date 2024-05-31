@@ -28,6 +28,10 @@ const assetDetails = {
     totalArea: 100
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class ReadAssetWorkload extends WorkloadModuleBase {
 
     constructor() {
@@ -51,7 +55,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
                 value: 0,
                 args: [assetDetails, [acc1], [10000]]
             };
-            await this.sutAdapter.sendRequests(request);
+            this.sutAdapter.sendRequests(request);
         }
         
         const request = [{
@@ -67,13 +71,15 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             readOnly: true
         }];
 
+        await sleep(5000);
+
         const result = await this.sutAdapter.sendRequests(request);;
         this.assets = result[1].GetResult();
         console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Assets: ${this.assets}`);
     }
 
     async submitTransaction() {
-        let txid = this.txCounter++;
+        let txid = (this.totalWorkers*this.txCounter++) + this.workerIndex;
 
         const assetAddr = this.assets[txid % this.assets.length];
 
