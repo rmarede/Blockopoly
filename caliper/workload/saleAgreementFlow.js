@@ -60,9 +60,11 @@ class ReadAssetWorkload extends WorkloadModuleBase {
 
         await sleep(5000);
 
-        const result = await this.sutAdapter.sendRequests(request);;
+        const result = await this.sutAdapter.sendRequests(request);
         this.assets = result[1].GetResult();
-        console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Assets: ${this.assets}`);
+        if (this.assets.length > this.assetNr) {
+            this.assets = this.assets.slice(-this.assetNr);
+        }
     }
 
     async submitTransaction() {
@@ -99,12 +101,9 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             args: [assetAddr],
             readOnly: true
         }];
-        await sleep(5000);
 
         const result = await this.sutAdapter.sendRequests(requestsSettings);
-        const saleAddr = result[0].GetResult()[txid];
-        
-        console.log(`$$$$$$$$$$$$$$$$$$$$$$$$$$ Sale Agreement ${txid} created at ${saleAddr} for asset ${assetAddr} $$$$$$$$$$$$$$$$$$$$$$$$$$`);
+        const saleAddr = result[0].GetResult()[Math.floor(txid / this.assetNr)];
 
         requestsSettings = [{
             contract: 'Ownership',
