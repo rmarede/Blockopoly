@@ -1,9 +1,9 @@
 test:
   workers:
-    number: 1
+    number: 2
   rounds:
     - label: create-and-read-asset
-      txNumber: 10
+      txNumber: 100
       rateControl:
         type: fixed-rate
         opts:

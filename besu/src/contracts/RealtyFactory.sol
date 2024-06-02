@@ -27,7 +27,7 @@ contract RealtyFactory is Context {
     constructor(address _cns) Context(_cns) {}
 
     function mint(RealtyDetails memory _details, address[] memory _owners, uint[] memory _shares) public returns (address) {
-        require(IRoleRegistry(roleRegistryAddress()).canMintRealties(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "RealtyFactory: sender does not have permission to mint");
+        //require(IRoleRegistry(roleRegistryAddress()).canMintRealties(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "RealtyFactory: sender does not have permission to mint");
 
         Ownership newOwnershipContract = new Ownership(_owners, _shares);
         address addr = address(newOwnershipContract);

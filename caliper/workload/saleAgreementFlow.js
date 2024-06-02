@@ -3,20 +3,7 @@ const functionEncoder = require('../scripts/abi-data-encoder');
 
 const textEncoder = new TextEncoder();
 const emptyAddr = "0x0000000000000000000000000000000000000000"; 
-const acc1 = "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"; // TODO talvez de para acessar atraves do sutContext (vem do connector):
 const acc2 = "0xFcCf97710dfdfBFe80ad627A6c10104A61b3C93C";
-
-/*
-let context = {
-    chainId: 1,
-    clientIndex: this.workerIndex,
-    gasPrice: 0,
-    contracts: {},
-    nonces: {},
-    web3: this.web3
-};*/
-
-// ou atraves do sutAdapter: connector usa isto this.ethereumConfig.fromAddress
 
 const assetDetails = {
     name: "foo",
@@ -39,21 +26,21 @@ class ReadAssetWorkload extends WorkloadModuleBase {
         this.assetNr = 0;
         this.assets = undefined;
         this.txCounter = 0;
+        this.clientAddr = undefined;
     }
 
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
-        console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Round arguments: ${JSON.stringify(roundArguments)}`);
-
         this.assetNr = roundArguments.assets;
+        this.clientAddr = sutContext.fromAddress;
 
         for (let i=0; i<this.assetNr; i++) {
             const request = {
                 contract: 'RealtyFactory',
                 verb: 'mint',
                 value: 0,
-                args: [assetDetails, [acc1], [10000]]
+                args: [assetDetails, [this.clientAddr], [10000]]
             };
             this.sutAdapter.sendRequests(request);
         }
@@ -62,12 +49,12 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             contract: 'Wallet',
             verb: 'mint',
             value: 0,
-            args: [acc1, 900000000]
+            args: [this.clientAddr, 900000000]
         },{
             contract: 'RealtyFactory',
             verb: 'getRealtiesOf',
             value: 0,
-            args: [acc1],
+            args: [this.clientAddr],
             readOnly: true
         }];
 
@@ -84,8 +71,8 @@ class ReadAssetWorkload extends WorkloadModuleBase {
         const assetAddr = this.assets[txid % this.assets.length];
 
         const saleDetails = {
-            buyer: acc1,
-            seller: acc1,
+            buyer: this.clientAddr,
+            seller: this.clientAddr,
             realty: assetAddr,
             share: 3000,
             price: 1000,
@@ -109,14 +96,15 @@ class ReadAssetWorkload extends WorkloadModuleBase {
             contract: 'SaleAgreementFactory',
             verb: 'getSalesOf',
             value: 0,
-            args: [acc1],
+            args: [assetAddr],
             readOnly: true
         }];
+        await sleep(5000);
+
         const result = await this.sutAdapter.sendRequests(requestsSettings);
-        const saleAddr = result[0].GetResult()[2*txid];
+        const saleAddr = result[0].GetResult()[txid];
         
         console.log(`$$$$$$$$$$$$$$$$$$$$$$$$$$ Sale Agreement ${txid} created at ${saleAddr} for asset ${assetAddr} $$$$$$$$$$$$$$$$$$$$$$$$$$`);
-
 
         requestsSettings = [{
             contract: 'Ownership',
@@ -147,8 +135,6 @@ class ReadAssetWorkload extends WorkloadModuleBase {
         }];
 
         await this.sutAdapter.sendRequests(requestsSettings);
-
-        console.log(`+++++++++++++++++++++++++++++++++++ FINISHED TRANSACTION ${txid} +++++++++++++++++++++++++++++++++++`);
     }
 
 }
