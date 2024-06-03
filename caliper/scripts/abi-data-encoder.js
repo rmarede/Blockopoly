@@ -8,7 +8,6 @@ let abis = JSON.parse(fs.readFileSync(ABIS_PATH, 'utf8'));
 
 function encodeSaleAgreementData(functionToCall, params) {
   let data = web3.eth.abi.encodeFunctionCall(abis.saleAgreementAbi.find(method => method.name === functionToCall), params);
-  console.log(JSON.stringify(abis.saleAgreementAbi.find(method => method.name === functionToCall)));
   return data;
 }
 
