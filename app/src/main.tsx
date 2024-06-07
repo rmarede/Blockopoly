@@ -1,10 +1,46 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
+import './styles.css'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import RealtiesPage from './pages/RealtiesPage.tsx'
+import SalesPage from './pages/SalesPage.tsx'
+import RentalsPage from './pages/RentalsPage.tsx'
+import MortgagesPage from './pages/MortgagesPage.tsx'
+import NotFoundPage from './pages/NotFoundPage.tsx'
+import PropertyPage from './pages/PropertyPage.tsx'
+import HomePage from './pages/HomePage.tsx'
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomePage/>,
+    errorElement: <NotFoundPage/>,
+  },
+  {
+    path: '/realties',
+    element: <RealtiesPage/>
+  },
+  {
+    path: '/sales',
+    element: <SalesPage/>
+  },
+  {
+    path: '/rentals',
+    element: <RentalsPage/>
+  },
+  {
+    path: '/mortgages',
+    element: <MortgagesPage/>
+  },
+  {
+    path: '/realties/:id',
+    element: <PropertyPage/>
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router}/>
   </React.StrictMode>,
 )
