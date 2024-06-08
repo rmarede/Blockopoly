@@ -7,14 +7,6 @@ import { useEffect, useState } from "react";
 
 export default function WalletPage() {
 
-    /*
-    const provider = new ethers.JsonRpcProvider("http://localhost:8500");
-    const wallet = new ethers.Wallet(PRIVATE_KEY_1, provider);
-    const signer = wallet.connect(provider);
-
-    const cns = new ethers.Contract(getAddress.contractNameServiceAddress(), getAbi.cnsAbi(), signer);
-    */
-
     const [balance, setBalance] = useState(0);
     const [userAddress, setUserAddress] = useState("0x0");
 
@@ -47,11 +39,14 @@ export default function WalletPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
-            <h1>Wallet Page</h1>
-            <p>Balance: {balance}</p>
-            <p>Address: {userAddress}</p>
-            <div>
+            <div className="walletPage">
+                <h1>My Wallet</h1>
+                <div>
+                    <p>User: {userAddress}</p>
+                    <p>Your Balance: {balance}</p>
+                </div>
                 <form onSubmit={mintCurrency}>
+                    <h2>Mint Currency</h2>
                     <label>Amount:</label>
                     <input name="amount" type="number" placeholder="100"/>
                     <label>To:</label>
