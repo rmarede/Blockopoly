@@ -10,6 +10,7 @@ import MortgagesPage from './pages/MortgagesPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import PropertyPage from './pages/PropertyPage.tsx'
 import HomePage from './pages/HomePage.tsx'
+import WalletPage from './pages/WalletPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
     path: '/realties/:id',
     element: <PropertyPage/>
   },
+  {
+    path: '/wallet',
+    element: <WalletPage/>
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -4,6 +4,7 @@ import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
 import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
 import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
+import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
 import logo from '../assets/blockopoly.png'
 
 export default function Navbar() {
@@ -39,6 +40,12 @@ export default function Navbar() {
                         <NavbarItem to="/mortgages">
                             <AccountBalanceRoundedIcon />
                             Mortgages
+                        </NavbarItem>
+                    </li>
+                    <li>
+                        <NavbarItem to="/wallet">
+                            <PaidRoundedIcon />
+                            Wallet
                         </NavbarItem>
                     </li>
                 </ul>

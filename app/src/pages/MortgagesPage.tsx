@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 
 export default function MortgagesPage() {
+
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
