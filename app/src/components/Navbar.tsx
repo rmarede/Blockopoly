@@ -13,37 +13,37 @@ export default function Navbar() {
             <nav>
                 <ul>
                     <li>
-                        <NavbarItem to="/">
-                            <HomeRoundedIcon />
+                        <NavbarItem color="grey" to="/">
+                            <HomeRoundedIcon/>
                             Home
                         </NavbarItem>
                     </li>
                     <li>
-                        <NavbarItem to="/realties">
+                        <NavbarItem color="#ff5e5e" to="/realties">
                             <BusinessRoundedIcon />
                             Realties
                         </NavbarItem>
                     </li>
                     <li>
-                        <NavbarItem to="/sales">
+                        <NavbarItem color="#e064ff" to="/sales">
                             <RepeatRoundedIcon />
                             Sales
                         </NavbarItem>
                     </li>
                     <li>
-                        <NavbarItem to="/rentals">
+                        <NavbarItem color="#646cff" to="/rentals">
                             <ReceiptRoundedIcon />
                             Rentals
                         </NavbarItem>
                     </li>
                     <li>
-                        <NavbarItem to="/mortgages">
+                        <NavbarItem color="#56e46d" to="/mortgages">
                             <AccountBalanceRoundedIcon />
                             Mortgages
                         </NavbarItem>
                     </li>
                     <li>
-                        <NavbarItem to="/wallet">
+                        <NavbarItem color="#ffc164" to="/wallet">
                             <PaidRoundedIcon />
                             Wallet
                         </NavbarItem>
@@ -55,13 +55,13 @@ export default function Navbar() {
     )
 }
 
-function NavbarItem({ to,  children } : { to: string, children: React.ReactNode }) {
+function NavbarItem({ to,  children, color } : { to: string, children: React.ReactNode, color: string }) {
     const resolvedPath = useResolvedPath(to)
     let isActive = useMatch({path: resolvedPath.pathname, end: false})
     if (to === "/") {
         isActive = null;
     } 
     return (
-        <Link className={isActive ? "navbar-item active" : "navbar-item" } to={to}>{children}</Link>
+        <Link style={{color: color}} className={isActive ? "navbar-item active" : "navbar-item" } to={to}>{children}</Link>
     )
 }

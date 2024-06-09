@@ -10,6 +10,7 @@
     height: 100vh;
     width: 120px;
     margin-right: 2rem;
+    background-color: black;
 }
 
 .navbar nav {
@@ -78,3 +79,15 @@
     padding: 1rem;
     border-radius: 16px;  
 }
+
+.popup-inner .action-button {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+}
+
+.realtiesPage .action-button { 
+    top: 8px;
+    right: 16px;
+}
+

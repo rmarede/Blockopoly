@@ -6,6 +6,8 @@ import { ethers } from "ethers";
 import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/RealtyFactory.sol/RealtyFactory.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { RealtyListItem } from "../components/RealtyListItem";
+import Popup from "../components/Popup";
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 
 
 export default function RealtiesPage() {
@@ -13,6 +15,7 @@ export default function RealtiesPage() {
     const pageSize = 12;
     const [pageView, setPageView] = useState<Realty[]>([]);
     const [realties, setRealties] = useState<Realty[]>([]);
+    const [addPopup, setAddPopup] = useState<boolean>(false);
 
     const handlePageChange = (pageNumber: number) => {
         const start = (pageNumber - 1) * pageSize;
@@ -50,13 +53,7 @@ export default function RealtiesPage() {
             {id: 18, name: "Apartment", location: "New York"},
             {id: 19, name: "House", location: "New York"},
             {id: 20, name: "Apartment", location: "New York"},
-            {id: 21, name: "House", location: "New York"},
-            {id: 22, name: "Apartment", location: "New York"},
-            {id: 23, name: "House", location: "New York"},
-            {id: 24, name: "Apartment", location: "New York"},
-            {id: 25, name: "House", location: "New York"},
-            {id: 26, name: "Apartment", location: "New York"},
-            {id: 27, name: "House", location: "New York"}];
+            {id: 21, name: "House", location: "New York"}];
         setRealties(res);
     }
 
@@ -71,10 +68,13 @@ export default function RealtiesPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
+            <Popup trigger={addPopup} close={setAddPopup}>
+                <h2>Add Realty</h2>
+            </Popup>
             <div className="realtiesPage">
                 <div style={{display:"flex", justifyContent: "space-between"}}> 
                     <h1>My Realties</h1>
-                    <button>+</button>
+                    <button className="action-button" onClick={() => setAddPopup(true)}><AddCircleOutlineRoundedIcon/></button>
                 </div>
                 <div className="realtiesGrid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)"}}>
                     {pageView.map((a, i) => (
