@@ -20,7 +20,7 @@ export default function WalletPage() {
         const res = await walletContract.balanceOf(signerAddress);
         setBalance(parseInt(res));
     }
-
+    
     useEffect(() => {
         fetchUserBalance();
     }, []);
@@ -43,7 +43,7 @@ export default function WalletPage() {
                 <h1>My Wallet</h1>
                 <div>
                     <p>User: {userAddress}</p>
-                    <p>Your Balance: {balance}</p>
+                    <p>Your Balance: {balance}$</p>
                 </div>
                 <form onSubmit={mintCurrency}>
                     <h2>Mint Currency</h2>

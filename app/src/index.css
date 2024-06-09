@@ -54,3 +54,27 @@
 .walletPage input {
     margin-bottom: 1rem;
 }
+
+.realtiesPage { 
+}
+
+.realtiesGrid {
+    gap: 1rem;
+    width: 85vw;
+    height: 60vh;
+    margin-bottom: 4rem;
+}
+
+.realtyItem { 
+    height: 150;
+    background-size: cover;
+    background-position: center;
+    border-radius: 16px;
+}
+
+.realtyInfo {
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    padding: 1rem;
+    border-radius: 16px;  
+}
