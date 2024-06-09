@@ -17,6 +17,8 @@
   --red: #ff5e5e;
   --yellow: #ffc164;
   --pink: #e064ff;
+  --light-black: #222222;
+  --grey: #7272729c;
 }
 
 input::-webkit-outer-spin-button,
@@ -91,7 +93,7 @@ form {
 
 form input{
   border: 2px solid transparent;
-  border-color: #7272729c;
+  border-color: var(--grey);
   border-radius: 8px;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -102,7 +104,7 @@ form input{
   transition: border-color 0.25s;
 }
 
-form input:hover, form select:hover, form textarea:hover {
+form input:hover {
   border-color: #646cff;
 }
 
@@ -127,6 +129,20 @@ form input:hover, form select:hover, form textarea:hover {
   max-width: 600px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+th {
+  color: #999999;
+}
+
+th, td {
+  padding: 15px;
+  text-align: left;
+}
+
+tr:nth-child(even) {background-color: #222222;}
 
 
 

@@ -91,9 +91,9 @@ export default function RealtiesPage() {
                         <PaginationItem {...item} sx={{
                             color: "white",
                             "&.Mui-selected": {
-                                backgroundColor: "#646cff"
+                                backgroundColor: "#ff5e5e"
                             },
-                            border: "2px solid #646cff",
+                            border: "2px solid #ff5e5e",
                         }} />}
                     onChange={(_, page) => handlePageChange(page)}
                     />
