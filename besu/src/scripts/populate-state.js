@@ -78,31 +78,31 @@ function sleep(ms) {
     console.log("Minting realties...")
 
     const realty1 = {
-        name: "Edificio Antonio Marques",
+        name: "Yuyan Garden",
         ownership: PUBLIC_KEY_1,
-        kind: "house",
-        district: "lisbon",
-        location: "central route",
-        image: "image",
+        kind: "building",
+        district: "Shanghai",
+        location: "Downtown Shanghai, 2000-100 Shanghai",
+        image: "https://www.intrepidtravel.com/adventures/wp-content/uploads/2017/08/china_shanghai_yuyuan-garden-city.jpg",
         totalArea: 100
     }
     const realty2 = {
         name: "Quinta do Lago",
         ownership: PUBLIC_KEY_1,
         kind: "house",
-        district: "lisbon",
-        location: "central route",
-        image: "image",
+        district: "Beja",
+        location: "Rua das Macieiras, 4002-200 Beja",
+        image: "https://www.the-yeatman-hotel.com/fotos/marcas/banner_1_3632649415bb49a128f13c.jpg",
         totalArea: 100
     }
 
     const realty3 = {
         name: "Edificio do Sol Nascente 3E",
         ownership: PUBLIC_KEY_1,
-        kind: "house",
-        district: "lisbon",
-        location: "central route",
-        image: "image",
+        kind: "apartment",
+        district: "Algarve",
+        location: "Rua do Sol Nascente 3E, 1000-100 Quarteira",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg/800px-The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg",
         totalArea: 100
     }
 
@@ -129,22 +129,7 @@ function sleep(ms) {
         contengencyClauses:  textEncoder.encode("foo")
     }
 
-    const saleDetails2 = {
-        buyer: PUBLIC_KEY_3,
-        seller: PUBLIC_KEY_3,
-        realty: realties[0],
-        share: 3000,
-        price: 1000,
-        earnest: 100,
-        realtor: PUBLIC_KEY_1,
-        comission: 0,
-        contengencyPeriod: 10,
-        contengencyClauses:  textEncoder.encode("foo")
-    }
-
     await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails1);
-    await sleep(1000);
-    await SaleAgreementFactory.connect(signer1).createSaleAgreement(saleDetails2);
     await sleep(1000);
     //Wallet.connect(signer4).approve('0x19f91B8C15200aC3536510496758367dfe9120a5', 100000);
     //await sleep(1000);

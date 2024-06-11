@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { Sale } from "../api/api";
+import { Sale, createSale } from "../api/api";
 import { ethers } from "ethers";
 import SaleFactoryAbi from "../../../besu/src/artifacts/contracts/factory/SaleAgreementFactory.sol/SaleAgreementFactory.json"
+import SaleAgreementAbi from "../../../besu/src/artifacts/contracts/SaleAgreement.sol/SaleAgreement.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -11,27 +12,25 @@ export default function SalesPage() {
 
     const [sales, setSales] = useState<Sale[]>([]);
 
-    const fetchRealties = async () => {
+    const fetchSales = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const saleFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#SaleAgreementFactory"], SaleFactoryAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
-        const res1 = await saleFactoryContract.getSalesOf(signerAddress);
-        console.log(res1);
-        const res = [
-            {id: "1", asset: "House", share: 0.5, price: 100000},
-            {id: "2", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "3", asset: "House", share: 0.5, price: 100000},
-            {id: "4", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "5", asset: "House", share: 0.5, price: 100000},
-            {id: "6", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "7", asset: "House", share: 0.5, price: 100000},];
-        setSales(res);
+        const res = await saleFactoryContract.getSalesOf(signerAddress);
+        const fetchedSales: Sale[] = [];
+        for (const r of res) {
+            const saleContract = new ethers.Contract(r, SaleAgreementAbi.abi, provider);
+            const saleDetails = await saleContract.details();
+            const sale : Sale = createSale(saleDetails, r);
+            fetchedSales.push(sale);
+        }
+        setSales(fetchedSales);
     }
 
     useEffect(() => {
-        fetchRealties();
+        fetchSales();
     }, []);
 
     return (
@@ -52,13 +51,13 @@ export default function SalesPage() {
                     </thead>
                     <tbody>
                         {sales.map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.id}</td>
-                                <td>{item.asset}</td>
-                                <td>{item.share}</td>
-                                <td>{item.price}</td>
+                            <tr key={item.address}>
+                                <td>{item.address}</td>
+                                <td>{item.realty}</td>
+                                <td>{item.share.toString()}</td>
+                                <td>{item.price.toString()}</td>
                                 <td>Pending</td>
-                                <td><Link to={`/sales/${item.id}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
+                                <td><Link to={`/sales/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                             </tr>
                         ))}
                     </tbody>
