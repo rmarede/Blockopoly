@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Ownership.sol";
-import "./utils/Arraysz.sol";
-import "./utils/Context.sol";
-import "./interface/permissioning/IRoleRegistry.sol";
-import "./interface/permissioning/IAccountRegistry.sol";
+import "../Ownership.sol";
+import "../utils/Arraysz.sol";
+import "../utils/Context.sol";
+import "../interface/permissioning/IRoleRegistry.sol";
+import "../interface/permissioning/IAccountRegistry.sol";
 
-// Ownership Factory
 contract RealtyFactory is Context {
 
     struct RealtyDetails {
         string name; 
         address ownership;
+        string kind;
         string district;
-        uint postalCode;
-        string street;
-        uint number;
+        string location;
+        string image;
         uint totalArea;
     }
 
@@ -28,7 +27,6 @@ contract RealtyFactory is Context {
 
     function mint(RealtyDetails memory _details, address[] memory _owners, uint[] memory _shares) public returns (address) {
         //require(IRoleRegistry(roleRegistryAddress()).canMintRealties(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "RealtyFactory: sender does not have permission to mint");
-
         Ownership newOwnershipContract = new Ownership(_owners, _shares);
         address addr = address(newOwnershipContract);
         _details.ownership = addr;
@@ -43,6 +41,14 @@ contract RealtyFactory is Context {
 
     function getRealtiesOf(address _user) public view returns (address[] memory) {
         return realtiesOf[_user];
+    }
+
+    function detailsOf(address _assetId) public view returns (RealtyDetails memory) {
+        return realties[_assetId];
+    }
+
+    function kindOf(address _assetId) public view returns (string memory) {
+        return realties[_assetId].kind;
     }
 
     function addOwnership(address _assetId, address _user) public {

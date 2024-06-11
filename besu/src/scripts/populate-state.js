@@ -44,7 +44,9 @@ function sleep(ms) {
     console.log("Adding organizations...")
     await PermissionEndpoints.connect(signer1).addOrganization("gov", PUBLIC_KEY_1, [0,1,2,3,4,5,6,7])
     await sleep(1000);
-    await PermissionEndpoints.connect(signer1).addOrganization("users", PUBLIC_KEY_2, [0,1,6])
+    await PermissionEndpoints.connect(signer1).addOrganization("bank", PUBLIC_KEY_2, [0,1,2,3,4,5,6,7])
+    await sleep(1000);
+    await PermissionEndpoints.connect(signer1).addOrganization("users", PUBLIC_KEY_3, [0,1,6])
     await sleep(2000);
     
     console.log("Adding nodes...") 
@@ -59,53 +61,51 @@ function sleep(ms) {
     await sleep(1000);
 
     console.log("Adding users...")
-    await PermissionEndpoints.connect(signer2).addRole("user", 1, [])
+    await PermissionEndpoints.connect(signer3).addRole("user", 1, [])
     await sleep(2000);
-    //console.log(await RoleRegistry.connect(signer1).getRoles())
-    await PermissionEndpoints.connect(signer2).addAccount(PUBLIC_KEY_3, "users_user", false)
-    await sleep(1000);
-    await PermissionEndpoints.connect(signer2).addAccount(PUBLIC_KEY_4, "users_user", false)
+    await PermissionEndpoints.connect(signer3).addAccount(PUBLIC_KEY_4, "users_user", false)
 
     console.log("Minting funds...")
-    await Wallet.connect(signer1).mint(PUBLIC_KEY_1, 100000000)
+    await Wallet.connect(signer2).mint(PUBLIC_KEY_1, 100000000)
     await sleep(1000);
-    await Wallet.connect(signer1).mint(PUBLIC_KEY_3, 100000)
+    await Wallet.connect(signer2).mint(PUBLIC_KEY_2, 100000000)
     await sleep(1000);
-    await Wallet.connect(signer1).mint(PUBLIC_KEY_4, 100000)
+    await Wallet.connect(signer2).mint(PUBLIC_KEY_3, 100000)
+    await sleep(1000);
+    await Wallet.connect(signer2).mint(PUBLIC_KEY_4, 100000)
     await sleep(1000);
 
     console.log("Minting realties...")
+
     const realty1 = {
         name: "Edificio Antonio Marques",
         ownership: PUBLIC_KEY_1,
-        district: "Lisbon",
-        postalCode: 2755455,
-        street: "av. da liberdade",
-        number: 25,
-        totalArea: 118
+        kind: "house",
+        district: "lisbon",
+        location: "central route",
+        image: "image",
+        totalArea: 100
     }
     const realty2 = {
         name: "Quinta do Lago",
         ownership: PUBLIC_KEY_1,
-        district: "Porto",
-        postalCode: 2345112,
-        street: "central route",
-        number: 1,
-        totalArea: 290
+        kind: "house",
+        district: "lisbon",
+        location: "central route",
+        image: "image",
+        totalArea: 100
     }
 
     const realty3 = {
         name: "Edificio do Sol Nascente 3E",
         ownership: PUBLIC_KEY_1,
-        district: "Algarve",
-        postalCode: 2193829,
-        street: "rua das palmeiras",
-        number: 37,
-        totalArea: 68
+        kind: "house",
+        district: "lisbon",
+        location: "central route",
+        image: "image",
+        totalArea: 100
     }
 
-    await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_1], [10000])
-    await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty1, [PUBLIC_KEY_3], [10000])
     await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty2, [PUBLIC_KEY_4], [10000])
@@ -180,22 +180,6 @@ function sleep(ms) {
     await sleep(1000);
     await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
-
-
-    
-
-
-
-    /*const abiEncoder2 = require('../../../caliper/scripts/abi-data-encoder');
-
-    //const Ownership = new ethers.Contract('0x3503EB9F5bA58D321A15D812fa2C8F22dC2eB100', getAbi.ownershipAbi(), provider);
-    //await Ownership.connect(signer3).approve('0x19f91B8C15200aC3536510496758367dfe9120a5');
-
-    const SaleAgreement = new ethers.Contract('0x19f91B8C15200aC3536510496758367dfe9120a5', getAbi.saleAgreementAbi(), provider);
-    //console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder.encodeSaleAgreementData('consent', [])));
-    //console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder2.encodeSaleAgreementData('consent', [])));
-    console.log(await SaleAgreement.connect(signer3).submitTransaction(0, abiEncoder2.encodeSaleAgreementData('commit', [])));
-*/
     console.log("Done!") 
   
 })();

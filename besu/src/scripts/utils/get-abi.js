@@ -10,10 +10,6 @@ function walletAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Wallet.sol/Wallet.json', 'utf8')).abi;
 }
 
-function realtyFactoryAbi() {
-  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'RealtyFactory.sol/RealtyFactory.json', 'utf8')).abi;
-}
-
 function ownershipAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Ownership.sol/Ownership.json', 'utf8')).abi;
 }
@@ -24,6 +20,10 @@ function rentalAgreementAbi() {
 
 function saleAgreementAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'SaleAgreement.sol/SaleAgreement.json', 'utf8')).abi;
+}
+
+function realtyFactoryAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'factory/RealtyFactory.sol/RealtyFactory.json', 'utf8')).abi;
 }
 
 function rentalFactoryAbi() {

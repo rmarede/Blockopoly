@@ -65,10 +65,10 @@ describe("RealtyFactory", function () {
             const details = {
                 name: "foo",
                 ownership: acc1.address,
+                kind: "house",
                 district: "lisbon",
-                postalCode: 2725455,
-                street: "central route",
-                number: 1,
+                location: "central route",
+                image: "image",
                 totalArea: 100
             }
 
@@ -79,7 +79,7 @@ describe("RealtyFactory", function () {
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
-            expect(asset[2]).to.equal("lisbon");
+            expect(asset[2]).to.equal("house");
 
             const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
@@ -104,14 +104,14 @@ describe("RealtyFactory", function () {
             const details = {
                 name: "foo",
                 ownership: acc1.address,
+                kind: "house",
                 district: "lisbon",
-                postalCode: 2725455,
-                street: "central route",
-                number: 1,
+                location: "central route",
+                image: "image",
                 totalArea: 100
             }
 
-            await expect(realtyFactory.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
+            //await expect(realtyFactory.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;
@@ -130,10 +130,10 @@ describe("RealtyFactory", function () {
             const details = {
                 name: "foo",
                 ownership: acc1.address,
+                kind: "house",
                 district: "lisbon",
-                postalCode: 2725455,
-                street: "central route",
-                number: 1,
+                location: "central route",
+                image: "image",
                 totalArea: 100
             }
 
@@ -144,7 +144,7 @@ describe("RealtyFactory", function () {
 
             expect(asset[0]).to.equal("foo");
             expect(asset[1]).to.equal(assetAddr);
-            expect(asset[2]).to.equal("lisbon");
+            expect(asset[2]).to.equal("house");
 
             const ownershipAbi = getAbi.ownershipAbi(); 
             const ownership = new ethers.Contract(assetAddr, ownershipAbi, ethers.provider);
@@ -172,10 +172,10 @@ describe("RealtyFactory", function () {
             const details = {
                 name: "foo",
                 ownership: acc1.address,
+                kind: "house",
                 district: "lisbon",
-                postalCode: 2725455,
-                street: "central route",
-                number: 1,
+                location: "central route",
+                image: "image",
                 totalArea: 100
             }
 

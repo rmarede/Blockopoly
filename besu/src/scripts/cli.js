@@ -81,12 +81,12 @@ async function mintRealty(signer, name, owners, shares) {
   const details = {
     name: name,
     ownership: PUBLIC_KEY_1,
+    kind: "house",
     district: "lisbon",
-    postalCode: 2725455,
-    street: "central route",
-    number: 1,
+    location: "central route",
+    image: "image",
     totalArea: 100
-  }
+    }
 
   return await RealtyFactory.connect(signer).mint(details, owners, shares);
 }

@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { Realty } from "../api/api";
 import { ethers } from "ethers";
-import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/RealtyFactory.sol/RealtyFactory.json"
+import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RealtyFactory.sol/RealtyFactory.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { RealtyListItem } from "../components/RealtyListItem";
 import Popup from "../components/Popup";
@@ -33,27 +33,12 @@ export default function RealtiesPage() {
         const res1 = await realtyFactoryContract.getRealtiesOf(signerAddress);
         console.log(res1);
         const res = [
-            {id: 1, name: "House", location: "New York"},
-            {id: 2, name: "Apartment", location: "New York"},
-            {id: 3, name: "House", location: "New York"},
-            {id: 4, name: "Apartment", location: "New York"},
-            {id: 5, name: "House", location: "New York"},
-            {id: 6, name: "Apartment", location: "New York"},
-            {id: 7, name: "House", location: "New York"},
-            {id: 8, name: "Apartment", location: "New York"},
-            {id: 9, name: "House", location: "New York"},
-            {id: 10, name: "Apartment", location: "New York"},
-            {id: 11, name: "House", location: "New York"},
-            {id: 12, name: "Apartment", location: "New York"},
-            {id: 13, name: "House", location: "New York"},
-            {id: 14, name: "Apartment", location: "New York"},
-            {id: 15, name: "House", location: "New York"},
-            {id: 16, name: "Apartment", location: "New York"},
-            {id: 17, name: "House", location: "New York"},
-            {id: 18, name: "Apartment", location: "New York"},
-            {id: 19, name: "House", location: "New York"},
-            {id: 20, name: "Apartment", location: "New York"},
-            {id: 21, name: "House", location: "New York"}];
+            {name: "Realty 1", ownership: "Owner 1", kind: "Apartment", district: "District 1", location: "Location 1", image: "https://via.placeholder.com/150", totalArea: "100"},
+            {name: "Realty 2", ownership: "Owner 2", kind: "Apartment", district: "District 2", location: "Location 2", image: "https://via.placeholder.com/150", totalArea: "200"},
+            {name: "Realty 3", ownership: "Owner 3", kind: "Apartment", district: "District 3", location: "Location 3", image: "https://via.placeholder.com/150", totalArea: "300"},
+            {name: "Realty 4", ownership: "Owner 4", kind: "Apartment", district: "District 4", location: "Location 4", image: "https://via.placeholder.com/150", totalArea: "400"},
+            {name: "Realty 5", ownership: "Owner 5", kind: "Apartment", district: "District 5", location: "Location 5", image: "https://via.placeholder.com/150", totalArea: "500"},
+            {name: "Realty 6", ownership: "Owner 6", kind: "Apartment", district: "District 6", location: "Location 6", image: "https://via.placeholder.com/150", totalArea: "600"},];
         setRealties(res);
     }
 

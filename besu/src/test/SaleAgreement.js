@@ -45,11 +45,11 @@ describe("SaleAgreement", function () {
 
         const realty_details = {
             name: "foo",
-            ownership: acc1.address, // placeholder, is replaced upon ownership creation
+            ownership: acc1.address,
+            kind: "house",
             district: "lisbon",
-            postalCode: 2725455,
-            street: "central route",
-            number: 1,
+            location: "central route",
+            image: "image",
             totalArea: 100
         }
 

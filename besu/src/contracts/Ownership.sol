@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./governance/WeightedMultiSig.sol"; 
-import "./RealtyFactory.sol"; 
+import "./factory/RealtyFactory.sol"; 
 
 // Multisig wallet (pattern) + fractional ownership
 contract Ownership is WeightedMultiSig {
