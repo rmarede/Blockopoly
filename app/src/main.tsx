@@ -8,7 +8,7 @@ import SalesPage from './pages/SalesPage.tsx'
 import RentalsPage from './pages/RentalsPage.tsx'
 import MortgagesPage from './pages/MortgagesPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
-import PropertyPage from './pages/PropertyPage.tsx'
+import PropertyPage from './pages/RealtyPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import WalletPage from './pages/WalletPage.tsx'
 

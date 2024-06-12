@@ -1,17 +1,16 @@
 import { Realty } from "../api/api";
 import { Link } from "react-router-dom";
 
-export const RealtyListItem = ({apartment}: {apartment: Realty}) => {
+export const RealtyListItem = ({realty}: {realty: Realty}) => {
 
   return (
-    <Link to={`/realties/${apartment.ownership}`} style={{ textDecoration: 'none'}}>
-        <div className="realtyItem" style={{backgroundImage: `url("${apartment.image}")`}}>
+    <Link to={`/realties/${realty.ownership}`} style={{ textDecoration: 'none'}}>
+        <div className="realtyItem" style={{backgroundImage: `url("${realty.image}")`}}>
             <div className="realtyInfo">
-                <h3>{apartment.name}</h3>
-                <p>{apartment.location}</p>
+                <h3>{realty.name}</h3>
+                <p>{realty.location}</p>
             </div>
         </div>
-        
     </Link>
   );
 };

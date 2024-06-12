@@ -46,7 +46,7 @@ export default function RealtyGrid({user}: {user: string}) {
         <div>
             <div className="realtiesGrid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)"}}>
                 {pageView.map((a, i) => (
-                    <RealtyListItem key={i} apartment={a}/>
+                    <RealtyListItem key={i} realty={a}/>
                 ))}
             </div>
             <div style={{display:"flex", justifyContent:"center", alignItems:"center", marginTop: "4rem"}}>

@@ -1,37 +1,36 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { Sale } from "../api/api";
+import { Rental, createRental } from "../api/api";
 import { ethers } from "ethers";
-import SaleFactoryAbi from "../../../besu/src/artifacts/contracts/factory/SaleAgreementFactory.sol/SaleAgreementFactory.json"
+import RentalFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RentalAgreementFactory.sol/RentalAgreementFactory.json"
+import RentalAgreementAbi from "../../../besu/src/artifacts/contracts/RentalAgreement.sol/RentalAgreement.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export default function RentalsPage() {
 
-    const [sales, setSales] = useState<Sale[]>([]);
+    const [rentals, setRentals] = useState<Rental[]>([]);
 
-    const fetchRealties = async () => {
+    const fetchRentals = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const saleFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#SaleAgreementFactory"], SaleFactoryAbi.abi, provider);
+        const rentalFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RentalAgreementFactory"], RentalFactoryAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
-        const res1 = await saleFactoryContract.getSalesOf(signerAddress);
-        console.log(res1);
-        const res = [
-            {id: "1", asset: "House", share: 0.5, price: 100000},
-            {id: "2", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "3", asset: "House", share: 0.5, price: 100000},
-            {id: "4", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "5", asset: "House", share: 0.5, price: 100000},
-            {id: "6", asset: "Apartment", share: 0.5, price: 100000},
-            {id: "7", asset: "House", share: 0.5, price: 100000},];
-        setSales(res);
+        const res = await rentalFactoryContract.getRentalsOf(signerAddress);
+        const fetchedRentals: Rental[] = [];
+        for (const r of res) {
+            const rentalContract = new ethers.Contract(r, RentalAgreementAbi.abi, provider);
+            const rentalTerms = await rentalContract.terms();
+            const rental : Rental = createRental(rentalTerms, r);
+            fetchedRentals.push(rental);
+        }
+        setRentals(fetchedRentals);
     }
 
     useEffect(() => {
-        fetchRealties();
+        fetchRentals();
     }, []);
 
     return (
@@ -44,21 +43,19 @@ export default function RentalsPage() {
                         <tr>
                             <th>ID</th>
                             <th>Asset</th>
-                            <th>Share</th>
-                            <th>Price</th>
+                            <th>Rent Value</th>
                             <th>Status</th>
                             <th>View</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sales.map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.id}</td>
-                                <td>{item.asset}</td>
-                                <td>{item.share}</td>
-                                <td>{item.price}</td>
+                        {rentals.map((item) => (
+                            <tr key={item.address}>
+                                <td>{item.address}</td>
+                                <td>{item.realty}</td>
+                                <td>{item.rentValue}</td>
                                 <td>Pending</td>
-                                <td><Link to={`/sales/${item.id}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
+                                <td><Link to={`/rentals/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                             </tr>
                         ))}
                     </tbody>
