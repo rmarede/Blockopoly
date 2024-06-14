@@ -7,6 +7,11 @@ import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/Real
 import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { bigIntToFloatString } from "../utils/unit-conversion";
+import TxHistoryModal from "../modal-pages/TxHistoryModal";
+import TransferModal from "../modal-pages/TransferModal";
+import CreateSaleModal from "../modal-pages/CreateSaleModal";
+import CreateRentalModal from "../modal-pages/CreateRentalModal";
+import CheckRequestsModal from "../modal-pages/CheckRequestsModal";
 
 export default function RealtyPage() {
     const params = useParams<{id:string}>();
@@ -14,6 +19,12 @@ export default function RealtyPage() {
     const [shareOf, setShareOf] = useState<number>(0);
     const [user, setUser] = useState<string>("");
     const [ownershipInfo, ] = useState(new Map());
+
+    const [historyPopup, setHistoryPopup] = useState<boolean>(false);
+    const [transferPopup, setTransferPopup] = useState<boolean>(false);
+    const [salePopup, setSalePopup] = useState<boolean>(false);
+    const [rentPopup, setRentPopup] = useState<boolean>(false);
+    const [requestsPopup, setRequestsPopup] = useState<boolean>(false);
 
     const fetchRealty = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -42,6 +53,11 @@ export default function RealtyPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
+            <TxHistoryModal trigger={historyPopup} close={setHistoryPopup} address={realty?.ownership ?? ""}/>
+            <TransferModal trigger={transferPopup} close={setTransferPopup} address={realty?.ownership ?? ""}/>
+            <CreateSaleModal trigger={salePopup} close={setSalePopup} address={realty?.ownership ?? ""}/>
+            <CreateRentalModal trigger={rentPopup} close={setRentPopup} address={realty?.ownership ?? ""}/>
+            <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={realty?.ownership ?? ""}/>
             <div className="realtyPage" style={{ display: "flex"}}>
                 <div className="realtyInfo">
                     <div className="realtyImage" style={{backgroundImage: `url(${realty?.image})`}}></div>
@@ -68,10 +84,11 @@ export default function RealtyPage() {
                 </div>
                 {shareOf > 0 && 
                     <div className="realtyActions">
-                        <button className="historyBtn">Transaction History</button>
-                        <button className="txBtn">Transfer Ownership</button>
-                        <button className="saleBtn">Create Sale Agreement</button>
-                        <button className="rentBtn">Create Rental Agreement</button>
+                        <button className="redButton" onClick={() => setHistoryPopup(true)}>Transaction History</button>
+                        <button className="redButton" onClick={() => setTransferPopup(true)}>Transfer Ownership</button>
+                        <button className="pinkButton" onClick={() => setSalePopup(true)}>Create Sale Agreement</button>
+                        <button className="blueButton" onClick={() => setRentPopup(true)}>Create Rental Agreement</button>
+                        <button className="whiteButton" onClick={() => setRequestsPopup(true)}>Check Requests</button>
                     </div>
                 }
             </div>

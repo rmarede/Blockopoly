@@ -23,6 +23,7 @@ export function createRealty(realtyDetails: any[]): Realty {
 
 export interface Sale {
     address: string;
+    status: number;
     buyer: string;
     seller: string;
     realty: string;
@@ -35,9 +36,10 @@ export interface Sale {
     contengencyClauses: string;
 }
 
-export function createSale(saleDetails: any[], address: string): Sale {
+export function createSale(saleDetails: any[], address: string, status: number): Sale {
     const sale: Sale = {
         address: address,
+        status: status,
         buyer: saleDetails[0],
         seller: saleDetails[1],
         realty: saleDetails[2],

@@ -52,7 +52,7 @@ export default function WalletPage() {
                     <input name="amount" type="number" placeholder="100"/>
                     <label>To:</label>
                     <input name="destinatary" type="text" placeholder="0x123..456"/>
-                    <button type="submit">Mint</button>
+                    <button className="yellowButton" type="submit">Mint</button>
                 </form>
             </div>
         </div>

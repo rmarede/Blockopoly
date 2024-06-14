@@ -7,6 +7,7 @@ import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { bigIntToFloatString } from "../utils/unit-conversion";
+import { saleStatusName } from "../utils/status-converter";
 
 export default function SaleList({of}: {of: string}) {
 
@@ -21,7 +22,8 @@ export default function SaleList({of}: {of: string}) {
         for (const r of res) {
             const saleContract = new ethers.Contract(r, SaleAgreementAbi.abi, provider);
             const saleDetails = await saleContract.details();
-            const sale : Sale = createSale(saleDetails, r);
+            const saleStatus = Number(await saleContract.status());
+            const sale : Sale = createSale(saleDetails, r, saleStatus);
             fetchedSales.push(sale);
         }
         setSales(fetchedSales);
@@ -50,7 +52,7 @@ export default function SaleList({of}: {of: string}) {
                         <td>{item.realty}</td>
                         <td>{bigIntToFloatString(item.share)}%</td>
                         <td>{bigIntToFloatString(item.price)}$</td>
-                        <td>Pending</td>
+                        <td>{saleStatusName(item.status)}</td>
                         <td><Link to={`/sales/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                     </tr>
                 ))}

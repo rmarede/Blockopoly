@@ -52,9 +52,6 @@
     height: 200px;
 }
 
-.walletPage input {
-    margin-bottom: 1rem;
-}
 
 .realtiesGrid {
     gap: 1rem;
@@ -115,6 +112,15 @@
     right: 16px;
 }
 
+.salePage {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.salePage h1 {
+    margin: 1rem 0 0 0;
+}
+
 .salePage .saleInfo {
     display: flex;
     flex-direction: column;
@@ -124,10 +130,13 @@
 .salePage .saleActions {
     display: flex;
     flex-direction: column;
-    margin-top: 2em;
     margin-left: 2em;
     padding-left: 2em;
     border-left: var(--grey) 2px solid;
+}
+
+.salePage .saleActions p {
+    margin: 0 0 1em 0;
 }
 
 .salePage .saleButtons {
@@ -162,6 +171,36 @@
 }
 
 
+
+.redButton {border-color: var(--red)}
+.redButton:hover {background-color: var(--red)}
+.yellowButton {border-color: var(--yellow)}
+.yellowButton:hover {background-color: var(--yellow)}
+.pinkButton {border-color: var(--pink)}
+.pinkButton:hover {background-color: var(--pink)}
+.blueButton {border-color: var(--blue)}
+.blueButton:hover {background-color: var(--blue)}
+.greenButton {border-color: var(--green)}
+.greenButton:hover {background-color: var(--green)}
+.whiteButton {border-color: var(--lightgrey)}
+.whiteButton:hover {background-color: var(--lightgrey)}
+
+.redInput {border-color: var(--red)}
+.yellowInput {border-color: var(--yellow)}
+.pinkInput:hover {border-color: var(--pink)}
+.blueInput:hover {border-color: var(--blue)}
+.greenInput:hover {border-color: var(--green)}
+
+.redButton:disabled,
+.yellowButton:disabled,
+.pinkButton:disabled,
+.blueButton:disabled,
+.greenButton:disabled,
+.whiteButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .realtiesPage .action-button:hover {color: var(--red)}
 .realtyItem:hover {border: 2px solid var(--red)}
 
@@ -178,18 +217,5 @@
 .mortgagesPage .MuiSvgIcon-root {color: var(--green)}
 
 .walletPage form input:hover {border-color: var(--yellow)}
-.walletPage button {border-color: var(--yellow)}
-.walletPage button:hover {background-color: var(--yellow)}
 
-.realtyPage .realtyActions .historyBtn {border-color: var(--red)}
-.realtyPage .realtyActions .historyBtn:hover {background-color: var(--red)}
-.realtyPage .realtyActions .txBtn {border-color: var(--red)}
-.realtyPage .realtyActions .txBtn:hover {background-color: var(--red)}
-.realtyPage .realtyActions .saleBtn {border-color: var(--pink)}
-.realtyPage .realtyActions .saleBtn:hover {background-color: var(--pink)}
-.realtyPage .realtyActions .rentBtn {border-color: var(--blue)}
-.realtyPage .realtyActions .rentBtn:hover {background-color: var(--blue)}
 .realtyPage th {border-bottom: 1px solid var(--red); width: 100%;}
-
-.salePage button {border-color: var(--pink)}
-.salePage button:hover {background-color: var(--pink)}

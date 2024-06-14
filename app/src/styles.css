@@ -103,6 +103,7 @@ form input{
   background-color: #1a1a1a;
   color: white;
   transition: border-color 0.25s;
+  margin-bottom: 1rem;
 }
 
 form input:hover {
@@ -126,8 +127,7 @@ form input:hover {
   background-color: #1a1a1a;
   border-radius: 8px;
   padding: 2rem;
-  width: 100%;
-  max-width: 600px;
+  width: fit-content;
 }
 
 table {

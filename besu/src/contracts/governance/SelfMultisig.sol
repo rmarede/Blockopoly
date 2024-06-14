@@ -16,6 +16,7 @@ contract SelfMultisig {
     }
 
     struct Transaction {
+        uint id;
         uint value;
         bytes data;
         bool executed;
@@ -38,6 +39,7 @@ contract SelfMultisig {
     function submitTransaction(uint _value, bytes memory _data) public virtual returns (uint transactionId) {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
+            id: transactionId,
             value: _value,
             data: _data,
             executed: false
@@ -109,6 +111,16 @@ contract SelfMultisig {
             }
         }
         return false;
+    }
+
+    function getTransaction(uint _transactionId) public view returns (uint, bytes memory, bool) {
+        require(_transactionId < transactionCount, "Multisig: Transaction does not exist");
+        Transaction memory txn = transactions[_transactionId];
+        return (txn.value, txn.data, txn.executed);
+    }
+
+    function hasConfirmed(uint _transactionId, address _participant) public view returns (bool) {
+        return confirmations[_transactionId][_participant];
     }
 
     function _isMultisignable(address _address) private view returns (bool) {
