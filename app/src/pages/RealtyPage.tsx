@@ -6,13 +6,14 @@ import { ethers } from "ethers";
 import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RealtyFactory.sol/RealtyFactory.json"
 import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
+import { bigIntToFloatString } from "../utils/unit-conversion";
 
 export default function RealtyPage() {
     const params = useParams<{id:string}>();
     const [realty, setRealty] = useState<Realty | undefined>(undefined);
     const [shareOf, setShareOf] = useState<number>(0);
     const [user, setUser] = useState<string>("");
-    const [ownershipInfo, setOwnershipInfo] = useState(new Map());
+    const [ownershipInfo, ] = useState(new Map());
 
     const fetchRealty = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -59,7 +60,7 @@ export default function RealtyPage() {
                             {[...ownershipInfo].map((item) => (
                                 <tr key={item[0]}>
                                     <td>{(item[0] == user) ? "You" : item[0]}</td>
-                                    <td>{parseFloat((Number(item[1])/100).toFixed(2)).toString()}%</td>
+                                    <td>{bigIntToFloatString(item[1])}%</td>
                                 </tr>
                             ))}
                         </tbody>

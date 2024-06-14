@@ -4,6 +4,7 @@ import WalletAbi from "../../../besu/src/artifacts/contracts/Wallet.sol/Wallet.j
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { numberToFloatString } from "../utils/unit-conversion";
 
 export default function WalletPage() {
 
@@ -43,7 +44,7 @@ export default function WalletPage() {
                 <h1>My Wallet</h1>
                 <div>
                     <p>User: {userAddress}</p>
-                    <p>Your Balance: {balance}$</p>
+                    <p>Your Balance: {numberToFloatString(balance)}$</p>
                 </div>
                 <form onSubmit={mintCurrency}>
                     <h2>Mint Currency</h2>

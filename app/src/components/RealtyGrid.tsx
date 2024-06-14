@@ -23,7 +23,7 @@ export default function RealtyGrid({user}: {user: string}) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const realtyFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
-        console.log("user", user);
+        console.log("Fetching Realties of: ", user);
         const res = await realtyFactoryContract.getRealtiesOf(user);
         const fetchedRealties: Realty[] = [];
         for (const r of res) {

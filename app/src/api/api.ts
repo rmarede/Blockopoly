@@ -38,11 +38,11 @@ export interface Sale {
 export function createSale(saleDetails: any[], address: string): Sale {
     const sale: Sale = {
         address: address,
-        seller: saleDetails[0],
-        buyer: saleDetails[1],
+        buyer: saleDetails[0],
+        seller: saleDetails[1],
         realty: saleDetails[2],
-        price: saleDetails[3],
-        share: saleDetails[4],
+        share: saleDetails[3],
+        price: saleDetails[4],
         earnest: saleDetails[5],
         realtor: saleDetails[6],
         comission: saleDetails[7],

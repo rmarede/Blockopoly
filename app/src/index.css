@@ -115,6 +115,53 @@
     right: 16px;
 }
 
+.salePage .saleInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.salePage .saleActions {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2em;
+    margin-left: 2em;
+    padding-left: 2em;
+    border-left: var(--grey) 2px solid;
+}
+
+.salePage .saleButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.salePage .txParties {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.infoCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+}
+
+.infoCard .title {
+    width: 100%;
+    border-bottom: var(--pink) 1px solid;
+    color: var(--lightgrey);
+}
+
+.infoCard :nth-child(n) {
+    padding: 0;
+    margin: 0;
+    align-self: start;
+}
+
+
 .realtiesPage .action-button:hover {color: var(--red)}
 .realtyItem:hover {border: 2px solid var(--red)}
 
@@ -143,3 +190,6 @@
 .realtyPage .realtyActions .rentBtn {border-color: var(--blue)}
 .realtyPage .realtyActions .rentBtn:hover {background-color: var(--blue)}
 .realtyPage th {border-bottom: 1px solid var(--red); width: 100%;}
+
+.salePage button {border-color: var(--pink)}
+.salePage button:hover {background-color: var(--pink)}

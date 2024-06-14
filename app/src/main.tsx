@@ -11,6 +11,9 @@ import NotFoundPage from './pages/NotFoundPage.tsx'
 import PropertyPage from './pages/RealtyPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import WalletPage from './pages/WalletPage.tsx'
+import SalePage from './pages/SalePage.tsx'
+import RentalPage from './pages/RentalPage.tsx'
+import MortgagePage from './pages/MortgagePage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -23,20 +26,32 @@ const router = createBrowserRouter([
     element: <RealtiesPage/>
   },
   {
+    path: '/realties/:id',
+    element: <PropertyPage/>
+  },
+  {
     path: '/sales',
     element: <SalesPage/>
+  },
+  {
+    path: '/sales/:id',
+    element: <SalePage/>
   },
   {
     path: '/rentals',
     element: <RentalsPage/>
   },
   {
+    path: '/rentals/:id',
+    element: <RentalPage/>
+  },
+  {
     path: '/mortgages',
     element: <MortgagesPage/>
   },
   {
-    path: '/realties/:id',
-    element: <PropertyPage/>
+    path: '/mortgages/:id',
+    element: <MortgagePage/>
   },
   {
     path: '/wallet',
