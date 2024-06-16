@@ -4,7 +4,7 @@ import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ow
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { useState } from "react";
 import Loader from "../components/Loader";
-import encodeRentalFactoryData from "../utils/operation-encoder";
+import {encodeRentalFactoryData} from "../utils/operation-encoder";
 
 export default function CreateRentalModal({ trigger, close, realty } : {trigger:boolean, close: (value: boolean) => void, realty:string}) {
     

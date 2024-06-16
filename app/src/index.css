@@ -63,7 +63,7 @@
 }
 
 .realtyItem { 
-    height: 150;
+    height: 160px;
     background-size: cover;
     background-position: center;
     border-radius: 16px;
@@ -75,6 +75,7 @@
     color: white;
     padding: 1rem;
     border-radius: 16px;  
+    height: 100%;
 }
 
 .realtyPage {

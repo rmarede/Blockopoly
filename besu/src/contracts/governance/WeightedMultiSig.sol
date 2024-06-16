@@ -120,10 +120,10 @@ contract WeightedMultiSig is Multisignable {
                 _count += shares[participants[i]];
     }
 
-    function getTransaction(uint _transactionId) public view returns (bytes memory, bool) {
+    function getTransaction(uint _transactionId) public view returns (address, bytes memory, bool) {
         require(_transactionId < transactionCount, "WeightedMultiSig: Transaction does not exist");
         Transaction memory txn = transactions[_transactionId];
-        return (txn.data, txn.executed);
+        return (txn.destination, txn.data, txn.executed);
     }
 
     function hasConfirmed(uint _transactionId, address _participant) public view returns (bool) {

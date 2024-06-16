@@ -1,3 +1,6 @@
+import {decodeFunctionData} from "../utils/operation-encoder"
+
+
 export interface Realty {
     name: string,
     ownership: string,
@@ -118,4 +121,25 @@ export function createLoan(loanDetails: any[], address: string): Loan {
         defaultDeadline: loanDetails[9]
     }
     return loan;
+}
+
+export interface OperationRequest {
+    id: number;
+    target: string;
+    name: string;
+    args: any[];
+    executed: boolean;
+}
+
+export function createOperationRequest(requestDetails: any[], id: number): OperationRequest {
+    const [name, args] = decodeFunctionData(requestDetails[1]);
+    const request: OperationRequest = {
+        id: id,
+        target: requestDetails[0],
+        name: name,
+        args: args,
+        executed: requestDetails[2]
+    }
+    console.log(request);
+    return request;
 }
