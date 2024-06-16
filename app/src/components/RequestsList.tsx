@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { OperationRequest, createOperationRequest } from "../api/api";
 import { ethers } from "ethers";
 import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
+import { printArgs } from "../utils/operation-encoder";
 
 export default function RequestsList({of}: {of: string}) {
 
@@ -42,7 +43,7 @@ export default function RequestsList({of}: {of: string}) {
                     <tr key={item.id}>
                         <td>{item.id}</td>
                         <td>{item.name}</td>
-                        <td>{item.args}</td>
+                        <td dangerouslySetInnerHTML={{ __html: printArgs(item.name, item.args)}}></td>
                         <td>{item.executed.toString()}</td>
                     </tr>
                 ))}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {decodeFunctionData} from "../utils/operation-encoder"
 
 
@@ -132,7 +133,7 @@ export interface OperationRequest {
 }
 
 export function createOperationRequest(requestDetails: any[], id: number): OperationRequest {
-    const [name, args] = decodeFunctionData(requestDetails[1]);
+    const [name, args] = decodeFunctionData(requestDetails[1]); 
     const request: OperationRequest = {
         id: id,
         target: requestDetails[0],
@@ -140,6 +141,5 @@ export function createOperationRequest(requestDetails: any[], id: number): Opera
         args: args,
         executed: requestDetails[2]
     }
-    console.log(request);
     return request;
 }
