@@ -2,8 +2,8 @@ import { Pagination, PaginationItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Realty, createRealty } from "../api/api";
 import { ethers } from "ethers";
-import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RealtyFactory.sol/RealtyFactory.json"
-import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
+import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RealtyFactory.sol/RealtyFactory.json";
+import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json";
 import { RealtyListItem } from "./RealtyListItem";
 
 export default function RealtyGrid({user}: {user: string}) {
@@ -51,17 +51,17 @@ export default function RealtyGrid({user}: {user: string}) {
             </div>
             <div style={{display:"flex", justifyContent:"center", alignItems:"center", marginTop: "4rem"}}>
                 <Pagination
-                count={Math.ceil(realties.length / pageSize)}
-                variant="outlined"
-                renderItem={(item) => 
-                    <PaginationItem {...item} sx={{
-                        color: "white",
-                        "&.Mui-selected": {
-                            backgroundColor: "#ff5e5e"
-                        },
-                        border: "2px solid #ff5e5e",
-                    }} />}
-                onChange={(_, page) => handlePageChange(page)}
+                    count={Math.ceil(realties.length / pageSize)}
+                    variant="outlined"
+                    renderItem={(item) => 
+                        <PaginationItem {...item} sx={{
+                            color: "white",
+                            "&.Mui-selected": {
+                                backgroundColor: "#ff5e5e"
+                            },
+                            border: "2px solid #ff5e5e",
+                        }} />}
+                    onChange={(_, page) => handlePageChange(page)}
                 />
             </div>
         </div>

@@ -91,7 +91,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig, Multisignable {
     {
         require(_terms.rentValue > 0, "RentalAgreement: rent value must be greater than 0");
         require(_terms.duration > 0, "RentalAgreement: duration must be greater than 0");
-        require(_terms.earlyTerminationNotice <= _terms.duration, "RentalAgreement: early termination notice must be less or equal to duration");
+        //require(_terms.earlyTerminationNotice <= _terms.duration, "RentalAgreement: early termination notice must be less or equal to duration");
         require(_tenant != address(0), "RentalAgreement: tenant address is zero");
         //require(_terms.startDate > block.timestamp - 1 hours, "RentalAgreement: start date must be in the future");
 

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import Popup from "../components/Popup";
 import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
-import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
+import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json";
 import { useState } from "react";
 import Loader from "../components/Loader";
 import {encodeRentalFactoryData} from "../utils/operation-encoder";
