@@ -170,6 +170,17 @@
     align-self: start;
 }
 
+.Loader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2em;
+}
+
+.submitButton {
+    margin-top: 1em;
+}
 
 
 .redButton {border-color: var(--red)}
@@ -185,8 +196,8 @@
 .whiteButton {border-color: var(--lightgrey)}
 .whiteButton:hover {background-color: var(--lightgrey)}
 
-.redInput {border-color: var(--red)}
-.yellowInput {border-color: var(--yellow)}
+.redInput:hover {border-color: var(--red)}
+.yellowInput:hover {border-color: var(--yellow)}
 .pinkInput:hover {border-color: var(--pink)}
 .blueInput:hover {border-color: var(--blue)}
 .greenInput:hover {border-color: var(--green)}

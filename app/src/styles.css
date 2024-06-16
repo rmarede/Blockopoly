@@ -120,6 +120,7 @@ form input:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2000;
 }
 
 .popup-inner { 
@@ -128,6 +129,7 @@ form input:hover {
   border-radius: 8px;
   padding: 2rem;
   width: fit-content;
+  min-width: 400px;
 }
 
 table {

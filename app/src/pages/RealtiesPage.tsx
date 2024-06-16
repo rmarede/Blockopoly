@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import Popup from "../components/Popup";
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import RealtyGrid from "../components/RealtyGrid";
+import AddRealtyModal from "../modal-pages/AddRealtyModal";
 
 
 export default function RealtiesPage() {
@@ -26,9 +27,7 @@ export default function RealtiesPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
-            <Popup trigger={addPopup} close={setAddPopup}>
-                <h2>Add Realty</h2>
-            </Popup>
+            <AddRealtyModal trigger={addPopup} close={setAddPopup} user={userAddress}/>
             <div className="realtiesPage">
                 <div style={{display:"flex", justifyContent: "space-between"}}> 
                     <h1>My Realties</h1>
