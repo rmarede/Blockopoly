@@ -57,40 +57,34 @@ export function createSale(saleDetails: any[], address: string, status: number):
 export interface Rental {
     address: string;
     tenant: string;
-    landlord: string;
     realty: string;
-    startDate: number;
-    duration: number;
-    rentValue: number;
-    securityDeposit: number;
-    securityReturnDueDate: number;
-    paymentDueDate: number;
-    latePaymentFee: number;
-    earlyTerminationFee: number;
-    earlyTerminationNotice: number;
+    startDate: bigint;
+    duration: bigint;
+    rentValue: bigint;
+    securityDeposit: bigint;
+    securityReturnDueDate: bigint;
+    paymentDueDate: bigint;
+    latePaymentFee: bigint;
+    earlyTerminationFee: bigint;
+    earlyTerminationNotice: bigint;
     extra: string;
-    payees: string[];
-    shares: number[];
 }
 
-export function createRental(rentalDetails: any[], address: string): Rental {
+export function createRental(rentalDetails: any[], address: string, tenant: string): Rental {
     const rental: Rental = {
         address: address,
-        tenant: rentalDetails[0],
-        landlord: rentalDetails[1],
-        realty: rentalDetails[2],
-        startDate: rentalDetails[3],
-        duration: rentalDetails[4],
-        rentValue: rentalDetails[5],
-        securityDeposit: rentalDetails[6],
-        securityReturnDueDate: rentalDetails[7],
-        paymentDueDate: rentalDetails[8],
-        latePaymentFee: rentalDetails[9],
-        earlyTerminationFee: rentalDetails[10],
-        earlyTerminationNotice: rentalDetails[11],
-        extra: rentalDetails[12],
-        payees: rentalDetails[13],
-        shares: rentalDetails[14]
+        tenant: tenant,
+        realty: rentalDetails[0],
+        startDate: rentalDetails[1],
+        duration: rentalDetails[2],
+        rentValue: rentalDetails[3],
+        securityDeposit: rentalDetails[4],
+        securityReturnDueDate: rentalDetails[5],
+        paymentDueDate: rentalDetails[6],
+        latePaymentFee: rentalDetails[7],
+        earlyTerminationFee: rentalDetails[8],
+        earlyTerminationNotice: rentalDetails[9],
+        extra: rentalDetails[10],
     }
     return rental;
 }
@@ -99,14 +93,14 @@ export interface Loan {
     address: string;
     lender: string;
     borrower: string;
-    principal: number;
-    downPayment: number;
-    interestRate: number;
-    loanTerm: number;
-    startDate: number;
-    gracePeriod: number;
-    latePaymentFee: number;
-    defaultDeadline: number;
+    principal: bigint;
+    downPayment: bigint;
+    interestRate: bigint;
+    loanTerm: bigint;
+    startDate: bigint;
+    gracePeriod: bigint;
+    latePaymentFee: bigint;
+    defaultDeadline: bigint;
 }
 
 export function createLoan(loanDetails: any[], address: string): Loan {

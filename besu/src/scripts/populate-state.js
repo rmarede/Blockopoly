@@ -80,7 +80,7 @@ function sleep(ms) {
     const realty1 = {
         name: "Yuyan Garden",
         ownership: PUBLIC_KEY_1,
-        kind: "building",
+        kind: "BUILDING",
         district: "Shanghai",
         location: "Downtown Shanghai, 2000-100 Shanghai",
         image: "https://www.intrepidtravel.com/adventures/wp-content/uploads/2017/08/china_shanghai_yuyuan-garden-city.jpg",
@@ -89,7 +89,7 @@ function sleep(ms) {
     const realty2 = {
         name: "Quinta do Lago",
         ownership: PUBLIC_KEY_1,
-        kind: "house",
+        kind: "HOUSE",
         district: "Beja",
         location: "Rua das Macieiras, 4002-200 Beja",
         image: "https://www.the-yeatman-hotel.com/fotos/marcas/banner_1_3632649415bb49a128f13c.jpg",
@@ -99,7 +99,7 @@ function sleep(ms) {
     const realty3 = {
         name: "Edificio do Sol Nascente 3E",
         ownership: PUBLIC_KEY_1,
-        kind: "apartment",
+        kind: "APARTMENT",
         district: "Algarve",
         location: "Rua do Sol Nascente 3E, 1000-100 Quarteira",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg/800px-The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg",
@@ -111,7 +111,7 @@ function sleep(ms) {
     await RealtyFactory.connect(signer1).mint(realty2, [PUBLIC_KEY_4], [10000])
     await sleep(1000);
     await RealtyFactory.connect(signer1).mint(realty3, [PUBLIC_KEY_3, PUBLIC_KEY_4], [4000, 6000])
-    await sleep(1000);
+    await sleep(2000);
 
     console.log("Issuing Sale Agrements...");
     const realties = await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3);
@@ -164,6 +164,49 @@ function sleep(ms) {
     await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
     await sleep(1000);
     await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
+
+    console.log("Issuing Rental Agreements...")
+
+    const rentalTerms1 = {
+        realtyContract: realties[0],
+        startDate: timeHelper.toSolidityTime(Date.now()),
+        duration: 3, 
+        rentValue: 200,
+        securityDeposit: 100,
+        securityReturnDueDate: 15,
+        paymentDueDate: 1,
+        latePaymentFee: 10,
+        earlyTerminationFee: 50, 
+        earlyTerminationNotice: 1,
+        extra: 'extra terms', 
+        payees: [], 
+        shares: []
+    };
+
+    const rentalTerms2 = {
+        realtyContract: realties[1],
+        startDate: timeHelper.toSolidityTime(Date.now()),
+        duration: 1, 
+        rentValue: 50,
+        securityDeposit: 10,
+        securityReturnDueDate: 15,
+        paymentDueDate: 1,
+        latePaymentFee: 10,
+        earlyTerminationFee: 50, 
+        earlyTerminationNotice: 1,
+        extra: 'extra terms', 
+        payees: [], 
+        shares: []
+    };
+
+    let OwnershipContract = new ethers.Contract(realties[0], getAbi.ownershipAbi(), provider);
+    let createRentalData = abiEncoder.encodeRentalFactoryData('createRentalAgreement', [PUBLIC_KEY_4, rentalTerms1]);
+    await OwnershipContract.connect(signer3).submitTransaction(getAddress.rentalFactoryAddress(), 0, createRentalData);
+    await sleep(1000); 
+
+    OwnershipContract = new ethers.Contract(realties[1], getAbi.ownershipAbi(), provider);
+    createRentalData = abiEncoder.encodeRentalFactoryData('createRentalAgreement', [PUBLIC_KEY_4, rentalTerms2]);
+    await OwnershipContract.connect(signer3).submitTransaction(getAddress.rentalFactoryAddress(), 0, createRentalData);
 
     console.log("Done!") 
   

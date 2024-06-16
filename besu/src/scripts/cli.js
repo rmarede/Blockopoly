@@ -203,7 +203,7 @@ function encodeMintRentalAgreement(tenant, realty, startDate, duration, rentValu
     payees: [], 
     shares: []
   };
-  return abiEncoder.encodeRentalFactoryData('mintRentalAgreement', [tenant, terms]);
+  return abiEncoder.encodeRentalFactoryData('createRentalAgreement', [tenant, terms]);
 }
 
 // ------------------------------------------------ MORTGAGE LOANS ------------------------------------------------

@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "../utils/Context.sol";
 import "../RentalAgreement.sol";
 import "../Ownership.sol";
+import "../governance/Multisignable.sol";
 
-contract RentalAgreementFactory {
+contract RentalAgreementFactory is Multisignable {
 
     event NewRentalAgreement(address indexed tenant, address indexed landlord, address indexed realty, address agreement);
 
@@ -13,7 +14,7 @@ contract RentalAgreementFactory {
 
     mapping (address => address[]) public rentalsOf;
 
-    constructor(address _cns) {
+    constructor(address _cns) Multisignable(Policy.UNANIMOUS_OR_ADMIN) {
         cns = _cns;
     }
 

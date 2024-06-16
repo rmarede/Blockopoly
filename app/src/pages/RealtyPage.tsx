@@ -56,7 +56,7 @@ export default function RealtyPage() {
             <TxHistoryModal trigger={historyPopup} close={setHistoryPopup} address={realty?.ownership ?? ""}/>
             <TransferModal trigger={transferPopup} close={setTransferPopup}  user={user} realty={realty?.ownership ?? ""}/>
             <CreateSaleModal trigger={salePopup} close={setSalePopup} user={user} realty={realty?.ownership ?? ""}/>
-            <CreateRentalModal trigger={rentPopup} close={setRentPopup} address={realty?.ownership ?? ""}/>
+            <CreateRentalModal trigger={rentPopup} close={setRentPopup} realty={realty?.ownership ?? ""}/>
             <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={realty?.ownership ?? ""}/>
             <div className="page realtyPage" style={{ display: "flex"}}>
                 <div className="realtyInfo">

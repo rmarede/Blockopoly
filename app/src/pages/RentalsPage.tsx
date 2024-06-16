@@ -3,10 +3,12 @@ import Navbar from "../components/Navbar";
 import { Rental, createRental } from "../api/api";
 import { ethers } from "ethers";
 import RentalFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RentalAgreementFactory.sol/RentalAgreementFactory.json"
+import RealtyFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RealtyFactory.sol/RealtyFactory.json"
 import RentalAgreementAbi from "../../../besu/src/artifacts/contracts/RentalAgreement.sol/RentalAgreement.json"
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { bigIntToFloatString } from "../utils/unit-conversion";
 
 export default function RentalsPage() {
 
@@ -15,16 +17,22 @@ export default function RentalsPage() {
     const fetchRentals = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
+        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
         const rentalFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RentalAgreementFactory"], RentalFactoryAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
-        const res = await rentalFactoryContract.getRentalsOf(signerAddress);
+        const realties = await realtyFactoryContract.getRealtiesOf(signerAddress);
+
         const fetchedRentals: Rental[] = [];
-        for (const r of res) {
-            const rentalContract = new ethers.Contract(r, RentalAgreementAbi.abi, provider);
-            const rentalTerms = await rentalContract.terms();
-            const rental : Rental = createRental(rentalTerms, r);
-            fetchedRentals.push(rental);
+        for (const realty of realties) {
+            const res = await rentalFactoryContract.getRentalsOf(realty);
+            for (const r of res) {
+                const rentalContract = new ethers.Contract(r, RentalAgreementAbi.abi, provider);
+                const rentalTerms = await rentalContract.terms();
+                const tenant = await rentalContract.tenant();
+                const rental : Rental = createRental(rentalTerms, r, tenant);
+                fetchedRentals.push(rental);
+            }
         }
         setRentals(fetchedRentals);
     }
@@ -53,7 +61,7 @@ export default function RentalsPage() {
                             <tr key={item.address}>
                                 <td>{item.address}</td>
                                 <td>{item.realty}</td>
-                                <td>{item.rentValue}</td>
+                                <td>{bigIntToFloatString(item.rentValue)}$</td>
                                 <td>Pending</td>
                                 <td><Link to={`/rentals/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                             </tr>
