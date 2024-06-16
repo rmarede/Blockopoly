@@ -3,7 +3,7 @@ export default function HomePage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar />
-            <div>
+            <div className="page">
                 <h1>Welcome to Blockopoly!</h1>
                 <div style={{ display: "flex", justifyContent: "space-between"}}>
                     <div className="setupGuide">

@@ -4,7 +4,7 @@ export default function MortgagePage() {
 
 
     return (
-        <div style={{ display: "flex"}}>
+        <div className="page" style={{ display: "flex"}}>
             <Navbar/>
             
         </div>

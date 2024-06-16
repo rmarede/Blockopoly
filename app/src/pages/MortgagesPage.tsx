@@ -36,7 +36,7 @@ export default function MortgagesPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar />
-            <div className="mortgagesPage">
+            <div className="page mortgagesPage">
                 <h1>My Loans</h1>
                 <table >
                     <thead>

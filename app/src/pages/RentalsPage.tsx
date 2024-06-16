@@ -36,7 +36,7 @@ export default function RentalsPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar />
-            <div className="rentalsPage">
+            <div className="page rentalsPage">
                 <h1>My Rentals</h1>
                 <table >
                     <thead>

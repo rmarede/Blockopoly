@@ -11,6 +11,8 @@
     width: 120px;
     margin-right: 2rem;
     background-color: black;
+    position: fixed;
+    
 }
 
 .navbar nav {

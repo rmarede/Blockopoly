@@ -43,7 +43,7 @@ export default function SalePage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
-            <div className="salePage" style={{ display: "flex"}}>
+            <div className="page salePage" style={{ display: "flex"}}>
                 <div>
                     <div style={{ display: "flex"}}>
                         <h1>Sale Agreement</h1>

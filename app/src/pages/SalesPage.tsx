@@ -22,7 +22,7 @@ export default function SalesPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar />
-            <div className="salesPage">
+            <div className="page salesPage">
                 <h1>My Sales</h1>
                 {user !== "0x0" && <SaleList of={user}/>}
             </div>

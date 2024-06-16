@@ -40,7 +40,7 @@ export default function WalletPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
-            <div className="walletPage">
+            <div className="page walletPage">
                 <h1>My Wallet</h1>
                 <div>
                     <p>User: {userAddress}</p>

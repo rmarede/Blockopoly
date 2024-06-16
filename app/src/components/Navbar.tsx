@@ -50,7 +50,7 @@ export default function Navbar() {
                     </li>
                 </ul>
             </nav>
-            <img src={logo} alt="blockopoly_logo" />
+            <img className="blockopolyLogo" src={logo} alt="blockopoly_logo" />
         </div>
     )
 }
