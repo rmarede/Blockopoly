@@ -78,11 +78,6 @@
     height: 100%;
 }
 
-.realtyPage {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
 .realtyPage .realtyInfo {
     width: 40vw;
 }
@@ -115,12 +110,11 @@
     right: 16px;
 }
 
-.salePage {
-    margin-top: 20px;
-    margin-bottom: 20px;
+.salePage h1 {
+    margin: 1rem 0 0 0;
 }
 
-.salePage h1 {
+.rentalPage h1 {
     margin: 1rem 0 0 0;
 }
 
@@ -130,22 +124,10 @@
     gap: 1rem;
 }
 
-.salePage .saleActions {
+.rentalPage .rentalInfo { 
     display: flex;
     flex-direction: column;
-    margin-left: 2em;
-    padding-left: 2em;
-    border-left: var(--grey) 2px solid;
-}
-
-.salePage .saleActions p {
-    margin: 0 0 1em 0;
-}
-
-.salePage .saleButtons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    gap: 1rem
 }
 
 .salePage .txParties {
@@ -163,8 +145,15 @@
 
 .infoCard .title {
     width: 100%;
-    border-bottom: var(--pink) 1px solid;
     color: var(--lightgrey);
+}
+
+.salePage .infoCard .title {
+    border-bottom: var(--pink) 1px solid;
+}
+
+.rentalPage .infoCard .title {
+    border-bottom: var(--blue) 1px solid;
 }
 
 .infoCard :nth-child(n) {
@@ -183,6 +172,23 @@
 
 .submitButton {
     margin-top: 1em;
+}
+
+.actionbar {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2em;
+    padding-left: 2em;
+    border-left: var(--grey) 2px solid;
+    gap: 1rem;
+}
+
+.actionbar h3 {
+    margin: 0;
+}
+
+.actionbar p {
+    margin: 0;
 }
 
 

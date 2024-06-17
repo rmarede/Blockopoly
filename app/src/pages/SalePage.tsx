@@ -10,6 +10,7 @@ import WalletAbi from "../../../besu/src/artifacts/contracts/Wallet.sol/Wallet.j
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
 import { saleStatusColor, saleStatusName } from "../utils/status-converter";
+import InfoCard from "../components/InfoCard";
 
 export default function SalePage() {
     const params = useParams<{id:string}>();
@@ -72,15 +73,13 @@ export default function SalePage() {
                     </div>
                 </div>
                 {(sale?.buyer === user || sale?.seller === user) && 
-                    <div className="saleActions">
+                    <div className="actionbar">
                         <h3>Assets Hold In Escrow</h3>
                         <p>Balance hold from buyer: {bigIntToFloatString(escrowBalance)}$</p>
                         <p>Shares hold from seller: {bigIntToFloatString(escrowShares)}%</p>
-                        <div className="saleButtons">
-                            <button disabled={sale.status != 0}>Consent</button>
-                            <button disabled={sale.status != 1}>Commit</button>
-                            <button disabled={sale.status == 2 || sale.status == 3} className="redButton">Withdraw</button>
-                        </div>
+                        <button disabled={sale.status != 0}>Consent</button>
+                        <button disabled={sale.status != 1}>Commit</button>
+                        <button disabled={sale.status == 2 || sale.status == 3} className="redButton">Withdraw</button>
                     </div>
                 }
             </div>
@@ -88,12 +87,5 @@ export default function SalePage() {
     )
 }
 
-function InfoCard({ title,  children } : { title: string, children: React.ReactNode }) {
-    return (
-        <div className="infoCard">
-            <h3 className="title">{title}</h3>
-            {children}
-        </div>
-    )
-}
+
 

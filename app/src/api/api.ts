@@ -59,6 +59,7 @@ export function createSale(saleDetails: any[], address: string, status: number):
 }
 
 export interface Rental {
+    status: number;
     address: string;
     tenant: string;
     realty: string;
@@ -74,8 +75,9 @@ export interface Rental {
     extra: string;
 }
 
-export function createRental(rentalDetails: any[], address: string, tenant: string): Rental {
+export function createRental(rentalDetails: any[], address: string, tenant: string, status: number): Rental {
     const rental: Rental = {
+        status: status,
         address: address,
         tenant: tenant,
         realty: rentalDetails[0],

@@ -60,6 +60,7 @@ export default function RequestsList({of}: {of: string}) {
                             <td>{item.name}</td>
                             <td dangerouslySetInnerHTML={{ __html: printArgs(item.name, item.args)}}></td>
                             <td>{item.executed.toString()}</td>
+                            <td><button className="redButton" disabled={item.executed}>Approve</button></td>
                         </tr>
                     ))}
                 </tbody>

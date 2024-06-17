@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ethers } from "ethers";
 import rentalFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RentalAgreementFactory.sol/RentalAgreementFactory.json"
+import rentalAgreementAbi from "../../../besu/src/artifacts/contracts/RentalAgreement.sol/RentalAgreement.json"
 
 export function encodeRentalFactoryData(functionToCall: string, params: any[]) {
     const itf = new ethers.Interface(rentalFactoryAbi.abi);
+    const data = itf.encodeFunctionData(functionToCall, params);
+    return data;
+}
+
+export function encodeRentalAgreementData(functionToCall: string, params: any[]) {
+    const itf = new ethers.Interface(rentalAgreementAbi.abi);
     const data = itf.encodeFunctionData(functionToCall, params);
     return data;
 }
@@ -31,6 +38,10 @@ export function printArgs(functionName: string, args: any[]): string {
                 "Early Termination Notice: " + args[1][9] + "<br/>" +
                 "Extra: " + args[1][10]
             );
+            case "renewTerm":
+                return (
+                    "Foo: " + args[0] + "<br/>" 
+                );
         default:
             return "";
     }
