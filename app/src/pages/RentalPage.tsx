@@ -102,10 +102,10 @@ export default function RentalPage() {
                                 <h3>Tenant Actions</h3>
                                 <button onClick={() => setEnrollPopup(true)} disabled={rental?.status != 0} className="redButton">Enroll</button>
                                 <button onClick={() => setPayPopup(true)} disabled={rental?.status != 1} className="yellowButton">Pay</button>
+                                <button onClick={() => setEarlyTermPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Anticipate Termination</button>
+                                <button onClick={() => setRenewalPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Request Renewal</button>
                             </>
                         }
-                        <button onClick={() => setEarlyTermPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Anticipate Termination</button>
-                        <button onClick={() => setRenewalPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Request Renewal</button>
                         <button onClick={() => setRequestsPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="whiteButton">Check Requests</button>
                         {(isOwner) && (
                             <>

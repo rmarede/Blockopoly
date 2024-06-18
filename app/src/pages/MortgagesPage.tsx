@@ -52,8 +52,8 @@ export default function MortgagesPage() {
                         {mortgages.map((item) => (
                             <tr key={item.address}>
                                 <td>{item.address}</td>
-                                <td>{item.principal}</td>
-                                <td>{item.interestRate}</td>
+                                <td>{item.principal.toString()}</td>
+                                <td>{item.interestRate.toString()}</td>
                                 <td>Pending</td>
                                 <td><Link to={`/mortgages/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                             </tr>

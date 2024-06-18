@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "./Multisignable.sol";
+import "../interface/governance/IMultisig.sol";
 
-contract SelfMultisig {
+contract SelfMultisig is IMultisig, Multisignable {
 
     modifier transactionExists(uint transactionId) {
         require(transactionId < transactionCount, "Multisig: Transaction does not exist");
@@ -26,11 +27,9 @@ contract SelfMultisig {
     mapping (uint => Transaction) public transactions;
     mapping (uint => mapping (address => bool)) internal confirmations;
     uint public transactionCount;
-    Policy public confirmationPolicy;
 
-    constructor(address[] memory _participants, Policy _policy)  {
+    constructor(address[] memory _participants, Policy _policy) Multisignable(_policy)  {
         require(_participants.length > 0, "Multisig: No participants specified");
-        confirmationPolicy = _policy;
         for (uint i=0; i<_participants.length; i++) {
             participants.push(_participants[i]);
         }
@@ -48,12 +47,12 @@ contract SelfMultisig {
         confirmTransaction(transactionId);
     }
 
-    function confirmTransaction(uint _transactionId) public transactionExists(_transactionId) {
+    function confirmTransaction(uint _transactionId) public override transactionExists(_transactionId) {
         confirmations[_transactionId][msg.sender] = true;
         executeTransaction(_transactionId);
     }   
 
-    function executeTransaction(uint _transactionId) public 
+    function executeTransaction(uint _transactionId) public override
         notExecuted(_transactionId)
     {
         if (isConfirmed(_transactionId)) {
@@ -65,9 +64,9 @@ contract SelfMultisig {
     }
 
     function isConfirmed(uint _transactionId) public view returns (bool) {
-        if (confirmationPolicy == Policy.MAJORITY || confirmationPolicy == Policy.MAJORITY_OR_ADMIN) {
+        if (policy == Policy.MAJORITY || policy == Policy.MAJORITY_OR_ADMIN) {
             return getConfirmationCount(_transactionId) > participants.length / 2;
-        } else if (confirmationPolicy == Policy.UNANIMOUS || confirmationPolicy == Policy.UNANIMOUS_OR_ADMIN) {
+        } else if (policy == Policy.UNANIMOUS || policy == Policy.UNANIMOUS_OR_ADMIN) {
             for (uint i=0; i<participants.length; i++)
                 if (!confirmations[_transactionId][participants[i]])
                     return false;
@@ -76,7 +75,7 @@ contract SelfMultisig {
         return false;
     }
 
-    function getConfirmationCount(uint _transactionId) public view returns (uint count) {
+    function getConfirmationCount(uint _transactionId) public view override returns (uint count) {
         for (uint i=0; i<participants.length; i++)
             if (confirmations[_transactionId][participants[i]])
                 count += 1;
@@ -113,22 +112,18 @@ contract SelfMultisig {
         return false;
     }
 
-    function getTransaction(uint _transactionId) public view returns (uint, bytes memory, bool) {
+    function getTransaction(uint _transactionId) public view override returns (address, bytes memory, bool) {
         require(_transactionId < transactionCount, "Multisig: Transaction does not exist");
         Transaction memory txn = transactions[_transactionId];
-        return (txn.value, txn.data, txn.executed);
+        return (address(this), txn.data, txn.executed);
     }
 
-    function hasConfirmed(uint _transactionId, address _participant) public view returns (bool) {
+    function getTransactionCount() public view override returns (uint) {
+        return transactionCount;
+    }
+
+    function hasConfirmed(uint _transactionId, address _participant) public view override returns (bool) {
         return confirmations[_transactionId][_participant];
-    }
-
-    function _isMultisignable(address _address) private view returns (bool) {
-        try Multisignable(_address).getMultisigPolicy() returns (Policy) {
-            return true;
-        } catch {
-            return false;
-        }
     }
 
 }

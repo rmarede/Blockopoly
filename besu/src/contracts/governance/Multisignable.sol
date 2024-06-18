@@ -16,7 +16,12 @@ contract Multisignable is IMultisignable {
     }
 
     function setMultisigPolicy(Policy _policy) public virtual {
+        //  TODO: only self
         policy = _policy;
+    }
+
+    function getMultisignableName() public pure virtual override returns (string memory) {
+        return "Multisignable";
     }
 
 }

@@ -2,10 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "./Multisignable.sol";
+import "../interface/governance/IMultisig.sol";
 
 // WIGHTED MULTI SIGNATURE WALLET PATTERN IMPLEMENTATION
 // github.com/OpenZeppelin/gnosis-multisig -> TODO maybe upgrade com openzeppelin Governor.sol
-contract WeightedMultiSig is Multisignable {
+contract WeightedMultiSig is IMultisig, Multisignable {
 
     struct Transaction {
         address destination;
@@ -79,7 +80,7 @@ contract WeightedMultiSig is Multisignable {
         confirmTransaction(_transactionId);
     }
 
-    function confirmTransaction(uint _transactionId) public 
+    function confirmTransaction(uint _transactionId) public override
         isOwner(msg.sender) 
         transactionExists(_transactionId) 
         notConfirmed(_transactionId, msg.sender) 
@@ -88,7 +89,7 @@ contract WeightedMultiSig is Multisignable {
         executeTransaction(_transactionId);
     }
 
-    function executeTransaction(uint _transactionId) public 
+    function executeTransaction(uint _transactionId) public override
         isOwner(msg.sender)
         confirmed(_transactionId, msg.sender)
         notExecuted(_transactionId)
@@ -114,19 +115,19 @@ contract WeightedMultiSig is Multisignable {
         return false;
     }
 
-    function getConfirmationCount(uint _transactionId) public view returns (uint _count) {
+    function getConfirmationCount(uint _transactionId) public view override returns (uint _count) {
         for (uint i=0; i<participants.length; i++)
             if (confirmations[_transactionId][participants[i]])
                 _count += shares[participants[i]];
     }
 
-    function getTransaction(uint _transactionId) public view returns (address, bytes memory, bool) {
+    function getTransaction(uint _transactionId) public view override returns (address, bytes memory, bool) {
         require(_transactionId < transactionCount, "WeightedMultiSig: Transaction does not exist");
         Transaction memory txn = transactions[_transactionId];
         return (txn.destination, txn.data, txn.executed);
     }
 
-    function hasConfirmed(uint _transactionId, address _participant) public view returns (bool) {
+    function hasConfirmed(uint _transactionId, address _participant) public view override returns (bool) {
         return confirmations[_transactionId][_participant];
     }
 
@@ -176,6 +177,10 @@ contract WeightedMultiSig is Multisignable {
                 }
             }
         }
+    }
+
+    function getTransactionCount() public view override returns (uint) {
+        return transactionCount;
     }
 
     function setMultisigPolicy(Policy _policy) public override onlySelf {

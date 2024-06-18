@@ -5,7 +5,6 @@ import "./finance/PaymentSplitter.sol";
 import "./Ownership.sol";
 import "./interface/IERC20.sol";
 import "./governance/SelfMultisig.sol";
-import "./governance/Multisignable.sol";
 import "./utils/Strings.sol";
 import "./interface/permissioning/IAccountRegistry.sol";
 
@@ -13,7 +12,7 @@ import "./interface/permissioning/IAccountRegistry.sol";
 
 // TODO escrever as clausulas qualitativas do contrato em comentarios?
 
-contract RentalAgreement is PaymentSplitter, SelfMultisig, Multisignable {
+contract RentalAgreement is PaymentSplitter, SelfMultisig {
 
     event RentalEnrolled(address indexed tenant, address indexed landlord, address indexed realty);
     event RentalComplete(address indexed tenant, address indexed landlord, address indexed realty);
@@ -87,7 +86,6 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig, Multisignable {
     constructor(address _cns, address _tenant, RentalTerms memory _terms) 
         PaymentSplitter(_terms.payees, _terms.shares, _cns) 
         SelfMultisig(_participants(_tenant, _terms.realtyContract), Policy.UNANIMOUS)
-        Multisignable(Policy.MAJORITY_OR_ADMIN)
     {
         require(_terms.rentValue > 0, "RentalAgreement: rent value must be greater than 0");
         require(_terms.duration > 0, "RentalAgreement: duration must be greater than 0");
@@ -152,7 +150,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig, Multisignable {
     }
 
 
-    function reduceTerm(uint _periods) public active onlyParties {
+    function reduceTerm(uint _periods) public active onlyTenant {
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");
 
         terms.duration -= _periods;
@@ -211,5 +209,9 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig, Multisignable {
 
     function isPrivileged(address _address) private view returns (bool) {
         return Strings.equals(IAccountRegistry(accountRegistryAddress()).orgOf(_address), "admin_org");
+    }
+
+    function getMultisignableName() public pure override returns (string memory) {
+        return "RentalAgreement";
     }
 }

@@ -7,7 +7,6 @@ import "./interface/permissioning/IRoleRegistry.sol";
 import "./interface/permissioning/IAccountRegistry.sol";
 import "./governance/Multisignable.sol";
 
-
 // Inspired by OpenZeppelin Contracts (token/ERC20/ERC20.sol) - last updated v4.7.0
 
 contract Wallet is IERC20, Context, Multisignable {
@@ -20,7 +19,7 @@ contract Wallet is IERC20, Context, Multisignable {
         return 2;
     }
 
-    function mint(address to, uint amount) public virtual returns (bool) {
+    function mint(address to, uint amount) public virtual override returns (bool) {
         require(to != address(0) && amount > 0, "Wallet: invalid input");
         //require(IRoleRegistry(roleRegistryAddress()).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
 
@@ -34,16 +33,16 @@ contract Wallet is IERC20, Context, Multisignable {
         balances[to] -= amount;
     }
 
-    function balanceOf(address account) public view virtual returns (uint) {
+    function balanceOf(address account) public view virtual override returns (uint) {
         return balances[account];
     }
 
-    function transfer(address to, uint amount) public virtual returns (bool) {
+    function transfer(address to, uint amount) public virtual override returns (bool) {
         _transfer(msg.sender, to, amount);
         return true;
     }
 
-    function transferFrom(address from, address to, uint amount) public virtual returns (bool) {
+    function transferFrom(address from, address to, uint amount) public virtual override returns (bool) {
         if (msg.sender != from) {
             _spendAllowance(from, msg.sender, amount);
         }
@@ -52,14 +51,14 @@ contract Wallet is IERC20, Context, Multisignable {
     }
 
 
-    function approve(address spender, uint amount) public virtual returns (bool) {
+    function approve(address spender, uint amount) public virtual override returns (bool) {
         require(spender != address(0), "Wallet: invalid input");
         allowances[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
         return true;
     }
 
-    function allowance(address owner, address spender) public view virtual returns (uint) {
+    function allowance(address owner, address spender) public view virtual override returns (uint) {
         return allowances[owner][spender];
     }
 
@@ -77,6 +76,10 @@ contract Wallet is IERC20, Context, Multisignable {
         uint currentAllowance = allowance(owner, spender);
         require(currentAllowance >= amount, "Wallet: insufficient allowance");
         allowances[owner][spender] = currentAllowance - amount;
+    }
+
+    function getMultisignableName() public pure override returns (string memory) {
+        return "Wallet";
     }
     
 }

@@ -15,13 +15,13 @@ export function encodeRentalAgreementData(functionToCall: string, params: any[])
     return data;
 }
 
-export function decodeFunctionData(data:string) : [string, any[]] {
-    const itf = new ethers.Interface(rentalFactoryAbi.abi);
+export function decodeFunctionData(data:string, abi:ethers.InterfaceAbi) : [string, any[]] {
+    const itf = new ethers.Interface(abi);
     const decoded = itf.parseTransaction({data});
     return [decoded?.name ?? "", decoded?.args ?? []];
 }
 
-export function printArgs(functionName: string, args: any[]): string {
+export function printArgs(target:string, functionName: string, args: any[]): string {
     switch (functionName) {
         case "createRentalAgreement":
             return (
@@ -38,10 +38,11 @@ export function printArgs(functionName: string, args: any[]): string {
                 "Early Termination Notice: " + args[1][9] + "<br/>" +
                 "Extra: " + args[1][10]
             );
-            case "renewTerm":
-                return (
-                    "Foo: " + args[0] + "<br/>" 
-                );
+        case "renewTerm":
+            return (
+                "Periods: " + args[0] + "<br/>" 
+        );
+
         default:
             return "";
     }

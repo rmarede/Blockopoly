@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {decodeFunctionData} from "../utils/operation-encoder"
-
+import rentalFactoryAbi from "../../../besu/src/artifacts/contracts/factory/RentalAgreementFactory.sol/RentalAgreementFactory.json"
+import rentalAgreementAbi from "../../../besu/src/artifacts/contracts/RentalAgreement.sol/RentalAgreement.json"
+import saleAgreementAbi from "../../../besu/src/artifacts/contracts/SaleAgreement.sol/SaleAgreement.json"
+import IMultisignableAbi from "../../../besu/src/artifacts/contracts/interface/governance/IMultisignable.sol/IMultisignable.json"
+import OwnershipAbi from "../../../besu/src/artifacts/contracts/Ownership.sol/Ownership.json"
+import { ethers } from "ethers"
 
 export interface Realty {
     name: string,
@@ -134,8 +139,29 @@ export interface OperationRequest {
     executed: boolean;
 }
 
-export function createOperationRequest(requestDetails: any[], id: number): OperationRequest {
-    const [name, args] = decodeFunctionData(requestDetails[1]); 
+export async function createOperationRequest(requestDetails: any[], id: number): Promise<OperationRequest> {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const multisignableContract = new ethers.Contract(requestDetails[0], IMultisignableAbi.abi, provider);
+    const contractName = await multisignableContract.getMultisignableName();
+    let abi:ethers.InterfaceAbi = rentalFactoryAbi.abi;
+    switch (contractName) {
+        case "RentalAgreementFactory":
+            abi = rentalFactoryAbi.abi;
+            break;
+        case "RentalAgreement":
+            abi = rentalAgreementAbi.abi;
+            break;
+        case "SaleAgreement":
+            abi = saleAgreementAbi.abi;
+            break;
+        case "Ownership":
+            abi = OwnershipAbi.abi;
+            break;
+        default:
+            break;
+    }
+    const [name, args] = decodeFunctionData(requestDetails[1], abi); 
     const request: OperationRequest = {
         id: id,
         target: requestDetails[0],

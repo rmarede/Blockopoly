@@ -53,7 +53,10 @@ contract SaleAgreement is Context, SelfMultisig {
         _;
     }
 
-    constructor(address _cns, SaleDetails memory _details) Context(_cns) SelfMultisig(_participants(_details.buyer, _details.seller), Policy.UNANIMOUS) {
+    constructor(address _cns, SaleDetails memory _details) 
+        Context(_cns) 
+        SelfMultisig(_participants(_details.buyer, _details.seller), Policy.UNANIMOUS) 
+    {
         require(_details.buyer != address(0) && _details.seller != address(0) && _details.realty != address(0), "SaleAgreement: invalid input");
         require(_details.price > 0 && _details.earnest > 0 && _details.share > 0, "SaleAgreement: invalid input");
         //require(_details.buyer != _details.seller, "SaleAgreement: buyer and seller can not be the same");
@@ -114,6 +117,10 @@ contract SaleAgreement is Context, SelfMultisig {
         res[0] = _buyer;
         res[1] = _seller;
         return res;
+    }
+
+    function getMultisignableName() public pure override returns (string memory) {
+        return "SaleAgreement";
     }
   
 }

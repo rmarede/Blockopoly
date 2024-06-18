@@ -72,4 +72,8 @@ contract Ownership is WeightedMultiSig {
         require(false, "Ownership: Not allowed");
     }
 
+    function getMultisignableName() public pure override returns (string memory) {
+        return "Ownership";
+    }
+
 }
