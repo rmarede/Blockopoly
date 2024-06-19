@@ -6,7 +6,7 @@ import { printArgs } from "../utils/operation-encoder";
 import { Pagination, PaginationItem } from "@mui/material";
 import Loader from "./Loader";
 
-export default function RequestsList({of}: {of: string}) {
+export default function RequestsListTenant({of}: {of: string}) {
 
     const pageSize = 1;
     const [pageView, setPageView] = useState<OperationRequest[]>([]);
@@ -83,10 +83,10 @@ export default function RequestsList({of}: {of: string}) {
                             {pageView.map((item) => (
                                 <tr key={item.id}>
                                     <td>{item.id}</td>
-                                    <td>{item.name}</td>*
+                                    <td>{item.name}</td>
                                     <td dangerouslySetInnerHTML={{ __html: printArgs(item.target, item.name, item.args)}}></td>
                                     <td>{item.executed.toString()}</td>
-                                    <td><button className="redButton" disabled={item.executed} onClick={() => approve(item.id)}>Approve</button></td>
+                                    <td><button className="redButton" disabled={item.executed} onClick={() => approve(item.id)}>Request Approval</button></td>
                                 </tr>
                             ))}
                         </tbody>

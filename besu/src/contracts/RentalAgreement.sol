@@ -44,17 +44,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
     }
 
     modifier onlyParties() {
-        require(msg.sender == terms.realtyContract || msg.sender == tenant, "Only landlord or tenant can call this operation.");
-        _;
-    }
-
-    modifier onlySelf() {
-        require(msg.sender == address(this), "RentalAgreement: this operation can only be invoked by consensus");
-        _;
-    }
-
-    modifier privileged() {
-        require(msg.sender == address(this) || isPrivileged(msg.sender), "SaleAgreement: only privileged entities can call this function");
+        require(msg.sender == terms.realtyContract || msg.sender == tenant || msg.sender == address(this) || isPrivileged(msg.sender), "Only landlord or tenant can call this operation.");
         _;
     }
 
@@ -120,9 +110,20 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         }
     }
 
-    function terminate() public privileged active {
-        status = RentStatus.COMPLETE;
-        emit RentalComplete(tenant, terms.realtyContract, address(this));
+    function terminate() public onlyParties active {
+        if (msg.sender == address(this)) {
+            status = RentStatus.COMPLETE;
+            emit RentalComplete(tenant, terms.realtyContract, address(this));
+        } else {
+            bytes memory data = abi.encodeWithSignature("terminate()");
+            for (uint i = 0; i < transactionCount; i++) {
+                if (keccak256(transactions[i].data) == keccak256(data)) {
+                    confirmTransaction(i);
+                    return;
+                }
+            }
+            submitTransaction(0, data);
+        }
     }
 
     function evict() public onlyLandlord active {
@@ -163,10 +164,21 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         }
     }
 
-    function renewTerm(uint _periods) public complete onlySelf {
-        terms.duration += _periods;
-        status = RentStatus.ACTIVE;
-        emit TermRenewed(tenant, terms.realtyContract, address(this));
+    function renewTerm(uint _periods) public complete onlyParties {
+        if (msg.sender == address(this)) {
+            terms.duration += _periods;
+            status = RentStatus.ACTIVE;
+            emit TermRenewed(tenant, terms.realtyContract, address(this));
+        } else {
+            bytes memory data = abi.encodeWithSignature("renewTerm(uint256)", _periods);
+            for (uint i = 0; i < transactionCount; i++) {
+                if (keccak256(transactions[i].data) == keccak256(data)) {
+                    confirmTransaction(i);
+                    return;
+                }
+            }
+            submitTransaction(0, data);
+        }
     }
 
     function paymentExpiration() public view returns (uint) {

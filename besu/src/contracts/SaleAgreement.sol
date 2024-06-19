@@ -34,7 +34,7 @@ contract SaleAgreement is Context, SelfMultisig {
     uint public createdAt;
     
     modifier onlyParties() {
-        require(msg.sender == details.buyer || msg.sender == details.seller, "SaleAgreement: only buyer or seller can call this function");
+        require(msg.sender == details.buyer || msg.sender == details.seller || msg.sender == address(this) || isPrivileged(msg.sender), "SaleAgreement: only buyer or seller can call this function");
         _;
     }
 
@@ -45,11 +45,6 @@ contract SaleAgreement is Context, SelfMultisig {
 
     modifier onlySeller() {
         require(msg.sender == details.seller, "SaleAgreement: only seller can call this function");
-        _;
-    }
-
-    modifier privileged() {
-        require(msg.sender == address(this) || isPrivileged(msg.sender), "SaleAgreement: only privileged entities can call this function");
         _;
     }
 
@@ -68,41 +63,73 @@ contract SaleAgreement is Context, SelfMultisig {
         createdAt = block.timestamp;
     }
 
-    function consent() public onlySelf { // TODO mudar nome pre agreement, terms, consent, hold in escrow?
+    function consent() public onlyParties { // TODO mudar nome pre agreement, terms, consent, hold in escrow?
         require(status == Status.PENDING, "SaleAgreement: sale already agreed on");
-        Ownership(details.realty).transferShares(details.seller, address(this), details.share);
-        IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.earnest);
-        status = Status.AGREED;
-        emit PreSaleAgreement(details.buyer, details.seller, details.realty);
+        if (msg.sender == address(this)) {
+            Ownership(details.realty).transferShares(details.seller, address(this), details.share);
+            IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.earnest);
+            status = Status.AGREED;
+            emit PreSaleAgreement(details.buyer, details.seller, details.realty);
+        } else {
+            bytes memory data = abi.encodeWithSignature("consent()");
+            for (uint i = 0; i < transactionCount; i++) {
+                if (keccak256(transactions[i].data) == keccak256(data)) {
+                    confirmTransaction(i);
+                    return;
+                }
+            }
+            submitTransaction(0, data);
+        }
     }
 
-    function commit() public onlySelf {
+    function commit() public onlyParties {
         require(status == Status.AGREED, "SaleAgreement: sale already processed or not yet agreed on");
-        IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.price - details.earnest);
-        uint comm = details.price * details.comission / 10000;
-        IERC20(walletContractAddress()).transfer(details.realtor, comm);
-        IERC20(walletContractAddress()).transfer(details.seller, details.price - comm);
-        Ownership(details.realty).transferShares(address(this), details.buyer, details.share);
-        emit DeedTransfer(details.buyer, details.seller, details.realty);
-        status = Status.COMPLETED;
+        if (msg.sender == address(this)) {
+            IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.price - details.earnest);
+            uint comm = details.price * details.comission / 10000;
+            IERC20(walletContractAddress()).transfer(details.realtor, comm);
+            IERC20(walletContractAddress()).transfer(details.seller, details.price - comm);
+            Ownership(details.realty).transferShares(address(this), details.buyer, details.share);
+            emit DeedTransfer(details.buyer, details.seller, details.realty);
+            status = Status.COMPLETED;
+        } else {
+            bytes memory data = abi.encodeWithSignature("commit()");
+            for (uint i = 0; i < transactionCount; i++) {
+                if (keccak256(transactions[i].data) == keccak256(data)) {
+                    confirmTransaction(i);
+                    return;
+                }
+            }
+            submitTransaction(0, data);
+        }
     }
 
-    function withdraw(uint _penalty) public privileged {
+    function withdraw(uint _penalty) public onlyParties {
         require(status == Status.AGREED, "SaleAgreement: sale already processed or not yet agreed on");
         require(_penalty <= details.earnest, "SaleAgreement: penalty can not be more than earnest");
         //require(block.timestamp - createdAt < details.contengencyPeriod, "SaleAgreement: contengency period already over");
-
-        IERC20(walletContractAddress()).transfer(details.seller, _penalty);
-        if (details.earnest - _penalty > 0) {
-            IERC20(walletContractAddress()).transfer(details.buyer, details.earnest - _penalty);
+        if (msg.sender == address(this) || isPrivileged(msg.sender)) {
+            IERC20(walletContractAddress()).transfer(details.seller, _penalty);
+            if (details.earnest - _penalty > 0) {
+                IERC20(walletContractAddress()).transfer(details.buyer, details.earnest - _penalty);
+            }
+            Ownership(details.realty).transferShares(address(this), details.seller, details.share);
+            status = Status.WITHDRAWN;
+            emit SaleWithdrawal(details.buyer, details.seller, details.realty);
+        } else {
+            bytes memory data = abi.encodeWithSignature("withdraw(uint256)", _penalty);
+            for (uint i = 0; i < transactionCount; i++) {
+                if (keccak256(transactions[i].data) == keccak256(data)) {
+                    confirmTransaction(i);
+                    return;
+                }
+            }
+            submitTransaction(0, data);
         }
-        Ownership(details.realty).transferShares(address(this), details.seller, details.share);
-        status = Status.WITHDRAWN;
-        emit SaleWithdrawal(details.buyer, details.seller, details.realty);
     }
 
     // executa funcoes no contrato Ownership do realty
-    function executeTransaction(uint _value, bytes memory _data) public onlySeller {
+    function realtyTransaction(uint _value, bytes memory _data) public onlySeller {
         require(status == Status.AGREED, "SaleAgreement: realty not held in escrow");
         (bool success, ) = details.realty.call{value: _value}(_data);
         require(success, "SaleAgreement: transaction failed");
@@ -122,5 +149,4 @@ contract SaleAgreement is Context, SelfMultisig {
     function getMultisignableName() public pure override returns (string memory) {
         return "SaleAgreement";
     }
-  
 }

@@ -90,7 +90,7 @@ export default function RentalPage() {
                             <p>Payment Due Date: {rental?.paymentDueDate.toString()}th of each period</p>
                             <p>Late Payment Fee: {bigIntToFloatString(rental?.latePaymentFee ?? 0n)}$</p>
                             <p>Early Termination Fee: {bigIntToFloatString(rental?.earlyTerminationFee ?? 0n)}$</p>
-                            <p>Early Termination Notice: {rental?.earlyTerminationNotice.toString()} days</p>
+                            <p>Early Termination Notice: {rental?.earlyTerminationNotice.toString()} periods</p>
                             <p>Extra: {rental?.extra}</p>
                         </InfoCard>
                     </div>
@@ -102,7 +102,7 @@ export default function RentalPage() {
                                 <h3>Tenant Actions</h3>
                                 <button onClick={() => setEnrollPopup(true)} disabled={rental?.status != 0} className="redButton">Enroll</button>
                                 <button onClick={() => setPayPopup(true)} disabled={rental?.status != 1} className="yellowButton">Pay</button>
-                                <button onClick={() => setEarlyTermPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Anticipate Termination</button>
+                                <button onClick={() => setEarlyTermPopup(true)} disabled={rental?.status != 1 } className="blueButton">Anticipate Termination</button>
                                 <button onClick={() => setRenewalPopup(true)} disabled={rental?.status != 1 && rental?.status != 2} className="blueButton">Request Renewal</button>
                             </>
                         }
