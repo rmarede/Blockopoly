@@ -207,7 +207,9 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
     }
 
     function daysSince(uint date) private view returns (uint) {
-        require(block.timestamp >= date, "Internal Error: Specified date is in the future");
+        if (block.timestamp < date) {
+            return 0;
+        }
         uint timeDiff = block.timestamp - date;
         return timeDiff / 60 / 60 / 24; // seconds to days
     }

@@ -98,12 +98,8 @@ describe("SaleAgreement", function () {
 
             await expect(wallet.mint(acc3.address, 10000)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).to.be.reverted;
         });
         
         it("Should not consent after already consented", async function () {
@@ -115,17 +111,10 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(1)).to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).to.be.reverted;
         });
 
         it("Should hold assets in escrow when both consented", async function () {
@@ -136,13 +125,9 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
             expect(await saleAgreement.status()).to.equal(0);
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
             expect(await saleAgreement.status()).to.equal(1);
 
             expect(await wallet.balanceOf(acc3.address)).to.equal(9900);
@@ -160,11 +145,7 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).to.be.reverted;
+            await expect(saleAgreement.connect(acc2).commit()).to.be.reverted;
         });
         
         it("Should not commit if no allowance", async function () {
@@ -175,17 +156,10 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 100)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
-
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).commit()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).commit()).to.be.reverted;
         });
 
         it("Should not commit if already commited", async function () {
@@ -196,23 +170,12 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).commit()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).commit()).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
-
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(2)).to.be.reverted;  
+            await expect(saleAgreement.connect(acc3).commit()).to.be.reverted;
         });
 
         it("Should commit and transfer assets", async function () {
@@ -223,17 +186,11 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).commit()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).commit()).not.to.be.reverted;
 
             expect(await saleAgreement.status()).to.equal(2);
             expect(await wallet.balanceOf(acc1.address)).to.equal(5);
@@ -256,23 +213,12 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).commit()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).commit()).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('commit', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
-
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(2)).to.be.reverted;
+            await expect(saleAgreement.connect(acc3).withdraw(50)).to.be.reverted;
         });
 
         it("Should not withdraw if not consented", async function () {
@@ -283,11 +229,7 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(0)).to.be.reverted;
+            await expect(saleAgreement.connect(acc3).withdraw(50)).to.be.reverted;
         });
 
         it("Should withdraw and return assets", async function () {
@@ -298,17 +240,11 @@ describe("SaleAgreement", function () {
             await expect(wallet.connect(acc3).approve(saleAgreement.target, 10000)).not.to.be.reverted;
             await expect(ownership.connect(acc2).approve(saleAgreement.target)).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc2).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('consent', []))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc3).confirmTransaction(0)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
 
-            await expect(saleAgreement.connect(acc3).submitTransaction(
-                0, 
-                abi_encoder.encodeSaleAgreementData('withdraw', [50]))
-            ).not.to.be.reverted;
-            await expect(saleAgreement.connect(acc2).confirmTransaction(1)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc3).withdraw(50)).not.to.be.reverted;
+            await expect(saleAgreement.connect(acc2).withdraw(50)).not.to.be.reverted;
 
             expect(await saleAgreement.status()).to.equal(3);
             expect(await wallet.balanceOf(acc2.address)).to.equal(50);

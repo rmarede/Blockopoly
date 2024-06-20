@@ -1,3 +1,7 @@
+function now () {
+    return Date.now();
+}
+
 function day() {
     return 1000 * 60 * 60 * 24;
 }
@@ -8,6 +12,22 @@ function month() {
 
 function year() {
     return month() * 12;
+}
+
+function ethNow() {
+    return Math.floor(Date.now() / 1000);
+}
+
+function ethDay() {
+    return 60 * 60 * 24;
+}
+
+function ethMonth() {
+    return ethDay() * 30;
+}
+
+function ethYear() {
+    return ethMonth() * 12;
 }
 
 function timeBetween(date1, date2) {
@@ -36,4 +56,4 @@ function fromSolidityTime(value) {
 
 
 
-module.exports = { day, month, year, timeBetween, toDays, toMonths, toYears, toSolidityTime, fromSolidityTime};
+module.exports = { day, month, year, timeBetween, toDays, toMonths, toYears, toSolidityTime, fromSolidityTime, ethDay, ethMonth, ethYear, ethNow, now};
