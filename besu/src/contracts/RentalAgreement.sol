@@ -117,7 +117,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         } else {
             bytes memory data = abi.encodeWithSignature("terminate()");
             for (uint i = 0; i < transactionCount; i++) {
-                if (keccak256(transactions[i].data) == keccak256(data)) {
+                if (!transactions[i].executed && keccak256(transactions[i].data) == keccak256(data)) {
                     confirmTransaction(i);
                     return;
                 }
@@ -172,7 +172,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         } else {
             bytes memory data = abi.encodeWithSignature("renewTerm(uint256)", _periods);
             for (uint i = 0; i < transactionCount; i++) {
-                if (keccak256(transactions[i].data) == keccak256(data)) {
+                if (!transactions[i].executed && keccak256(transactions[i].data) == keccak256(data)) {
                     confirmTransaction(i);
                     return;
                 }

@@ -1,12 +1,11 @@
 import Popup from "../components/Popup";
-import RentalAgreementAbi from "../../../besu/src/artifacts/contracts/RentalAgreement.sol/RentalAgreement.json";
+import SaleAgreementAbi from "../../../besu/src/artifacts/contracts/SaleAgreement.sol/SaleAgreement.json";
 import { ethers } from "ethers";
-import { Rental } from "../api/api";
+import { Sale } from "../api/api";
 import { useState } from "react";
 import Loader from "../components/Loader";
-import { encodeRentalAgreementData } from "../utils/operation-encoder";
 
-export default function RenewalModal({ trigger, close, rental } : {trigger:boolean, close: (value: boolean) => void, rental:Rental}) {
+export default function WithdrawModal({ trigger, close, sale } : {trigger:boolean, close: (value: boolean) => void, sale:Sale}) {
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -18,8 +17,8 @@ export default function RenewalModal({ trigger, close, rental } : {trigger:boole
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         try {
-            const rentalContract = new ethers.Contract(rental.address, RentalAgreementAbi.abi, signer);
-            const tx = await rentalContract.submitTransaction(0, encodeRentalAgreementData("renewTerm", [data.get("periods")]));
+            const saleContract = new ethers.Contract(sale.address, SaleAgreementAbi.abi, signer);
+            const tx = await saleContract.withdraw(data.get("penalty"));
             const receipt = await tx.wait();
             if (!receipt.status) {
                 console.log('Error with transaction: ', receipt);
@@ -39,13 +38,12 @@ export default function RenewalModal({ trigger, close, rental } : {trigger:boole
         <Popup trigger={trigger} close={close}>
             {isLoading ? <Loader color="#ff5e5e"/> : (
                 <form className="renewalModal" onSubmit={submit}>
-                    <h2>Request Contract Term Renewal</h2>
-                    <p>This action will create a request for term renewal.<br/>
-                    Only if the other party approves it will take place.</p>
-                    <p>Current Contract Duration: {rental?.duration.toString()}</p>
-                    <label>Periods (of 30 days):</label>
-                    <input className="blueInput" name="periods" type="number" placeholder="6" required/>
-                    <button className="blueButton submitButton" type="submit">Submit</button>
+                    <h3>Withdraw from this sale agreement?</h3>
+                    <p>Upon both parties withdraw, this action will transfer the shares back<br/> 
+                    to the seller, and the earnest to the buyer minus the determined penalty.</p>
+                    <label>Penalty (in cents):</label>
+                    <input className="redInput" name="penalty" type="number" placeholder="10000" required/>
+                    <button className="redButton submitButton" type="submit">Submit</button>
                 </form>
             )}
         </Popup>
