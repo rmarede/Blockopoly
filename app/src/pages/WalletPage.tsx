@@ -14,7 +14,7 @@ export default function WalletPage() {
     const fetchUserBalance = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, provider);
+        const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
         setUserAddress(signerAddress);
@@ -32,7 +32,7 @@ export default function WalletPage() {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
-        const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, signer);
+        const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, signer);
         const tx = await walletContract.mint(data.get("destinatary"), data.get("amount"));
         console.log(tx);
     }

@@ -6,7 +6,7 @@ const jsonContent = JSON.parse(fs.readFileSync(file_path, 'utf8'))
 
 const CNS_ADDRESS = jsonContent['ContractNameServiceModule#ContractNameService'];
 
-module.exports = buildModule("FactoryModule", (m) => {
+module.exports = buildModule("GeneralModule", (m) => {
 
     const cnsAddress = m.getParameter("_cns", CNS_ADDRESS);
 
@@ -23,5 +23,8 @@ module.exports = buildModule("FactoryModule", (m) => {
         },
     });
 
-    return { saleFactory, loanFactory, rentalFactory, realtyFactory };
+    const wallet = m.contract("Wallet", [cnsAddress], {});
+	const compliance = m.contract("Compliance", [cnsAddress], {});
+
+    return { saleFactory, loanFactory, rentalFactory, realtyFactory, wallet, compliance };
 });

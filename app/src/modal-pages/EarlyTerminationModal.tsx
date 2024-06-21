@@ -20,7 +20,7 @@ export default function EarlyTerminationModal({ trigger, close, rental } : {trig
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         try {
-            const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, signer);
+            const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, signer);
             const rentalContract = new ethers.Contract(rental.address, RentalAgreementAbi.abi, signer);
             let tx = await walletContract.approve(rental.address, rental.earlyTerminationFee);
             let receipt = await tx.wait();

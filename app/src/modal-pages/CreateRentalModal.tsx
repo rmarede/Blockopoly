@@ -38,7 +38,7 @@ export default function CreateRentalModal({ trigger, close, realty } : {trigger:
         const encodedCallData = encodeRentalFactoryData('createRentalAgreement', [data.get("tenant"), terms]);
 
         try {
-            const tx = await ownershipContract.submitTransaction(DeployedAddresses["FactoryModule#RentalAgreementFactory"], 0, encodedCallData);
+            const tx = await ownershipContract.submitTransaction(DeployedAddresses["GeneralModule#RentalAgreementFactory"], 0, encodedCallData);
             console.log(tx);
             const receipt = await tx.wait();
             if (!receipt.status) {

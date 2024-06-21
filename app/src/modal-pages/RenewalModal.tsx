@@ -4,7 +4,6 @@ import { ethers } from "ethers";
 import { Rental } from "../api/api";
 import { useState } from "react";
 import Loader from "../components/Loader";
-import { encodeRentalAgreementData } from "../utils/operation-encoder";
 
 export default function RenewalModal({ trigger, close, rental } : {trigger:boolean, close: (value: boolean) => void, rental:Rental}) {
 
@@ -19,7 +18,7 @@ export default function RenewalModal({ trigger, close, rental } : {trigger:boole
         const signer = await provider.getSigner();
         try {
             const rentalContract = new ethers.Contract(rental.address, RentalAgreementAbi.abi, signer);
-            const tx = await rentalContract.submitTransaction(0, encodeRentalAgreementData("renewTerm", [data.get("periods")]));
+            const tx = await rentalContract.renewTerm(data.get("periods"));
             const receipt = await tx.wait();
             if (!receipt.status) {
                 console.log('Error with transaction: ', receipt);

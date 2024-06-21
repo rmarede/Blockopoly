@@ -29,11 +29,11 @@ for (( i=1; i<$NODE_COUNT; i++ )); do
   cp ../compose/templates/docker-compose.yml ../compose/docker-compose-node-$i.yml
   # Replace bootnode enode's localhost address with the docker besu-node-0 container's address
   export E_ADDRESS="${ENODE#enode://}"
-  echo "e_address: $E_ADDRESS"
+  #echo "e_address: $E_ADDRESS"
   export DOCKER_NODE_0_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' besu-node-0)
-  echo "docker_node_address: $DOCKER_NODE_0_ADDRESS"
+  #echo "docker_node_address: $DOCKER_NODE_0_ADDRESS"
   export E_ADDRESS=$(echo $E_ADDRESS | sed -e "s/127.0.0.1/$DOCKER_NODE_0_ADDRESS/g")
-  echo "FINAL E_ADDRESS: $E_ADDRESS"
+  #echo "FINAL E_ADDRESS: $E_ADDRESS"
   sed -i "s/<ENODE>/enode:\/\/$E_ADDRESS/g" ../compose/docker-compose-node-$i.yml
   sed -i 's/<NODENUM>/'$i'/g' ../compose/docker-compose-node-$i.yml
 done

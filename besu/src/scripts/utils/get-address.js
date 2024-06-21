@@ -4,23 +4,23 @@ const file_path = path.join(__dirname, '../../ignition/deployments/chain-1337/de
 const jsonContent = JSON.parse(fs.readFileSync(file_path, 'utf8'))
 
 function walletAddress() {
-  return jsonContent['WalletModule#Wallet'];
+  return jsonContent['GeneralModule#Wallet'];
 }
 
 function realtyFactoryAddress() {
-    return jsonContent['FactoryModule#RealtyFactory'];
+    return jsonContent['GeneralModule#RealtyFactory'];
 }
 
 function saleFactoryAddress() {
-    return jsonContent['FactoryModule#SaleAgreementFactory'];
+    return jsonContent['GeneralModule#SaleAgreementFactory'];
 }
 
 function mortgageFactoryAddress() {
-    return jsonContent['FactoryModule#MortgageLoanFactory'];
+    return jsonContent['GeneralModule#MortgageLoanFactory'];
 }
 
 function rentalFactoryAddress() {
-    return jsonContent['FactoryModule#RentalAgreementFactory'];
+    return jsonContent['GeneralModule#RentalAgreementFactory'];
 }
 
 function organizationVoterAddress() {

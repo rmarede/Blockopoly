@@ -32,7 +32,7 @@ export default function RealtyPage() {
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
         setUser(signerAddress);
-        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
+        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
         const realtyDetails = await realtyFactoryContract.detailsOf(params.id);
         setRealty(createRealty(realtyDetails));
 

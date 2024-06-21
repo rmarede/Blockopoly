@@ -16,7 +16,7 @@ export default function SaleList({of}: {of: string}) {
     const fetchSales = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const saleFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#SaleAgreementFactory"], SaleFactoryAbi.abi, provider);
+        const saleFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#SaleAgreementFactory"], SaleFactoryAbi.abi, provider);
         const res = await saleFactoryContract.getSalesOf(of);
         const fetchedSales: Sale[] = [];
         for (const r of res) {

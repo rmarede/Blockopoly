@@ -16,7 +16,7 @@ export default function AddRealtyModal({ trigger, close, user} : {trigger:boolea
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
-        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RealtyFactory"], RealtyFactoryAbi.abi, signer);
+        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#RealtyFactory"], RealtyFactoryAbi.abi, signer);
         const realtyDetails = {
             name: data.get("realtyName"),
             ownership: user,

@@ -18,8 +18,8 @@ export default function RentalsPage() {
     const fetchRentals = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
-        const rentalFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#RentalAgreementFactory"], RentalFactoryAbi.abi, provider);
+        const realtyFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#RealtyFactory"], RealtyFactoryAbi.abi, provider);
+        const rentalFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#RentalAgreementFactory"], RentalFactoryAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
         const realties = await realtyFactoryContract.getRealtiesOf(signerAddress);

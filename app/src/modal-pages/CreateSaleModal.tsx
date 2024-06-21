@@ -16,7 +16,7 @@ export default function CreateSaleModal({ trigger, close, user, realty } : {trig
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
-        const saleFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#SaleAgreementFactory"], SaleFactoryAbi.abi, signer);
+        const saleFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#SaleAgreementFactory"], SaleFactoryAbi.abi, signer);
         const textEncoder = new TextEncoder();
         const saleDetails = {
             buyer: data.get("buyer"),

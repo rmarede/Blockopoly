@@ -31,7 +31,7 @@ export default function ConsentModal({ trigger, close, sale } : {trigger:boolean
             let receipt;
             const saleContract = new ethers.Contract(sale.address, SaleAgreementAbi.abi, signer);
             if (user === sale.buyer) {
-                const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, signer);
+                const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, signer);
                 const tx = await walletContract.approve(sale.address, sale.earnest);
                 receipt = await tx.wait();
             } else if (user === sale.seller) {

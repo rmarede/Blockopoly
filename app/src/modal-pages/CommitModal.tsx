@@ -29,7 +29,7 @@ export default function CommitModal({ trigger, close, sale } : {trigger:boolean,
         try {
             const saleContract = new ethers.Contract(sale.address, SaleAgreementAbi.abi, signer);
             if (user === sale.buyer) {
-                const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, signer);
+                const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, signer);
                 const tx = await walletContract.approve(sale.address, sale.price - sale.earnest);
                 let receipt = await tx.wait();
 
