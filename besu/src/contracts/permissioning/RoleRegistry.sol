@@ -22,7 +22,7 @@ contract RoleRegistry is IRoleRegistry, Context {
     mapping(string => mapping(Permission => bool)) rolePermission;
 
     constructor(address _cns) Context(_cns) {
-        roleList.push(); // TODO verificar se isto da mm push e aumenta o tamanho do array
+        roleList.push(); 
     }
 
     function addRole(string memory _roleName, string memory _orgId, uint _privilege, Permission[] memory _perms) public override onlyMain {
@@ -80,8 +80,8 @@ contract RoleRegistry is IRoleRegistry, Context {
         return hasPermission(_roleName, Permission.CAN_MINT_REALTIES);
     }
 
-    function canMintSaleAgreements(string memory _roleName) public view override returns (bool) {
-        return hasPermission(_roleName, Permission.CAN_MINT_SALEAGREEMENTS);
+    function canDefinePolicies(string memory _roleName) public view override returns (bool) {
+        return hasPermission(_roleName, Permission.CAN_DEFINE_POLICIES);
     }
 
     function canMintLoans(string memory _roleName) public view override returns (bool) {

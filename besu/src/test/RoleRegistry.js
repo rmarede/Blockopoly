@@ -50,7 +50,7 @@ describe("RoleRegistry", function () {
             expect(await roleRegistry.canCreateContracts("org1_admin")).to.be.true;
             expect(await roleRegistry.canMintCurrency("org1_admin")).to.be.false;
             expect(await roleRegistry.canMintRealties("org1_admin")).to.be.true;
-            expect(await roleRegistry.canMintSaleAgreements("org1_admin")).to.be.true;
+            expect(await roleRegistry.canDefinePolicies("org1_admin")).to.be.true;
             expect(await roleRegistry.canMintLoans("org1_admin")).to.be.false;
         });
 
