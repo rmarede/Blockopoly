@@ -21,7 +21,10 @@ contract Wallet is IERC20, Context, Multisignable {
 
     function mint(address to, uint amount) public virtual override returns (bool) {
         require(to != address(0) && amount > 0, "Wallet: invalid input");
-        //require(IRoleRegistry(roleRegistryAddress()).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
+        address roleRegistry = roleRegistryAddress();
+        if (roleRegistry != address(0)) {
+            require(IRoleRegistry(roleRegistry).canMintCurrency(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "Wallet: sender does not have permission to mint");
+        }
 
         balances[to] += amount;
         return true;

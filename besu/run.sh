@@ -43,8 +43,8 @@ case $1 in
         . up.sh
         . deploy.sh
         cd ../src/scripts
-        node populate-cns.js
-        node populate-state.js
+        echo 'n' | node populate-cns.js
+        echo 'n' | node populate-state.js
         cd ../..
         ;;
     "prod")
@@ -54,8 +54,8 @@ case $1 in
         . up.sh
         . deploy.sh
         cd ../src/scripts
-        node populate-cns.js
-        node populate-state.js
+        echo 'y' | node populate-cns.js
+        echo 'y' | node populate-state.js
         node boot-permissioning.js
         cd ../..
         ;;

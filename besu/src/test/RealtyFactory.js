@@ -24,21 +24,8 @@ describe("RealtyFactory", function () {
         });
         const realtyFactory = await RealtyFactory.deploy(cns.target);
 
-        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
-        const accountRegistry = await AccountRegistry.deploy(cns.target);
-
-        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
-        const roleRegistry = await RoleRegistry.deploy(cns.target);
-
         await cns.setContractAddress("RealtyFactory", realtyFactory.target);
-        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
-        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
-        await cns.setContractAddress("PermissionEndpoints", acc1.address);
-
-        await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
-
-        return {realtyFactory, accountRegistry, roleRegistry};
+        return {realtyFactory};
     }
 
     describe("Deployment", function () {
@@ -46,13 +33,7 @@ describe("RealtyFactory", function () {
         it("Should deploy RealtyFactory contract", async function () {
             const [acc1] = await ethers.getSigners();
 
-            const {realtyFactory, accountRegistry, roleRegistry} = await loadFixture(deployRealtyFactoryFixture);
-
-            expect(await accountRegistry.orgOf(acc1.address)).to.equal("landregi");
-            expect(await accountRegistry.roleOf(acc1.address)).to.equal("landregi_admin");
-            
-            expect(await roleRegistry.canMintRealties("landregi_admin")).to.be.true;
-
+            const {realtyFactory} = await loadFixture(deployRealtyFactoryFixture);
         });
     });
 
@@ -111,7 +92,6 @@ describe("RealtyFactory", function () {
                 totalArea: 100
             }
 
-            //await expect(realtyFactory.connect(acc2).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3000])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 3001])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [4000, 3000, 2999])).to.be.reverted;
             await expect(realtyFactory.connect(acc1).mint(details, [acc1.address, acc2.address, acc3.address], [5000, 5000, 0])).to.be.reverted;

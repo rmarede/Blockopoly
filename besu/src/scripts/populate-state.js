@@ -30,8 +30,6 @@ const signer4 = wallet4.connect(provider);
 
 const Wallet = new ethers.Contract(getAddress.walletAddress(), getAbi.walletAbi(), provider);
 const RealtyFactory = new ethers.Contract(getAddress.realtyFactoryAddress(), getAbi.realtyFactoryAbi(), provider);
-const PermissionEndpoints = new ethers.Contract(getAddress.permissionEndpointsAddress(), getAbi.permissionEndpointsAbi(), provider);
-const RoleRegistry = new ethers.Contract(getAddress.roleRegistryAddress(), getAbi.roleRegistryAbi(), provider);
 const RentalAgreementFactory = new ethers.Contract(getAddress.rentalFactoryAddress(), getAbi.rentalFactoryAbi(), provider);
 const SaleAgreementFactory = new ethers.Contract(getAddress.saleFactoryAddress(), getAbi.saleFactoryAbi(), provider);
 const MortgageLoanFactory = new ethers.Contract(getAddress.mortgageFactoryAddress(), getAbi.mortgageFactoryAbi(), provider);
@@ -40,31 +38,41 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-(async () => {
-    console.log("Adding organizations...")
-    await PermissionEndpoints.connect(signer1).addOrganization("gov", PUBLIC_KEY_1, [0,1,2,3,4,5,6,7])
-    await sleep(1000);
-    await PermissionEndpoints.connect(signer1).addOrganization("bank", PUBLIC_KEY_2, [0,1,2,3,4,5,6,7])
-    await sleep(1000);
-    await PermissionEndpoints.connect(signer1).addOrganization("users", PUBLIC_KEY_3, [0,1,6])
-    await sleep(2000);
-    
-    console.log("Adding nodes...") 
-    const rl = readline.createInterface({
-        input: fs.createReadStream(path.join(__dirname, '../../cryptogen/enodeIds.txt'))
-    });
-    for await (const enodeId of rl) {
-        if (enodeId) {
-            await PermissionEndpoints.connect(signer1).addNode(enodeId, "", 0, 0)
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.question('Do you want to set the permissioning state? (y/n) ', async (answer) => {
+    if (answer.toLowerCase() === 'y') {
+        const PermissionEndpoints = new ethers.Contract(getAddress.permissionEndpointsAddress(), getAbi.permissionEndpointsAbi(), provider);
+        console.log("Adding organizations...")
+        await PermissionEndpoints.connect(signer1).addOrganization("gov", PUBLIC_KEY_1, [0,1,2,3,4,5,6,7])
+        await sleep(1000);
+        await PermissionEndpoints.connect(signer1).addOrganization("bank", PUBLIC_KEY_2, [0,1,2,3,4,5,6,7])
+        await sleep(1000);
+        await PermissionEndpoints.connect(signer1).addOrganization("users", PUBLIC_KEY_3, [0,1,6])
+        await sleep(2000);
+        
+        console.log("Adding nodes...") 
+        const rlf = readline.createInterface({
+            input: fs.createReadStream(path.join(__dirname, '../../cryptogen/enodeIds.txt'))
+        });
+        for await (const enodeId of rlf) {
+            if (enodeId) {
+                await PermissionEndpoints.connect(signer1).addNode(enodeId, "", 0, 0)
+            }
         }
+        await sleep(1000);
+
+        console.log("Adding users...")
+        await PermissionEndpoints.connect(signer3).addRole("user", 1, [])
+        await sleep(2000);
+        await PermissionEndpoints.connect(signer3).addAccount(PUBLIC_KEY_4, "users_user", false)
     }
-    await sleep(1000);
+});
 
-    console.log("Adding users...")
-    await PermissionEndpoints.connect(signer3).addRole("user", 1, [])
-    await sleep(2000);
-    await PermissionEndpoints.connect(signer3).addAccount(PUBLIC_KEY_4, "users_user", false)
-
+(async () => {
     console.log("Minting funds...")
     await Wallet.connect(signer2).mint(PUBLIC_KEY_1, 100000000)
     await sleep(1000);

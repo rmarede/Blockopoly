@@ -59,7 +59,9 @@ contract ContractNameService is IContractNameService {
     }
 
     function getContractAddress(string calldata _name) public view override returns (address) {
-        require(indexOf[_name] > 0, "ContractNameService: Contract not found in registry.");
+        if (indexOf[_name] == 0) {
+            return address(0);
+        }
         return registry[indexOf[_name]].addr;
     }
 

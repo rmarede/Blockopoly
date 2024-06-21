@@ -15,7 +15,7 @@ contract SaleAgreementFactory is Context {
     constructor(address _cns) Context(_cns) {}
     
     function createSaleAgreement(SaleAgreement.SaleDetails memory _details) public returns (address) {
-        //require(IRoleRegistry(roleRegistryAddress()).canMintSaleAgreements(IAccountRegistry(accountRegistryAddress()).roleOf(msg.sender)), "SaleAgreementFactory: only realtor can create sale agreement contracts");
+        // TODO check msg.sender?
         SaleAgreement agreement = new SaleAgreement(cns_address, _details);
         salesOf[_details.realty].push(address(agreement));
         salesOf[_details.buyer].push(address(agreement));
