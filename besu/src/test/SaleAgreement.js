@@ -31,17 +31,8 @@ describe("SaleAgreement", function () {
         });
         const realtyFactory = await RealtyFactory.deploy(cns.target);
 
-        const AccountRegistry = await ethers.getContractFactory("AccountRegistry");
-        const accountRegistry = await AccountRegistry.deploy(cns.target);
-
-        const RoleRegistry = await ethers.getContractFactory("RoleRegistry");
-        const roleRegistry = await RoleRegistry.deploy(cns.target);
-
         await cns.setContractAddress("Wallet", wallet.target);
         await cns.setContractAddress("RealtyFactory", realtyFactory.target);
-        await cns.setContractAddress("AccountRegistry", accountRegistry.target);
-        await cns.setContractAddress("RoleRegistry", roleRegistry.target);
-        await cns.setContractAddress("PermissionEndpoints", acc1.address);
 
         const realty_details = {
             name: "foo",
@@ -53,8 +44,6 @@ describe("SaleAgreement", function () {
             totalArea: 100
         }
 
-        await expect(roleRegistry.connect(acc1).addRole("admin", "landregi", 0, [0,1,2,3,4,5,6,7])).not.to.be.reverted;
-        await expect(accountRegistry.connect(acc1).addAccount(acc1.address, "landregi", "landregi_admin", true)).not.to.be.reverted; 
         await expect(realtyFactory.connect(acc1).mint(realty_details, [acc2.address], [10000])).not.to.be.reverted;
 
         const ownershipAbi = getAbi.ownershipAbi(); 

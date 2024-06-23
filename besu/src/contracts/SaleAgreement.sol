@@ -7,6 +7,7 @@ import "./interface/IERC20.sol";
 import "./interface/permissioning/IAccountRegistry.sol";
 import "./utils/Strings.sol";
 import "./governance/SelfMultisig.sol";
+import "./compliance/Compliance.sol";
 
 contract SaleAgreement is Context, SelfMultisig {
 
@@ -65,6 +66,13 @@ contract SaleAgreement is Context, SelfMultisig {
 
     function consent() public onlyParties { // TODO mudar nome pre agreement, terms, consent, hold in escrow?
         require(status == Status.PENDING, "SaleAgreement: sale already agreed on");
+
+        address complianceAddress = complianceAddress();
+        if (complianceAddress != address(0)) {
+            Compliance compliance = Compliance(complianceAddress);
+            require(compliance.isCompliant(details.realty, "sale"), "SaleAgreement: realty not compliant for sale");
+        }
+
         if (msg.sender == address(this)) {
             Ownership(details.realty).transferShares(details.seller, address(this), details.share);
             IERC20(walletContractAddress()).transferFrom(details.buyer, address(this), details.earnest);
@@ -136,7 +144,11 @@ contract SaleAgreement is Context, SelfMultisig {
     }
 
     function isPrivileged(address _address) private view returns (bool) {
-        return Strings.equals(IAccountRegistry(accountRegistryAddress()).orgOf(_address), "admin_org");
+        address accRegiAddr = accountRegistryAddress();
+        if (accRegiAddr != address(0)) {
+            return Strings.equals(IAccountRegistry(accRegiAddr).orgOf(_address), "admin_org");
+        }
+        return false;
     }
 
     function _participants(address _buyer, address _seller) private pure returns (address[] memory) {

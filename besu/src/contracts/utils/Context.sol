@@ -51,4 +51,8 @@ contract Context {
         return cns.getContractAddress("OrganizationVoter");
     }
 
+    function complianceAddress() internal view returns (address) {
+        return cns.getContractAddress("Compliance");
+    }
+
 }
