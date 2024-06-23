@@ -13,7 +13,6 @@ contract ADocument is IDocument, Context {
         if (accountRegistry != address(0)) {
             require(keccak256(abi.encodePacked(IAccountRegistry(accountRegistry).orgOf(msg.sender))) == keccak256(abi.encodePacked(issuer_org)), "ADocument: sender does not have permission to issue this kind of document");
         }
-        require(msg.sender == msg.sender, "ADocument: Only the emitter can perform this action");
         _;
     }
 

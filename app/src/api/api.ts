@@ -30,6 +30,21 @@ export function createRealty(realtyDetails: any[]): Realty {
     return realty;
 }
 
+export interface Documentation {
+    name: string,
+    address: string,
+    expirationDate: bigint
+}
+
+export function createDocumentation(docName: string, address: string, expirationDate: bigint): Documentation {
+    const doc: Documentation = {
+        name: docName,
+        address: address,
+        expirationDate: expirationDate
+    }
+    return doc;
+}
+
 export interface Sale {
     address: string;
     status: number;

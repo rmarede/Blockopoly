@@ -11,6 +11,14 @@ function realtyFactoryAddress() {
     return jsonContent['GeneralModule#RealtyFactory'];
 }
 
+function complianceAddress() {
+    return jsonContent['GeneralModule#Compliance'];
+}
+
+function aDocumentAddress() {
+    return jsonContent['GeneralModule#ADocument'];
+}
+
 function saleFactoryAddress() {
     return jsonContent['GeneralModule#SaleAgreementFactory'];
 }
@@ -52,6 +60,6 @@ function nodeRegistryAddress() {
 }
 
 module.exports = { walletAddress, realtyFactoryAddress, saleFactoryAddress, mortgageFactoryAddress, rentalFactoryAddress, organizationVoterAddress, 
-    permissionEndpointsAddress, contractNameServiceAddress, organizationRegistryAddress, accountRegistryAddress, roleRegistryAddress, 
-    nodeRegistryAddress 
+    permissionEndpointsAddress, contractNameServiceAddress, organizationRegistryAddress, accountRegistryAddress, roleRegistryAddress, complianceAddress,
+    nodeRegistryAddress, aDocumentAddress
 };

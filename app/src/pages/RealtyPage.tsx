@@ -57,7 +57,7 @@ export default function RealtyPage() {
             <TransferModal trigger={transferPopup} close={setTransferPopup}  user={user} realty={realty?.ownership ?? ""}/>
             <CreateSaleModal trigger={salePopup} close={setSalePopup} user={user} realty={realty?.ownership ?? ""}/>
             <CreateRentalModal trigger={rentPopup} close={setRentPopup} realty={realty?.ownership ?? ""}/>
-            <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={realty?.ownership ?? ""}/>
+            <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={realty?.ownership ?? ""} recursive={false}/>
             <div className="page realtyPage" style={{ display: "flex"}}>
                 <div className="realtyInfo">
                     <div className="realtyImage" style={{backgroundImage: `url(${realty?.image})`}}></div>

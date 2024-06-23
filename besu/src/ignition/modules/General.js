@@ -25,6 +25,7 @@ module.exports = buildModule("GeneralModule", (m) => {
 
     const wallet = m.contract("Wallet", [cnsAddress], {});
 	const compliance = m.contract("Compliance", [cnsAddress], {});
+    const aDocument = m.contract("ADocument", [cnsAddress], {});
 
-    return { saleFactory, loanFactory, rentalFactory, realtyFactory, wallet, compliance };
+    return { saleFactory, loanFactory, rentalFactory, realtyFactory, wallet, compliance, aDocument };
 });

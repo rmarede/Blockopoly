@@ -33,6 +33,8 @@ const RealtyFactory = new ethers.Contract(getAddress.realtyFactoryAddress(), get
 const RentalAgreementFactory = new ethers.Contract(getAddress.rentalFactoryAddress(), getAbi.rentalFactoryAbi(), provider);
 const SaleAgreementFactory = new ethers.Contract(getAddress.saleFactoryAddress(), getAbi.saleFactoryAbi(), provider);
 const MortgageLoanFactory = new ethers.Contract(getAddress.mortgageFactoryAddress(), getAbi.mortgageFactoryAbi(), provider);
+const Compliance = new ethers.Contract(getAddress.complianceAddress(), getAbi.complianceAbi(), provider);
+const ADocument = new ethers.Contract(getAddress.aDocumentAddress(), getAbi.aDocumentAbi(), provider);
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -121,6 +123,10 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
     await RealtyFactory.connect(signer1).mint(realty3, [PUBLIC_KEY_3, PUBLIC_KEY_4], [4000, 6000])
     await sleep(2000);
 
+    console.log("Issuing Documents...")
+    await Compliance.connect(signer1).addDocumentation("BUILDING", "sale", getAddress.aDocumentAddress())
+    await sleep(1000);
+
     console.log("Issuing Sale Agrements...");
     const realties = await RealtyFactory.connect(signer1).getRealtiesOf(PUBLIC_KEY_3);
 
@@ -142,36 +148,6 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
     //Wallet.connect(signer4).approve('0x19f91B8C15200aC3536510496758367dfe9120a5', 100000);
     //await sleep(1000);
     //Wallet.connect(signer3).approve('0x19f91B8C15200aC3536510496758367dfe9120a5', 100000);
-
-    console.log("Issuing Mortgage Loans...")
-    const details1 = {
-        lender: PUBLIC_KEY_1,
-        borrower: PUBLIC_KEY_3,
-        principal: 200000,
-        downPayment: 5000,
-        interestRate: 100,
-        loanTerm: 3,
-        startDate: timeHelper.toSolidityTime(Date.now()),
-        gracePeriod: 10,
-        latePaymentFee: 1000,
-        defaultDeadline: 3
-    }
-    const details2 = {
-        lender: PUBLIC_KEY_1,
-        borrower: PUBLIC_KEY_4,
-        principal: 200000,
-        downPayment: 5000,
-        interestRate: 100,
-        loanTerm: 3,
-        startDate: timeHelper.toSolidityTime(Date.now()),
-        gracePeriod: 10,
-        latePaymentFee: 1000,
-        defaultDeadline: 3
-    }
-    
-    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
-    await sleep(1000);
-    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
     console.log("Issuing Rental Agreements...")
 
@@ -215,6 +191,36 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
     OwnershipContract = new ethers.Contract(realties[1], getAbi.ownershipAbi(), provider);
     createRentalData = abiEncoder.encodeRentalFactoryData('createRentalAgreement', [PUBLIC_KEY_4, rentalTerms2]);
     await OwnershipContract.connect(signer3).submitTransaction(getAddress.rentalFactoryAddress(), 0, createRentalData);
+
+    console.log("Issuing Mortgage Loans...")
+    const details1 = {
+        lender: PUBLIC_KEY_1,
+        borrower: PUBLIC_KEY_3,
+        principal: 200000,
+        downPayment: 5000,
+        interestRate: 100,
+        loanTerm: 3,
+        startDate: timeHelper.toSolidityTime(Date.now()),
+        gracePeriod: 10,
+        latePaymentFee: 1000,
+        defaultDeadline: 3
+    }
+    const details2 = {
+        lender: PUBLIC_KEY_1,
+        borrower: PUBLIC_KEY_4,
+        principal: 200000,
+        downPayment: 5000,
+        interestRate: 100,
+        loanTerm: 3,
+        startDate: timeHelper.toSolidityTime(Date.now()),
+        gracePeriod: 10,
+        latePaymentFee: 1000,
+        defaultDeadline: 3
+    }
+    
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);
+    await sleep(1000);
+    await MortgageLoanFactory.connect(signer1).createMortgageLoan(details2);
 
     console.log("Done!") 
   

@@ -58,7 +58,7 @@ export default function RentalPage() {
     return (
         <div style={{ display: "flex"}}>
             <Navbar/>
-            <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={rental?.address ?? ""}/>
+            <CheckRequestsModal trigger={requestsPopup} close={setRequestsPopup} address={rental?.address ?? ""} recursive={isOwner}/>
             <RentalEnrollModal trigger={enrollPopup} close={setEnrollPopup} rental={rental}/>
             <PayRentModal trigger={payPopup} close={setPayPopup} rental={rental}/>
             <RenewalModal trigger={renewalPopup} close={setRenewalPopup} rental={rental}/>

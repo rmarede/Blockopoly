@@ -14,6 +14,14 @@ function ownershipAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'Ownership.sol/Ownership.json', 'utf8')).abi;
 }
 
+function complianceAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'compliance/Compliance.sol/Compliance.json', 'utf8')).abi;
+}
+
+function aDocumentAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'compliance/ADocument.sol/ADocument.json', 'utf8')).abi;
+}
+
 function rentalAgreementAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'RentalAgreement.sol/RentalAgreement.json', 'utf8')).abi;
 }
@@ -69,5 +77,5 @@ function nodeRegistryAbi() {
 
 module.exports = { walletAbi, realtyFactoryAbi, ownershipAbi, rentalAgreementAbi, rentalFactoryAbi, saleAgreementAbi,
   weightedMultiSigAbi, organizationVoterAbi, permissionEndpointsAbi, cnsAbi, saleFactoryAbi, mortgageFactoryAbi, 
-  roleRegistryAbi, accountRegistryAbi, organizationRegistryAbi, nodeRegistryAbi
+  roleRegistryAbi, accountRegistryAbi, organizationRegistryAbi, nodeRegistryAbi, complianceAbi, aDocumentAbi
 };

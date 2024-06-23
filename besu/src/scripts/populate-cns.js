@@ -43,6 +43,8 @@ rl.question('Do you want to set the permissioning addresses? (y/n) ', async (ans
     await sleep(1000);
     await cns.setContractAddress("Wallet", getAddress.walletAddress());
     await sleep(1000);
+    await cns.setContractAddress("Compliance", getAddress.complianceAddress());
+    await sleep(1000);
     await cns.setContractAddress("RealtyFactory", getAddress.realtyFactoryAddress());
     await sleep(2000);
     console.log("[INFO] CNS populated with addresses:");

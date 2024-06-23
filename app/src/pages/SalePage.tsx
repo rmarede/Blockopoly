@@ -14,6 +14,7 @@ import InfoCard from "../components/InfoCard";
 import ConsentModal from "../modal-pages/ConsentModal";
 import CommitModal from "../modal-pages/CommitModal";
 import WithdrawModal from "../modal-pages/WithdrawModal";
+import DocumentationGrid from "../components/DocumentationGrid";
 
 export default function SalePage() {
     const params = useParams<{id:string}>();
@@ -81,6 +82,8 @@ export default function SalePage() {
                             <p>Contengency Period: {sale?.contengencyPeriod.toString()} days</p>
                         </InfoCard>
                     </div>
+                    <h2>Due Documentation</h2>
+                    <DocumentationGrid realty={sale?.realty ?? ""}/>
                 </div>
                 {(sale?.buyer === user || sale?.seller === user) && 
                     <div className="actionbar">

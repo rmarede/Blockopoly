@@ -136,6 +136,32 @@
     gap: 1rem;
 }
 
+.documentationGridItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--pink);
+    border-radius: 16px;
+}
+
+.documentationGridItem h3 {
+    margin: 0;
+}
+
+.documentationGridItem p {
+    margin: 4px;
+}
+
+.documentationGridItem .compliant{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--green);
+    border-radius: 16px;
+}
+
 .infoCard {
     display: flex;
     flex-direction: column;

@@ -42,6 +42,15 @@ export function printArgs(target:string, functionName: string, args: any[]): str
             return (
                 "Periods: " + args[0] + "<br/>" 
         );
+        case "returnDeposit":
+            return (
+                "Rental: " + target + "<br/>"  + 
+                "Penalty: " + args[0] + "<br/>" 
+        );
+        case "evict":
+            return (
+                "Rental: " + target + "<br/>"
+        );
 
         default:
             return "TODO: " + functionName;
