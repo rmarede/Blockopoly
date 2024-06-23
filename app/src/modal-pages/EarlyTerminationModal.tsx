@@ -35,7 +35,7 @@ export default function EarlyTerminationModal({ trigger, close, rental } : {trig
                     window.alert('Transaction Failed. See console for details.');
                 } else {
                     window.alert('Transaction successful.');
-                    close(false);
+                    window.location.reload();
                 }
             }
         } catch (error) {

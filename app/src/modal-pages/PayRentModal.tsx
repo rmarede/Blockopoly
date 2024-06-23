@@ -33,7 +33,7 @@ export default function PayRentModal({ trigger, close, rental } : {trigger:boole
                     window.alert('Transaction Failed. See console for details.');
                 } else {
                     window.alert('Transaction successful.');
-                    close(false);
+                    window.location.reload();
                 }
             }
         } catch (error) {

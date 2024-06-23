@@ -134,7 +134,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
     }
 
     function returnDeposit(uint _penalty) public onlyParties complete returns (uint) {
-        require(_penalty < terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
+        require(_penalty <= terms.securityDeposit, "RentalAgreement: penalty must be less than the security deposit");
         if(daysSince(paymentExpiration()) < terms.securityReturnDueDate) {
             require(msg.sender == terms.realtyContract, "RentalAgreement: only landlord can return deposit before due date");
         }

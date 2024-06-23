@@ -44,6 +44,6 @@ export function printArgs(target:string, functionName: string, args: any[]): str
         );
 
         default:
-            return "";
+            return "TODO: " + functionName;
     }
 }

@@ -36,6 +36,7 @@ export default function AddRealtyModal({ trigger, close, user} : {trigger:boolea
                 window.alert('Transaction Failed. See console for details.');
             } else {
                 window.alert('Transaction successful.');
+                window.location.reload();
             }
         } catch (error) {
             console.log('Error with transaction:', error);

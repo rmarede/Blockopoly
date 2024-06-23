@@ -36,7 +36,7 @@ export default function SalePage() {
         const saleDetails = await saleContract.details();
         const saleStatus = Number(await saleContract.status());
         setSale(createSale(saleDetails, params.id ?? "", saleStatus));
-        const walletContract = new ethers.Contract(DeployedAddresses["WalletModule#Wallet"], WalletAbi.abi, provider);
+        const walletContract = new ethers.Contract(DeployedAddresses["GeneralModule#Wallet"], WalletAbi.abi, provider);
         const balance = await walletContract.balanceOf(params.id);
         setEscrowBalance(balance);
         const ownershipContract = new ethers.Contract(saleDetails.realty, OwnershipAbi.abi, provider);
@@ -87,8 +87,8 @@ export default function SalePage() {
                         <h3>Assets Hold In Escrow</h3>
                         <p>Balance hold from buyer: {bigIntToFloatString(escrowBalance)}$</p>
                         <p>Shares hold from seller: {bigIntToFloatString(escrowShares)}%</p>
-                        <button onClick={() => setConsentPopup(true)} disabled={sale.status != 0}>Consent</button>
-                        <button onClick={() => setCommitPopup(true)} disabled={sale.status != 1}>Commit</button>
+                        <button onClick={() => setConsentPopup(true)} disabled={sale.status != 0} className="pinkButton">Consent</button>
+                        <button onClick={() => setCommitPopup(true)} disabled={sale.status != 1} className="pinkButton">Commit</button>
                         <button onClick={() => setWithdrawPopup(true)} disabled={sale.status != 1} className="redButton">Withdraw</button>
                     </div>
                 }

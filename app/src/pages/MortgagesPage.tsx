@@ -7,6 +7,7 @@ import MortgageLoanAbi from "../../../besu/src/artifacts/contracts/MortgageLoan.
 import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337/deployed_addresses.json"
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { bigIntToFloatString } from "../utils/unit-conversion";
 
 export default function MortgagesPage() {
 
@@ -15,7 +16,7 @@ export default function MortgagesPage() {
     const fetchMortgages = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const mortgageFactoryContract = new ethers.Contract(DeployedAddresses["FactoryModule#MortgageLoanFactory"], MortgageFactoryAbi.abi, provider);
+        const mortgageFactoryContract = new ethers.Contract(DeployedAddresses["GeneralModule#MortgageLoanFactory"], MortgageFactoryAbi.abi, provider);
         const signer = await provider.getSigner();
         const signerAddress = await signer.getAddress();
         const res = await mortgageFactoryContract.getMortgagesOf(signerAddress);
@@ -52,8 +53,8 @@ export default function MortgagesPage() {
                         {mortgages.map((item) => (
                             <tr key={item.address}>
                                 <td>{item.address}</td>
-                                <td>{item.principal.toString()}</td>
-                                <td>{item.interestRate.toString()}</td>
+                                <td>{bigIntToFloatString(item.principal)}$</td>
+                                <td>{bigIntToFloatString(item.interestRate)}%</td>
                                 <td>Pending</td>
                                 <td><Link to={`/mortgages/${item.address}`} style={{padding:"10px"}}><KeyboardArrowRightIcon/></Link></td>
                             </tr>

@@ -25,6 +25,7 @@ export default function TransferModal({ trigger, close, user, realty } : {trigge
                 window.alert('Transaction Failed. See console for details.');
             } else {
                 window.alert('Transaction successful.');
+                window.location.reload();
             }
         } catch (error) {
             console.log('Error with transaction:', error);
