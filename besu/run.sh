@@ -52,7 +52,7 @@ case $1 in
         . clean.sh
         . cryptogen.sh
         . up.sh
-        . deploy.sh
+        . deploy.sh --deploy-permissioning
         cd ../src/scripts
         echo 'y' | node populate-cns.js
         echo 'y' | node populate-state.js
