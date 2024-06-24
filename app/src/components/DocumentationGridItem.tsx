@@ -4,10 +4,12 @@ import { ethers } from "ethers";
 import DocumentAbi from "../../../besu/src/artifacts/contracts/interface/compliance/IDocument.sol/IDocument.json";
 import TaskIcon from '@mui/icons-material/Task';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import AddDocumentModal from "../modal-pages/AddDocumentModal";
 
 export const DocumentationGridItem = ({docAddr, realtyAddr}: {docAddr: string, realtyAddr:string}) => {
 
     const [document, setDocument] = useState<Documentation>();
+    const [addDocPopup, setAddDocPopup] = useState<boolean>(false);
 
     const fetchDocumentation = async () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -26,19 +28,20 @@ export const DocumentationGridItem = ({docAddr, realtyAddr}: {docAddr: string, r
 
     return (
         <>
+            <AddDocumentModal trigger={addDocPopup} close={setAddDocPopup} realtyAddr={realtyAddr}/>
             { document?.expirationDate > Math.floor(Date.now() / 1000) ? (
                 <div className="documentationGridItem compliant">
-                    <TaskIcon/>
+                    <TaskIcon fontSize="large"/>
                     <h3>{document?.name}</h3>
                     <p>Status: Compliant</p>
                 </div>
                 ) : (
-                <div className="documentationGridItem">
-                    <NoteAddIcon/>
+                <div className="documentationGridItem" onClick={() => setAddDocPopup(true)}>
+                    <NoteAddIcon fontSize="large"/>
                     <h3>{document?.name}</h3>
                     <p>Status: Missing</p>
                 </div>
-                )}
+            )}
         </>
     );
 };
