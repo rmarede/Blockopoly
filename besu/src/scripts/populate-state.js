@@ -88,11 +88,11 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
     console.log("Minting realties...")
 
     const realty1 = {
-        name: "Yuyan Garden",
+        name: "Yuyuan Garden",
         ownership: PUBLIC_KEY_1,
         kind: "BUILDING",
         district: "Shanghai",
-        location: "Downtown Shanghai, 2000-100 Shanghai",
+        location: "Downtown Shanghai, 2000-100 Shanghai, China",
         image: "https://www.intrepidtravel.com/adventures/wp-content/uploads/2017/08/china_shanghai_yuyuan-garden-city.jpg",
         totalArea: 100
     }
@@ -100,8 +100,8 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
         name: "Quinta do Lago",
         ownership: PUBLIC_KEY_1,
         kind: "HOUSE",
-        district: "Beja",
-        location: "Rua das Macieiras, 4002-200 Beja",
+        district: "Alentejo",
+        location: "Rua das Macieiras, 4002-200 Beja, Portugal",
         image: "https://www.the-yeatman-hotel.com/fotos/marcas/banner_1_3632649415bb49a128f13c.jpg",
         totalArea: 100
     }
@@ -111,8 +111,8 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
         ownership: PUBLIC_KEY_1,
         kind: "APARTMENT",
         district: "Algarve",
-        location: "Rua do Sol Nascente 3E, 1000-100 Quarteira",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg/800px-The_Lauren_condo_Bethesda_MD_2021-12-12_10-11-55_1.jpg",
+        location: "Rua do Sol Nascente 3E, 1000-100 Quarteira, Portugal",
+        image: "https://i0.wp.com/theconstructor.org/wp-content/uploads/2014/10/Residential-building.jpg",
         totalArea: 100
     }
 

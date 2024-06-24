@@ -28,9 +28,9 @@ export default function RealtiesPage() {
             <Navbar/>
             <AddRealtyModal trigger={addPopup} close={setAddPopup} user={userAddress}/>
             <div className="page realtiesPage">
-                <div style={{display:"flex", justifyContent: "space-between"}}> 
+                <div style={{display:"flex", alignItems:"center"}}> 
                     <h1>My Realties</h1>
-                    <button className="action-button" onClick={() => setAddPopup(true)}><AddCircleOutlineRoundedIcon/></button>
+                    <button className="action-button" style={{marginTop:"8px"}} onClick={() => setAddPopup(true)}><AddCircleOutlineRoundedIcon/></button>
                 </div>
                 {userAddress !== "0x0" && <RealtyGrid user={userAddress}/>}
             </div>
