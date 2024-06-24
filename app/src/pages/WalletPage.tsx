@@ -5,6 +5,7 @@ import DeployedAddresses from "../../../besu/src/ignition/deployments/chain-1337
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { numberToFloatString } from "../utils/unit-conversion";
+import MortgageList from "../components/MortgageList";
 
 export default function WalletPage() {
 
@@ -41,19 +42,25 @@ export default function WalletPage() {
         <div style={{ display: "flex"}}>
             <Navbar/>
             <div className="page walletPage">
-                <h1>My Wallet</h1>
                 <div>
-                    <p>User: {userAddress}</p>
-                    <p>Your Balance: {numberToFloatString(balance)}$</p>
+                    <h1>My Wallet</h1>
+                    <div>
+                        <p>User: {userAddress}</p>
+                        <p>Your Balance: {numberToFloatString(balance)}$</p>
+                    </div>
+                    <h2>My Loans</h2>
+                    {userAddress !== "0x0" && <MortgageList of={userAddress}/>}
                 </div>
-                <form onSubmit={mintCurrency}>
-                    <h2>Mint Currency</h2>
-                    <label>Amount:</label>
-                    <input name="amount" type="number" placeholder="100"/>
-                    <label>To:</label>
-                    <input name="destinatary" type="text" placeholder="0x123..456"/>
-                    <button className="yellowButton" type="submit">Mint</button>
-                </form>
+                <div className="walletActions">
+                    <form onSubmit={mintCurrency}>
+                        <h2>Mint Currency</h2>
+                        <label>Amount:</label>
+                        <input name="amount" type="number" placeholder="100"/>
+                        <label>To:</label>
+                        <input name="destinatary" type="text" placeholder="0x123..456"/>
+                        <button className="yellowButton" type="submit">Mint</button>
+                    </form>
+                </div>
             </div>
         </div>
     )

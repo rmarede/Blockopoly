@@ -54,6 +54,24 @@
     height: 200px;
 }
 
+.walletPage {
+    display: flex;
+    gap: 2em
+}
+
+.walletPage h2 {
+    margin-top: 2em;
+    margin-bottom: 0;
+}
+
+.walletActions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-left: 2em;
+    padding-left: 2em;
+    border-left: var(--grey) 2px solid;
+}
 
 .realtiesGrid {
     gap: 1rem;
@@ -68,6 +86,7 @@
     background-position: center;
     border-radius: 16px;
     border: 2px solid #1a1a1a;
+    transition: border-color 0.25s;
 }
 
 .realtyItem .realtyInfo {
@@ -118,6 +137,10 @@
     margin: 1rem 0 0 0;
 }
 
+.mortgagePage h1 {
+    margin: 1rem 0 0 0;
+}
+
 .salePage .saleInfo {
     display: flex;
     flex-direction: column;
@@ -130,7 +153,13 @@
     gap: 1rem
 }
 
-.salePage .txParties {
+.mortgagePage .mortgageInfo { 
+    display: flex;
+    flex-direction: column;
+    gap: 1rem
+}
+
+.txParties {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -177,6 +206,10 @@
 
 .rentalPage .infoCard .title {
     border-bottom: var(--blue) 1px solid;
+}
+
+.mortgagePage .infoCard .title {
+    border-bottom: var(--yellow) 1px solid;
 }
 
 .infoCard :nth-child(n) {
@@ -247,17 +280,21 @@
 .realtiesPage .action-button:hover {color: var(--red)}
 .realtyItem:hover {border: 2px solid var(--red)}
 
-.salesPage tr:hover {border: 1px solid var(--pink)}
+.salesPage tr:hover {outline: 1px solid var(--pink)}
 .salesPage th {border-bottom: 1px solid var(--pink)}
 .salesPage .MuiSvgIcon-root {color: var(--pink)}
 
-.rentalsPage tr:hover {border: 1px solid var(--blue)}
+.rentalsPage tr:hover {outline: 1px solid var(--blue)}
 .rentalsPage th {border-bottom: 1px solid var(--blue)}
 .rentalsPage .MuiSvgIcon-root {color: var(--blue)}
 
-.mortgagesPage tr:hover {border: 1px solid var(--green)}
+.mortgagesPage tr:hover {outline: 1px solid var(--green)}
 .mortgagesPage th {border-bottom: 1px solid var(--green)}
 .mortgagesPage .MuiSvgIcon-root {color: var(--green)}
+
+.walletPage tr:hover {outline: 1px solid var(--yellow)}
+.walletPage th {border-bottom: 1px solid var(--yellow)}
+.walletPage .MuiSvgIcon-root {color: var(--yellow)}
 
 .walletPage form input:hover {border-color: var(--yellow)}
 

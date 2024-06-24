@@ -127,9 +127,11 @@ export interface Loan {
     gracePeriod: bigint;
     latePaymentFee: bigint;
     defaultDeadline: bigint;
+    status: number;
+    paymentCounter: number;
 }
 
-export function createLoan(loanDetails: any[], address: string): Loan {
+export function createLoan(loanDetails: any[], address: string, status:number, paymentCounter:number): Loan {
     const loan: Loan = {
         address: address,
         lender: loanDetails[0],
@@ -141,7 +143,9 @@ export function createLoan(loanDetails: any[], address: string): Loan {
         startDate: loanDetails[6],
         gracePeriod: loanDetails[7],
         latePaymentFee: loanDetails[8],
-        defaultDeadline: loanDetails[9]
+        defaultDeadline: loanDetails[9],
+        status: status,
+        paymentCounter: paymentCounter
     }
     return loan;
 }
