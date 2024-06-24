@@ -34,7 +34,9 @@ case $1 in
         . cryptogen.sh
         . up.sh
         . deploy.sh
-        cd ..
+        cd ../src/scripts
+        echo 'n' | node populate-cns.js
+        cd ../..
         ;;
     "populate")
         cd scripts

@@ -15,7 +15,7 @@
                     "getRealtiesOf": 9000000000000000,
                     "testMethod": 9000000000000000
                 },
-                "address": "0x664D6EbAbbD5cf656eD07A509AFfBC81f9615741",
+                "address": "0xC9Bc439c8723c5c6fdbBE14E5fF3a1224f8A0f7C",
                 "abi": [
                     {
                         "inputs": [
@@ -50,6 +50,62 @@
                         "inputs": [
                             {
                                 "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "detailsOf",
+                        "outputs": [
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "string",
+                                        "name": "name",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address",
+                                        "name": "ownership",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "kind",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "district",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "location",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "image",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "totalArea",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "internalType": "struct RealtyFactory.RealtyDetails",
+                                "name": "",
+                                "type": "tuple"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
                                 "name": "_user",
                                 "type": "address"
                             }
@@ -60,6 +116,25 @@
                                 "internalType": "address[]",
                                 "name": "",
                                 "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "kindOf",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
                             }
                         ],
                         "stateMutability": "view",
@@ -81,23 +156,23 @@
                                     },
                                     {
                                         "internalType": "string",
+                                        "name": "kind",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
                                         "name": "district",
                                         "type": "string"
                                     },
                                     {
-                                        "internalType": "uint256",
-                                        "name": "postalCode",
-                                        "type": "uint256"
-                                    },
-                                    {
                                         "internalType": "string",
-                                        "name": "street",
+                                        "name": "location",
                                         "type": "string"
                                     },
                                     {
-                                        "internalType": "uint256",
-                                        "name": "number",
-                                        "type": "uint256"
+                                        "internalType": "string",
+                                        "name": "image",
+                                        "type": "string"
                                     },
                                     {
                                         "internalType": "uint256",
@@ -153,23 +228,23 @@
                             },
                             {
                                 "internalType": "string",
+                                "name": "kind",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
                                 "name": "district",
                                 "type": "string"
                             },
                             {
-                                "internalType": "uint256",
-                                "name": "postalCode",
-                                "type": "uint256"
-                            },
-                            {
                                 "internalType": "string",
-                                "name": "street",
+                                "name": "location",
                                 "type": "string"
                             },
                             {
-                                "internalType": "uint256",
-                                "name": "number",
-                                "type": "uint256"
+                                "internalType": "string",
+                                "name": "image",
+                                "type": "string"
                             },
                             {
                                 "internalType": "uint256",
@@ -248,7 +323,7 @@
                     "mint": 9000000000000000,
                     "approve": 9000000000000000
                 },
-                "address": "0xfeae27388A65eE984F452f86efFEd42AaBD438FD",
+                "address": "0xe135783649BfA7c9c4c6F8E528C7f56166efC8a6",
                 "abi": [
                     {
                         "inputs": [
@@ -423,6 +498,19 @@
                         "type": "function"
                     },
                     {
+                        "inputs": [],
+                        "name": "getMultisignableName",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
                         "inputs": [
                             {
                                 "internalType": "address",
@@ -532,7 +620,7 @@
                     "createSaleAgreement": 9000000000000000,
                     "getSalesOf": 9000000000000000
                 },
-                "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20",
+                "address": "0xfeae27388A65eE984F452f86efFEd42AaBD438FD",
                 "abi": [
                     {
                         "inputs": [
@@ -694,8 +782,8 @@
             },
             "SaleAgreement": {
                 "gas": {
-                    "submitTransaction": 9000000000000000,
-                    "confirmTransaction": 9000000000000000
+                    "consent": 9000000000000000,
+                    "commit": 9000000000000000
                 },
                 "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20",
                 "abi": [
@@ -864,19 +952,6 @@
                     },
                     {
                         "inputs": [],
-                        "name": "confirmationPolicy",
-                        "outputs": [
-                            {
-                                "internalType": "enum Policy",
-                                "name": "",
-                                "type": "uint8"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [],
                         "name": "consent",
                         "outputs": [],
                         "stateMutability": "nonpayable",
@@ -957,24 +1032,6 @@
                         "inputs": [
                             {
                                 "internalType": "uint256",
-                                "name": "_value",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "bytes",
-                                "name": "_data",
-                                "type": "bytes"
-                            }
-                        ],
-                        "name": "executeTransaction",
-                        "outputs": [],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "uint256",
                                 "name": "_transactionId",
                                 "type": "uint256"
                             }
@@ -1005,12 +1062,104 @@
                     },
                     {
                         "inputs": [],
+                        "name": "getMultisigPolicy",
+                        "outputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "",
+                                "type": "uint8"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getMultisignableName",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
                         "name": "getParticipants",
                         "outputs": [
                             {
                                 "internalType": "address[]",
                                 "name": "",
                                 "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "getTransaction",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "",
+                                "type": "bytes"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getTransactionCount",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_participant",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "hasConfirmed",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
                             }
                         ],
                         "stateMutability": "view",
@@ -1075,6 +1224,50 @@
                     },
                     {
                         "inputs": [],
+                        "name": "policy",
+                        "outputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "",
+                                "type": "uint8"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_value",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "_data",
+                                "type": "bytes"
+                            }
+                        ],
+                        "name": "realtyTransaction",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "_policy",
+                                "type": "uint8"
+                            }
+                        ],
+                        "name": "setMultisigPolicy",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
                         "name": "status",
                         "outputs": [
                             {
@@ -1133,6 +1326,11 @@
                         ],
                         "name": "transactions",
                         "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
                             {
                                 "internalType": "uint256",
                                 "name": "value",
@@ -1314,12 +1512,91 @@
                     },
                     {
                         "inputs": [],
+                        "name": "getMultisignableName",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
                         "name": "getParticipants",
                         "outputs": [
                             {
                                 "internalType": "address[]",
                                 "name": "",
                                 "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "getTransaction",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "",
+                                "type": "bytes"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getTransactionCount",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_participant",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "hasConfirmed",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
                             }
                         ],
                         "stateMutability": "view",

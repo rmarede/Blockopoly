@@ -1,5 +1,4 @@
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
-const functionEncoder = require('../scripts/abi-data-encoder');
 
 const textEncoder = new TextEncoder();
 const emptyAddr = "0x0000000000000000000000000000000000000000"; 
@@ -8,10 +7,10 @@ const acc2 = "0xFcCf97710dfdfBFe80ad627A6c10104A61b3C93C";
 const assetDetails = {
     name: "foo",
     ownership: emptyAddr,
+    kind: "house",
     district: "lisbon",
-    postalCode: 2725455,
-    street: "central route",
-    number: 1,
+    location: "central route",
+    image: "image",
     totalArea: 100
 }
 
@@ -120,16 +119,16 @@ class ReadAssetWorkload extends WorkloadModuleBase {
         },
         {
             contract: 'SaleAgreement',
-            verb: 'submitTransaction',
+            verb: 'consent',
             value: 0,
-            args: [0, functionEncoder.encodeSaleAgreementData('consent', [])],
+            args: [],
             address: saleAddr
         },
         {
             contract: 'SaleAgreement',
-            verb: 'submitTransaction',
+            verb: 'commit',
             value: 0,
-            args: [0, functionEncoder.encodeSaleAgreementData('commit', [])],
+            args: [],
             address: saleAddr
         }];
 
