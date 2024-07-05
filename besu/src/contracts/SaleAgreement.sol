@@ -136,13 +136,6 @@ contract SaleAgreement is Context, SelfMultisig {
         }
     }
 
-    // executa funcoes no contrato Ownership do realty
-    function realtyTransaction(uint _value, bytes memory _data) public onlySeller {
-        require(status == Status.AGREED, "SaleAgreement: realty not held in escrow");
-        (bool success, ) = details.realty.call{value: _value}(_data);
-        require(success, "SaleAgreement: transaction failed");
-    }
-
     function isPrivileged(address _address) private view returns (bool) {
         address accRegiAddr = accountRegistryAddress();
         if (accRegiAddr != address(0)) {

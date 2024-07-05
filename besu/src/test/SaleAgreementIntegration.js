@@ -9,7 +9,7 @@ const abi_encoder = require('../scripts/utils/abi-data-encoder');
 
 const textEncoder = new TextEncoder();
   
-describe("SaleAgreement", function () {
+describe("SaleAgreement + Wallet + Ownership Integration", function () {
 
     async function deployCNSFixture() {
         const contract = await ethers.getContractFactory("ContractNameService");

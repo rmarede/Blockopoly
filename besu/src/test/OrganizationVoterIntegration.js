@@ -3,7 +3,7 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const abi = require('../scripts/utils/abi-data-encoder');
 
-describe("OrganizationVoter", function () {
+describe("OrganizationVoter Integration", function () {
 
     async function deployCNSFixture() {
         const contract = await ethers.getContractFactory("ContractNameService");

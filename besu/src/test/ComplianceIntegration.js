@@ -5,7 +5,7 @@ const getAbi = require('../scripts/utils/get-abi');
 
 const textEncoder = new TextEncoder();
 
-describe("Compliance", function () {
+describe("Compliance + SaleAgreement + Ownership Integration", function () {
 
     async function deployCNSFixture() {
         const CNS = await ethers.getContractFactory("ContractNameService");

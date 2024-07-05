@@ -4,7 +4,7 @@ const { expect } = require("chai");
 const abi = require('../scripts/utils/abi-data-encoder');
 
 
-describe("PaymentSplitter", function () {
+describe("PaymentSplitter + Wallet Integration", function () {
 
     async function deployCNSFixture() {
         const CNS = await ethers.getContractFactory("ContractNameService");
@@ -16,7 +16,7 @@ describe("PaymentSplitter", function () {
         const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
 
         const { cns } = await loadFixture(deployCNSFixture);
-        const Wallet = await ethers.getContractFactory("MockWallet");
+        const Wallet = await ethers.getContractFactory("Wallet");
         const wallet = await Wallet.deploy(cns.target);
         
         const PaymentSplitter = await ethers.getContractFactory("PaymentSplitter");
@@ -43,10 +43,17 @@ describe("PaymentSplitter", function () {
             const { paymentSplitter, wallet } = await loadFixture(deployPaymentSplitterFixture);
             const [acc1, acc2, acc3, acc4] = await ethers.getSigners();
             
+            await expect(wallet.connect(acc1).mint(acc4.address, 1000)).not.to.be.reverted;
+            await expect(wallet.connect(acc4).approve(paymentSplitter.target, 1000)).not.to.be.reverted;
             await expect(paymentSplitter.connect(acc4).pay(1000))
                 .to.emit(wallet, 'Transfer').withArgs(acc4.address, acc1.address, 500)
                 .to.emit(wallet, 'Transfer').withArgs(acc4.address, acc2.address, 250)
                 .to.emit(wallet, 'Transfer').withArgs(acc4.address, acc3.address, 250);
+            expect(await wallet.balanceOf(paymentSplitter.target)).to.equal(0);
+            expect(await wallet.balanceOf(acc1.address)).to.equal(500);
+            expect(await wallet.balanceOf(acc2.address)).to.equal(250);
+            expect(await wallet.balanceOf(acc3.address)).to.equal(250);
+            expect(await wallet.balanceOf(acc4.address)).to.equal(0);
         });
 
 

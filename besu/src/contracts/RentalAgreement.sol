@@ -19,7 +19,6 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
     event RentalTerminated(address indexed tenant, address indexed landlord, address indexed realty);
     event TermRenewed(address indexed tenant, address indexed landlord, address indexed realty);
     event TermReduced(address indexed tenant, address indexed landlord, address indexed realty);
-    event SecurityDepositReturned(address indexed tenant, address indexed landlord, address indexed realty, uint value);
     event RentPayment(address indexed tenant, address indexed landlord, address indexed realty, uint value);
 
 
@@ -106,14 +105,14 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         emit RentPayment(tenant, terms.realtyContract, address(this), terms.rentValue + penaltySum);
         if (++paymentCounter == terms.duration) {
             status = RentStatus.COMPLETE;
-            emit RentalComplete(tenant, terms.realtyContract, address(this));
+            emit RentalComplete(tenant, terms.realtyContract, terms.realtyContract);
         }
     }
 
     function terminate() public onlyParties active {
         if (msg.sender == address(this)) {
             status = RentStatus.COMPLETE;
-            emit RentalComplete(tenant, terms.realtyContract, address(this));
+            emit RentalComplete(tenant, terms.realtyContract, terms.realtyContract);
         } else {
             bytes memory data = abi.encodeWithSignature("terminate()");
             for (uint i = 0; i < transactionCount; i++) {
@@ -130,7 +129,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         require(block.timestamp >= paymentDueDate(), "RentalAgreement: period has not passed since last payment");
         status = RentStatus.TERMINATED;
         super.collect();
-        emit RentalComplete(tenant, terms.realtyContract, address(this));
+        emit RentalComplete(tenant, terms.realtyContract, terms.realtyContract);
     }
 
     function returnDeposit(uint _penalty) public onlyParties complete returns (uint) {
@@ -146,7 +145,6 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         if (_penalty > 0) {
             super.collect();
         }
-        emit SecurityDepositReturned(tenant, terms.realtyContract, address(this), remaining);
         return remaining;
     }
 
@@ -155,7 +153,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         require(terms.duration-paymentCounter-_periods >= terms.earlyTerminationNotice, "RentalAgreement: cannot reduce duration by more than early termination notice period");
 
         terms.duration -= _periods;
-        emit TermReduced(tenant, terms.realtyContract, address(this));
+        emit TermReduced(tenant, terms.realtyContract, terms.realtyContract);
 
         if (msg.sender == tenant) {
             super.pay(terms.earlyTerminationFee);
@@ -168,7 +166,7 @@ contract RentalAgreement is PaymentSplitter, SelfMultisig {
         if (msg.sender == address(this)) {
             terms.duration += _periods;
             status = RentStatus.ACTIVE;
-            emit TermRenewed(tenant, terms.realtyContract, address(this));
+            emit TermRenewed(tenant, terms.realtyContract, terms.realtyContract);
         } else {
             bytes memory data = abi.encodeWithSignature("renewTerm(uint256)", _periods);
             for (uint i = 0; i < transactionCount; i++) {

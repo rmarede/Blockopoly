@@ -8,7 +8,7 @@ const abi = require('../scripts/utils/abi-data-encoder');
 const timeHelper = require('../scripts/utils/time-helper');
 
   
-describe("MortgageLoan", function () {
+describe("MortgageLoan + Wallet + Ownership + SaleAgreement Integration", function () { // TODO dividir isto em varios integration test files
 
     async function deployCNSFixture() {
         const CNS = await ethers.getContractFactory("ContractNameService");
@@ -16,7 +16,34 @@ describe("MortgageLoan", function () {
         return { cns };
     }
 
-    async function deployMortgageLoanFixturePresent() {
+    async function deployMortgageLoanFixture() {
+        const [acc1, acc2] = await ethers.getSigners();
+        const { cns } = await loadFixture(deployCNSFixture);
+        const Wallet = await ethers.getContractFactory("Wallet");
+        const wallet = await Wallet.deploy(cns.target);
+        
+        await cns.setContractAddress("Wallet", wallet.target);
+
+        const terms = {
+            lender: acc1.address,
+            borrower: acc2.address,
+            principal: 500,
+            downPayment: 100,  
+            interestRate: 24, 
+            loanTerm: 3, 
+            startDate: timeHelper.toSolidityTime(Date.now()),
+            gracePeriod: 1000, 
+            latePaymentFee: 5, 
+            defaultDeadline: timeHelper.toSolidityTime(Date.now()) + 100
+        };
+
+        const contract = await ethers.getContractFactory("MortgageLoan");
+        const mortgageLoan = await contract.deploy(cns.target, terms);
+    
+        return { mortgageLoan, wallet };
+    }
+
+    async function deployMortgageLoanFixturePermissioning() {
         const [acc1, acc2] = await ethers.getSigners();
         const { cns } = await loadFixture(deployCNSFixture);
         const Wallet = await ethers.getContractFactory("Wallet");
@@ -56,7 +83,7 @@ describe("MortgageLoan", function () {
 
     describe("Deployment", function () {
         it("Should deploy MortgageLoan", async function () {
-            const { mortgageLoan } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2] = await ethers.getSigners();
 
             const t = await mortgageLoan.details();
@@ -67,7 +94,7 @@ describe("MortgageLoan", function () {
 
     describe("Enroll", function () {
         it("Should initialize MortgageLoan", async function () {
-            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(wallet.mint(acc1.address, 500)).not.to.be.reverted;
@@ -89,7 +116,7 @@ describe("MortgageLoan", function () {
 
     describe("Secure", function () {
         it("Should enroll in initialized MortgageLoan", async function () {
-            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(wallet.mint(acc1.address, 500)).not.to.be.reverted;
@@ -115,7 +142,7 @@ describe("MortgageLoan", function () {
     describe("Amortize", function () {
 
         it("Should amortize active loan", async function () {
-            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(wallet.mint(acc1.address, 1000)).not.to.be.reverted;
@@ -139,7 +166,7 @@ describe("MortgageLoan", function () {
         });
 
         it("Should amortize with leftovers", async function () {
-            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(wallet.mint(acc1.address, 1000)).not.to.be.reverted;
@@ -154,7 +181,7 @@ describe("MortgageLoan", function () {
         });
 
         it("Should not amortize if already paid off", async function () {
-            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixturePresent);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(wallet.mint(acc1.address, 1000)).not.to.be.reverted;
