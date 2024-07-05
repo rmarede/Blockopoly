@@ -60,6 +60,7 @@ contract SelfMultisig is IMultisig, Multisignable {
             (bool success, ) = address(this).call{value: txn.value}(txn.data);
             txn.executed = true;
             require(success, "Multisig: Transaction failed");
+            emit MultisigTransaction(_transactionId, address(this));
         }
     }
 

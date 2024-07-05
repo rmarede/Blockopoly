@@ -99,6 +99,7 @@ contract WeightedMultiSig is IMultisig, Multisignable {
             (bool success, ) = txn.destination.call{value: txn.value}(txn.data);
             txn.executed = true;
             require(success, "WeightedMultiSig: Transaction failed");
+            emit MultisigTransaction(_transactionId, txn.destination);
         }
     }
 

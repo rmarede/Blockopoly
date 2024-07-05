@@ -7,6 +7,8 @@ import "./factory/RealtyFactory.sol";
 // Multisig wallet (pattern) + fractional ownership
 contract Ownership is WeightedMultiSig {
 
+    event OwnershipTransfer(address indexed from, address indexed to, uint amount);
+
     mapping(address => address) private approvals;
     address private REALTY_FACTORY_ADDRESS;
 
@@ -50,10 +52,7 @@ contract Ownership is WeightedMultiSig {
         if (shares[_to] == _amount) {
             RealtyFactory(REALTY_FACTORY_ADDRESS).addOwnership(address(this), _to);
         }
-    }
-
-    function submitTransaction(address _destination, uint _value, bytes memory _data) public override returns (uint transactionId) {
-        return super.submitTransaction(_destination, _value, _data);
+        emit OwnershipTransfer(_from, _to, _amount);
     }
 
     function isConfirmed(uint _transactionId) public view override returns (bool) {

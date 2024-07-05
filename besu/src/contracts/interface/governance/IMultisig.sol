@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface IMultisig {
+    event MultisigTransaction(uint transactionId, address indexed destination);
     function confirmTransaction(uint _transactionId) external;
     function executeTransaction(uint _transactionId) external;
     function getConfirmationCount(uint _transactionId) external view returns (uint count);
