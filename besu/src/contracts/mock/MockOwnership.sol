@@ -8,7 +8,7 @@ contract MockOwnership is MockWeightedMultiSig {
     event OwnershipTransfer(address indexed from, address indexed to, uint amount);
 
     address public mockApprovedOf;
-    bool public mockApprove;
+    bool public mockApprove = true;
 
     address public admin;
 
@@ -43,6 +43,14 @@ contract MockOwnership is MockWeightedMultiSig {
 
     function getMultisignableName() public pure override returns (string memory) {
         return "Ownership";
+    }
+
+    function setMockApprovedOf(address _mockApprovedOf) public {
+        mockApprovedOf = _mockApprovedOf;
+    }
+
+    function setMockApprove(bool _mockApprove) public {
+        mockApprove = _mockApprove;
     }
 
 }

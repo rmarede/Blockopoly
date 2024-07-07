@@ -19,7 +19,6 @@ contract MockWeightedMultiSig is IMultisig, Multisignable {
     uint public transactionCount;
 
     bool public mockSubmitTransaction = true;
-    bool public mockConfirmTransaction = true;
     bool public mockExecuteTransaction = true;
     bool public mockIsConfirmed;
 
@@ -39,17 +38,18 @@ contract MockWeightedMultiSig is IMultisig, Multisignable {
         return mockParticipants;
     }
 
-    function setTransactionCount(uint _count) public {
-        transactionCount = _count;
-    }
-
     function submitTransaction(address _destination, uint _value, bytes memory _data) public virtual returns (uint _transactionId) {
         require(mockSubmitTransaction, "MockWeightedMultiSig: Submit transaction failed");
         _transactionId = transactionCount;
+        if (mockExecuteTransaction) {
+            executeTransaction(_transactionId);
+        }
     }
 
     function confirmTransaction(uint _transactionId) public override {
-        require(mockConfirmTransaction, "MockWeightedMultiSig: Confirm transaction failed");
+        if (mockExecuteTransaction) {
+            executeTransaction(_transactionId);
+        }
     }
 
     function executeTransaction(uint _transactionId) public override {
@@ -95,6 +95,58 @@ contract MockWeightedMultiSig is IMultisig, Multisignable {
 
     function setMultisigPolicy(Policy _policy) public override {
         super.setMultisigPolicy(_policy);
+    }
+
+    function setMockParticipants(address[] memory _participants) public {
+        mockParticipants = _participants;
+    }
+
+    function setMockShare(uint _share) public {
+        mockShare = _share;
+    }
+
+    function setTotalShares(uint _totalShares) public {
+        totalShares = _totalShares;
+    }
+
+    function setMockSubmitTransaction(bool _mockSubmitTransaction) public {
+        mockSubmitTransaction = _mockSubmitTransaction;
+    }
+
+    function setMockExecuteTransaction(bool _mockExecuteTransaction) public {
+        mockExecuteTransaction = _mockExecuteTransaction;
+    }
+
+    function setMockIsConfirmed(bool _mockIsConfirmed) public {
+        mockIsConfirmed = _mockIsConfirmed;
+    }
+
+    function setMockConfirmationCount(uint _mockConfirmationCount) public {
+        mockConfirmationCount = _mockConfirmationCount;
+    }
+
+    function setMockTransaction(Transaction memory _mockTransaction) public {
+        mockTransaction = _mockTransaction;
+    }
+
+    function setMockHasConfirmed(bool _mockHasConfirmed) public {
+        mockHasConfirmed = _mockHasConfirmed;
+    }
+
+    function setMockTransferShares(bool _mockTransferShares) public {
+        mockTransferShares = _mockTransferShares;
+    }
+
+    function setMockAddShares(bool _mockAddShares) public {
+        mockAddShares = _mockAddShares;
+    }
+
+    function setMockRemoveShares(bool _mockRemoveShares) public {
+        mockRemoveShares = _mockRemoveShares;
+    }
+
+    function setTransactionCount(uint _count) public {
+        transactionCount = _count;
     }
 
 }
