@@ -2,10 +2,7 @@ const {
     time,
     loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
-const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
-const getAbi = require('../scripts/utils/get-abi');
-const abi_encoder = require('../scripts/utils/abi-data-encoder');
 
 const textEncoder = new TextEncoder();
   
@@ -22,15 +19,12 @@ describe("SaleAgreement", function () {
         const { cns } = await loadFixture(deployCNSFixture);
         const Wallet = await ethers.getContractFactory("MockWallet");
         const wallet = await Wallet.deploy(cns.target);
-        const RealtyFactory = await ethers.getContractFactory("MockRealtyFactory");
-        const realtyFactory = await RealtyFactory.deploy(cns.target);
         const Ownership = await ethers.getContractFactory("MockOwnership");
         const ownership = await Ownership.deploy([],[]);
 
         ownership.setMockShare(3000);
 
         await cns.setContractAddress("Wallet", wallet.target);
-        await cns.setContractAddress("RealtyFactory", realtyFactory.target);
 
         const details = {
             buyer: acc3.address,
@@ -47,7 +41,7 @@ describe("SaleAgreement", function () {
 
         const contract = await ethers.getContractFactory("SaleAgreement");
         const saleAgreement = await contract.deploy(cns.target, details);
-        return {saleAgreement, wallet, ownership, realtyFactory};
+        return {saleAgreement, wallet, ownership};
     }
 
     describe("Deployment", function () {
@@ -67,7 +61,7 @@ describe("SaleAgreement", function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
-            wallet.setTransferFrom(false);
+            await wallet.setTransferFrom(false);
 
             await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
             await expect(saleAgreement.connect(acc3).consent()).to.be.reverted;
@@ -77,7 +71,7 @@ describe("SaleAgreement", function () {
             const {saleAgreement, wallet, ownership} = await loadFixture(deploySaleAgreementFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
-            ownership.setMockTransferShares(false);
+            await ownership.setMockTransferShares(false);
 
             await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
             await expect(saleAgreement.connect(acc3).consent()).to.be.reverted;
@@ -120,7 +114,7 @@ describe("SaleAgreement", function () {
 
             await expect(saleAgreement.connect(acc2).consent()).not.to.be.reverted;
             await expect(saleAgreement.connect(acc3).consent()).not.to.be.reverted;
-            wallet.setTransferFrom(false);
+            await wallet.setTransferFrom(false);
             await expect(saleAgreement.connect(acc3).commit()).not.to.be.reverted;
             await expect(saleAgreement.connect(acc2).commit()).to.be.reverted;
         });

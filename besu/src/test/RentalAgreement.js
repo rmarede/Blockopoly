@@ -25,7 +25,7 @@ describe("RentalAgreement", function () {
 
         const terms = {
             realtyContract: acc1.address,
-            startDate: timeHelper.ethNow(),
+            startDate: await time.latest(),
             duration: 3, 
             rentValue: 200,
             securityDeposit: 100,
@@ -155,9 +155,9 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + 2 * timeHelper.ethMonth());
+            await time.increase(2 * timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.be.reverted;
           });
 
@@ -167,7 +167,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent())
                 .to.emit(rentalAgreement, 'RentalComplete').withArgs(acc2.address, acc1.address, acc1.address)
                 .to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
@@ -179,7 +179,7 @@ describe("RentalAgreement", function () {
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth() + 2*timeHelper.ethDay());
+            await time.increase(timeHelper.ethMonth() + 2*timeHelper.ethDay());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 210);
           });
     });
@@ -192,7 +192,7 @@ describe("RentalAgreement", function () {
             await expect(rentalAgreement.connect(acc1).returnDeposit(0)).to.be.reverted;
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc1).returnDeposit(0)).to.be.reverted;
         });
 
@@ -202,7 +202,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
             await expect(rentalAgreement.connect(acc1).returnDeposit(0)).not.to.be.reverted;
         });
@@ -213,7 +213,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
 
             await expect(wallet.setBalanceOf(10)).not.to.be.reverted;
@@ -229,7 +229,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
 
             await expect(rentalAgreement.connect(acc2).returnDeposit(0)).to.be.reverted;
@@ -241,9 +241,9 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + 3*timeHelper.ethMonth() + 15*timeHelper.ethDay());
+            await time.increase(3*timeHelper.ethMonth() + 15*timeHelper.ethDay());
             await expect(rentalAgreement.connect(acc2).returnDeposit(0)).not.to.be.reverted;
         });
     });
@@ -255,7 +255,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
 
             await expect(rentalAgreement.connect(acc1).renewTerm(3)).not.to.be.reverted;
@@ -273,7 +273,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
             await expect(rentalAgreement.connect(acc1).returnDeposit(0)).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc1).renewTerm(3)).to.be.reverted;
@@ -326,7 +326,7 @@ describe("RentalAgreement", function () {
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
-            await time.increaseTo(timeHelper.ethNow() + timeHelper.ethMonth());
+            await time.increase(timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc2).payRent()).to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, 200);
 
             await expect(rentalAgreement.connect(acc1).terminate()).to.be.reverted;
@@ -343,7 +343,7 @@ describe("RentalAgreement", function () {
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(rentalAgreement.connect(acc2).enroll()).not.to.be.reverted;
-            await time.increaseTo(timeHelper.ethNow() + 6*timeHelper.ethMonth());
+            await time.increase(6*timeHelper.ethMonth());
             await expect(rentalAgreement.connect(acc1).evict())
                 .to.emit(rentalAgreement, 'RentalComplete').withArgs(acc2.address, acc1.address, acc1.address);
             expect(await rentalAgreement.status()).to.equal(3);

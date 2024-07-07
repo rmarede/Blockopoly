@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "./utils/Context.sol";
 import "./governance/WeightedMultiSig.sol";
-import "./Ownership.sol";
 import "./interface/IERC20.sol"; 
 
 // TODO opcionais: fiador
@@ -12,27 +11,27 @@ contract MortgageLoan is WeightedMultiSig, Context {
 
     event LoanEnrolled(address indexed lender, address indexed borrower);
     event LoanSecured(address indexed lender, address indexed borrower);
-    event LoanAmortized(address indexed borrower, address indexed lender);
-    event LoanTerminated(address indexed borrower, address indexed lender);
-    event LoanForeclosured(address indexed borrower, address indexed lender);
+    event LoanAmortized(address indexed lender, address indexed borrower);
+    event LoanTerminated(address indexed lender, address indexed borrower);
+    event LoanForeclosed(address indexed lender, address indexed borrower);
 
     modifier tbd() {
-        require(state == State.TBD, "MortgageLoan: Loan process already initialized");
+        require(status == Status.TBD, "MortgageLoan: Loan process already initialized");
         _;
     }
 
     modifier pending() {
-        require(state == State.PENDING, "MortgageLoan: Loan not pending");
+        require(status == Status.PENDING, "MortgageLoan: Loan not pending");
         _;
     }
 
     modifier active() {
-        require(state == State.ACTIVE && paymentCounter < details.loanTerm, "MortgageLoan: Loan not active or already paid off");
+        require(status == Status.ACTIVE && paymentCounter < details.loanTerm, "MortgageLoan: Loan not active or already paid off");
         _;
     }
 
     modifier completed() {
-        require(state == State.ACTIVE && paymentCounter == details.loanTerm, "MortgageLoan: Loan not completed");
+        require(status == Status.ACTIVE && paymentCounter == details.loanTerm, "MortgageLoan: Loan not completed");
         _;
     }
 
@@ -51,40 +50,41 @@ contract MortgageLoan is WeightedMultiSig, Context {
         address borrower;
         uint principal;
         uint downPayment;
-        uint interestRate; // monthly, (100 for 1%) - 2 decimals
+        uint interestRate; // monthly, 2 decimals -> 1 = 1% (0.01)
         uint loanTerm;  // number of payments
         uint startDate;
-        uint gracePeriod; 
+        uint gracePeriod; // in days
         uint latePaymentFee;
-        uint defaultDeadline;
+        uint defaultDeadline; // in days
     }
 
-    enum State { TBD, PENDING, ACTIVE, TERMINATED, FORECLOSURED }
+    enum Status { TBD, PENDING, ACTIVE, TERMINATED, FORECLOSURED }
     uint public constant PERIOD = 30 days;
     
     uint public paymentCounter;
     LoanDetails public details;
-    State public state;
+    Status public status;
 
     constructor(address _cns, LoanDetails memory _details) 
-        WeightedMultiSig(_participant(_details.borrower), _shares(_details.downPayment), Policy.UNANIMOUS) 
+        WeightedMultiSig(_participant(_details.borrower), _shares(1), Policy.UNANIMOUS) 
         Context(_cns)
     {
+        require(_details.defaultDeadline > _details.gracePeriod, "MortgageLoan: Default deadline must be greater than grace period");
         details = _details;
         paymentCounter = 0;
-        state = State.TBD; 
+        status = Status.TBD; 
     }
 
     function enroll() public onlyBorrower tbd {
         IERC20(walletContractAddress()).transferFrom(details.borrower, address(this), details.downPayment);
-        state = State.PENDING;
+        status = Status.PENDING;
         emit LoanEnrolled(details.lender, details.borrower);
     }
 
     function secure() public onlyLender pending {
         IERC20(walletContractAddress()).transferFrom(details.lender, address(this), details.principal);
-        super.addShares(details.lender, details.principal);
-        state = State.ACTIVE;
+        super.addShares(details.lender, details.loanTerm);
+        status = Status.ACTIVE;
         emit LoanSecured(details.lender, details.borrower);
     }
 
@@ -92,15 +92,11 @@ contract MortgageLoan is WeightedMultiSig, Context {
         uint numerator = details.principal * details.interestRate * (100 + details.interestRate) ** details.loanTerm;
         uint denominator = ((100 + details.interestRate) ** details.loanTerm) - (100**details.loanTerm);
         uint res = (numerator / denominator);
-        return res / (10000);
+        return res / (100);
 
-        /*
-        uint numerator = details.interestRate * (1 + details.interestRate) ** details.loanTerm;
-        uint denominator = (1 + details.interestRate) ** details.loanTerm - 1;
-
-        return details.principal * (numerator / denominator);
-        */
-
+        /*uint numerator = details.principal * details.interestRate * (100 + details.interestRate) ** details.loanTerm;
+        uint denominator = (100 * (100+details.interestRate)**details.loanTerm) - 10**8;
+        return numerator / denominator;*/
     }
 
     function amortize() public onlyBorrower active {
@@ -116,28 +112,27 @@ contract MortgageLoan is WeightedMultiSig, Context {
         }
         paymentCounter++;
         _balanceEquity();
-        emit LoanAmortized(details.borrower, details.lender);
+        emit LoanAmortized(details.lender, details.borrower);
+        if (paymentCounter == details.loanTerm) {
+            status = Status.TERMINATED;
+            emit LoanTerminated(details.lender, details.borrower);
+        }
     }
 
-    function terminate(address _asset, uint _share) public completed {
-        Ownership(_asset).transferShares(address(this), details.borrower, _share);
-        state = State.TERMINATED;
-        emit LoanTerminated(details.borrower, details.lender);
+    function applyPenalty() public onlyLender active {
+        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + (details.gracePeriod * 1 days), "MortgageLoan: Grace period not surpassed");
+        details.interestRate++;
     }
 
-    function applyPenalty() public onlyLender active { // preciso ter cuidado para nao estragar a equity, aumentar o interest?
-        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + details.gracePeriod, "MortgageLoan: Grace period not reached");
-    }
-
-    function foreclosure(address _asset, uint _share) public onlyLender active {
-        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + details.defaultDeadline, "MortgageLoan: Default deadline not reached");
-        Ownership(_asset).transferShares(address(this), details.lender, _share);
-        state = State.FORECLOSURED;
-        emit LoanForeclosured(details.borrower, details.lender);
+    function foreclosure() public onlyLender active {
+        require(block.timestamp > details.startDate + (paymentCounter*PERIOD) + (details.defaultDeadline * 1 days), "MortgageLoan: Default deadline not yet reached");
+        super.transferShares(details.borrower, details.lender, super.shareOf(details.borrower));
+        status = Status.FORECLOSURED;
+        emit LoanForeclosed(details.lender, details.borrower);
     }
 
     function _balanceEquity() private {
-        super.transferShares(details.lender, msg.sender, details.principal / details.loanTerm);
+        super.transferShares(details.lender, msg.sender, 1);
     } 
 
     function transferShares(address _from, address _to, uint _amount) public pure override {
