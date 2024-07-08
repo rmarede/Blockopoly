@@ -50,6 +50,10 @@ function weightedMultiSigAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/WeightedMultiSig.sol/WeightedMultiSig.json', 'utf8')).abi;
 }
 
+function multisignableAbi() {
+  return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/Multisignable.sol/Multisignable.json', 'utf8')).abi;
+}
+
 function organizationVoterAbi() {
   return JSON.parse(fs.readFileSync(CONTRACTS_PATH + 'governance/OrganizationVoter.sol/OrganizationVoter.json', 'utf8')).abi;
 }
@@ -77,5 +81,5 @@ function nodeRegistryAbi() {
 
 module.exports = { walletAbi, realtyFactoryAbi, ownershipAbi, rentalAgreementAbi, rentalFactoryAbi, saleAgreementAbi,
   weightedMultiSigAbi, organizationVoterAbi, permissionEndpointsAbi, cnsAbi, saleFactoryAbi, mortgageFactoryAbi, 
-  roleRegistryAbi, accountRegistryAbi, organizationRegistryAbi, nodeRegistryAbi, complianceAbi, aDocumentAbi
+  roleRegistryAbi, accountRegistryAbi, organizationRegistryAbi, nodeRegistryAbi, complianceAbi, aDocumentAbi, multisignableAbi
 };

@@ -25,6 +25,12 @@ function encodeWeightedMultiSigData(functionToCall, params) {
   return data;
 }
 
+function encodeMultisignableData(functionToCall, params) {
+  let itf = new ethers.Interface(getAbi.multisignableAbi());
+  let data = itf.encodeFunctionData(functionToCall, params);
+  return data;
+}
+
 function encodeOrganizationVoterData(functionToCall, params) {
   let itf = new ethers.Interface(getAbi.organizationVoterAbi());
   let data = itf.encodeFunctionData(functionToCall, params);
@@ -51,5 +57,5 @@ function encodeRentalFactoryData(functionToCall, params) {
 
 
 module.exports = { encodeRentalAgreementData, encodeOwnershipData, encodeWeightedMultiSigData, encodeOrganizationVoterData, encodeWalletData, encodePermissionEndpointsData,
-  encodeRentalFactoryData, encodeSaleAgreementData
+  encodeRentalFactoryData, encodeSaleAgreementData, encodeMultisignableData
 };

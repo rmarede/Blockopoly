@@ -57,17 +57,18 @@ describe("WeightedMultiSig", function () {
                 weightedMultiSig.target, 
                 0, 
                 abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]))
-            ).not.to.be.reverted;
+            ).to.emit(weightedMultiSig, 'MultisigSubmission').withArgs(0, weightedMultiSig.target);
         
             expect(await weightedMultiSig.transactionCount()).to.equal(1);
             let result = await weightedMultiSig.transactions(0);
             expect(result[0]).to.equal(weightedMultiSig.target);
+            expect(result[1]).to.equal(0);
             expect(result[2]).to.equal(abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]));
             expect(result[3]).to.equal(false);
         }); 
     });
     
-      describe("Confirm", function () {
+    describe("Confirm", function () {
     
         it("Should not confirm if does not participate", async function () {
             const { weightedMultiSig, account1, account2, account3, account4} = await loadFixture(deployWeightedMultiSigFixture);
@@ -93,13 +94,59 @@ describe("WeightedMultiSig", function () {
                 abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]))
             ).not.to.be.reverted;
         
-            await expect(weightedMultiSig.connect(account2).confirmTransaction(0)).not.to.be.reverted;
+            await expect(weightedMultiSig.connect(account2).confirmTransaction(0))
+                .to.emit(weightedMultiSig, 'MultisigTransaction').withArgs(0, weightedMultiSig.target);
             let result = await weightedMultiSig.transactions(0);
             expect(result[3]).to.equal(true);
         
             expect(await weightedMultiSig.policy()).to.equal(1);
         }); 
-      });
+
+        it("Should not execute if not enough confirmations", async function () {
+            const { weightedMultiSig, account1, account2, account3, account4} = await loadFixture(deployWeightedMultiSigFixture);
+            
+            expect(await weightedMultiSig.policy()).to.equal(0);
+
+            await expect(weightedMultiSig.connect(account1).submitTransaction(
+                weightedMultiSig.target, 
+                0, 
+                abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]))
+            ).not.to.emit(weightedMultiSig, 'MultisigTransaction');
+            expect(await weightedMultiSig.policy()).to.equal(0);
+        }); 
+
+        it("Should not confirm twice", async function () {
+            const { weightedMultiSig, account1, account2, account3, account4} = await loadFixture(deployWeightedMultiSigFixture);
+            
+            expect(await weightedMultiSig.policy()).to.equal(0);
+
+            await expect(weightedMultiSig.connect(account1).submitTransaction(
+                weightedMultiSig.target, 
+                0, 
+                abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]))
+            ).not.to.emit(weightedMultiSig, 'MultisigTransaction');
+        
+            await expect(weightedMultiSig.connect(account1).confirmTransaction(0)).to.be.reverted;
+        }); 
+
+        it("Should not confirm if already executed", async function () {
+            const { weightedMultiSig, account1, account2, account3, account4} = await loadFixture(deployWeightedMultiSigFixture);
+            
+            expect(await weightedMultiSig.policy()).to.equal(0);
+
+            await expect(weightedMultiSig.connect(account1).submitTransaction(
+                weightedMultiSig.target, 
+                0, 
+                abi.encodeWeightedMultiSigData('setMultisigPolicy', [1]))
+            ).not.to.be.reverted;
+        
+            await expect(weightedMultiSig.connect(account2).confirmTransaction(0))
+                .to.emit(weightedMultiSig, 'MultisigTransaction').withArgs(0, weightedMultiSig.target);
+
+            await expect(weightedMultiSig.connect(account2).confirmTransaction(0)).to.be.reverted;
+                
+        });
+    });
 
 
 });

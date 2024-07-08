@@ -20,11 +20,6 @@ contract WeightedMultiSig is IMultisig, Multisignable {
         _;
     }
 
-    modifier confirmed(uint transactionId, address owner) {
-        require(confirmations[transactionId][owner], "WeightedMultiSig: Transaction not confirmed");
-        _;
-    }
-
     modifier notConfirmed(uint transactionId, address owner) {
         require(!confirmations[transactionId][owner], "WeightedMultiSig: Transaction already confirmed");
         _;
@@ -77,6 +72,7 @@ contract WeightedMultiSig is IMultisig, Multisignable {
             executed: false
         });
         transactionCount += 1;
+        emit MultisigSubmission(_transactionId, _destination);
         confirmTransaction(_transactionId);
     }
 
@@ -91,7 +87,6 @@ contract WeightedMultiSig is IMultisig, Multisignable {
 
     function executeTransaction(uint _transactionId) public override
         isOwner(msg.sender)
-        confirmed(_transactionId, msg.sender)
         notExecuted(_transactionId)
     {
         if (isConfirmed(_transactionId)) {

@@ -11,8 +11,18 @@ contract SelfMultisig is IMultisig, Multisignable {
         _;
     }
 
+    modifier notConfirmed(uint transactionId, address owner) {
+        require(!confirmations[transactionId][owner], "Multisig: Transaction already confirmed");
+        _;
+    }
+
     modifier notExecuted(uint transactionId) {
         require(!transactions[transactionId].executed, "Multisig: Transaction already executed");
+        _;
+    }
+
+    modifier isParticipant() {
+        require(participantExists(msg.sender), "Multisig: Permission denied");
         _;
     }
 
@@ -35,7 +45,7 @@ contract SelfMultisig is IMultisig, Multisignable {
         }
     }
 
-    function submitTransaction(uint _value, bytes memory _data) public virtual returns (uint transactionId) {
+    function submitTransaction(uint _value, bytes memory _data) public virtual isParticipant returns (uint transactionId) {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
             id: transactionId,
@@ -44,10 +54,15 @@ contract SelfMultisig is IMultisig, Multisignable {
             executed: false
         });
         transactionCount += 1;
+        emit MultisigSubmission(transactionId, address(this));
         confirmTransaction(transactionId);
     }
 
-    function confirmTransaction(uint _transactionId) public override transactionExists(_transactionId) {
+    function confirmTransaction(uint _transactionId) public override 
+        isParticipant 
+        transactionExists(_transactionId) 
+        notConfirmed(_transactionId, msg.sender) 
+    {
         confirmations[_transactionId][msg.sender] = true;
         executeTransaction(_transactionId);
     }   

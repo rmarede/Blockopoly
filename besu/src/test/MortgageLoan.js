@@ -280,8 +280,6 @@ describe("MortgageLoan", function () {
 
             const amortization = await mortgageLoan.amortization();
 
-            console.log("AMORTIZATION", amortization);
-
             await expect(mortgageLoan.connect(acc2).amortize())
                 .to.emit(wallet, 'Transfer').withArgs(mortgageLoan.target, acc1.address, 1)
                 .to.emit(wallet, 'Transfer').withArgs(acc2.address, acc1.address, amortization - 1n)

@@ -16,7 +16,7 @@ contract Multisignable is IMultisignable {
     }
 
     function setMultisigPolicy(Policy _policy) public virtual {
-        //  TODO: only self
+        require(msg.sender == address(this), "Multisignable: Permission denied");
         policy = _policy;
     }
 
