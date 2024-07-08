@@ -21,10 +21,6 @@ describe("MortgageLoan", function () {
         const { cns } = await loadFixture(deployCNSFixture);
         const Wallet = await ethers.getContractFactory("MockWallet");
         const wallet = await Wallet.deploy(cns.target);
-        const Ownership = await ethers.getContractFactory("MockOwnership");
-        const ownership = await Ownership.deploy([],[]);
-
-        ownership.setMockShare(10000);
         
         await cns.setContractAddress("Wallet", wallet.target);
 
@@ -44,7 +40,7 @@ describe("MortgageLoan", function () {
         const contract = await ethers.getContractFactory("MortgageLoan");
         const mortgageLoan = await contract.deploy(cns.target, terms);
     
-        return { mortgageLoan, wallet, ownership };
+        return { mortgageLoan, wallet };
     }
 
     async function deployMortgageLoanFixturePermissioning() {
@@ -176,7 +172,7 @@ describe("MortgageLoan", function () {
 
     describe("Submit Transaction", function () {
         it("Should submit and execute transaction immediately on pending loan", async function () {
-            const { mortgageLoan, wallet, ownership } = await loadFixture(deployMortgageLoanFixture);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
@@ -189,7 +185,7 @@ describe("MortgageLoan", function () {
         });
 
         it("Should submit but require confirm on active loan", async function () {
-            const { mortgageLoan, wallet, ownership } = await loadFixture(deployMortgageLoanFixture);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2] = await ethers.getSigners();
 
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
@@ -206,7 +202,7 @@ describe("MortgageLoan", function () {
         });
 
         it("Should not submit if not borrower on pending loan", async function () {
-            const { mortgageLoan, wallet, ownership } = await loadFixture(deployMortgageLoanFixture);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
@@ -226,7 +222,7 @@ describe("MortgageLoan", function () {
         });
 
         it("Should not submit if not borrower or lender on active loan", async function () {
-            const { mortgageLoan, wallet, ownership } = await loadFixture(deployMortgageLoanFixture);
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 
             await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
