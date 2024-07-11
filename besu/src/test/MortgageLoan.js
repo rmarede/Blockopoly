@@ -201,6 +201,25 @@ describe("MortgageLoan", function () {
                 .to.emit(wallet, 'Transfer').withArgs(mortgageLoan.target, acc2.address, 100);
         });
 
+        it("Should submit and execute transaction immediately on completed loan", async function () {
+            const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
+            const [acc1, acc2] = await ethers.getSigners();
+
+            await expect(mortgageLoan.connect(acc2).enroll()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc1).secure()).not.to.be.reverted;
+
+            await expect(mortgageLoan.connect(acc2).amortize()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc2).amortize()).not.to.be.reverted;
+            await expect(mortgageLoan.connect(acc2).amortize())
+                .to.emit(mortgageLoan, 'LoanTerminated').withArgs(acc1.address, acc2.address);
+
+            await expect(mortgageLoan.connect(acc2).submitTransaction(
+                wallet.target, 
+                0, 
+                abi.encodeWalletData('transfer', [acc2.address, 1]))
+            ).to.emit(wallet, 'Transfer').withArgs(mortgageLoan.target, acc2.address, 1);
+        });
+
         it("Should not submit if not borrower on pending loan", async function () {
             const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
