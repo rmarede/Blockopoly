@@ -18,7 +18,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class ReadAssetWorkload extends WorkloadModuleBase {
+class SaleWorkload extends WorkloadModuleBase {
 
     constructor() {
         super();
@@ -138,7 +138,7 @@ class ReadAssetWorkload extends WorkloadModuleBase {
 }
 
 function createWorkloadModule() {
-    return new ReadAssetWorkload();
+    return new SaleWorkload();
 }
 
 module.exports.createWorkloadModule = createWorkloadModule;

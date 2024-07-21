@@ -15,14 +15,19 @@ network_config.ethereum.contracts.Wallet.abi = getAbi.walletAbi();
 network_config.ethereum.contracts.SaleAgreementFactory.address = getAddress.saleFactoryAddress();
 network_config.ethereum.contracts.SaleAgreementFactory.abi = getAbi.saleFactoryAbi();
 
+network_config.ethereum.contracts.RentalAgreementFactory.address = getAddress.rentalFactoryAddress();
+network_config.ethereum.contracts.RentalAgreementFactory.abi = getAbi.realtyFactoryAbi();
+
 network_config.ethereum.contracts.Ownership.abi = getAbi.ownershipAbi();
 
 network_config.ethereum.contracts.SaleAgreement.abi = getAbi.saleAgreementAbi();
+network_config.ethereum.contracts.RentalAgreement.abi = getAbi.rentalAgreementAbi();
 
 fs.writeFileSync(NETWORK_CONFIG_PATH, JSON.stringify(network_config, null, 4));
 
 const ABIS_PATH = path.join(__dirname, '../deployment/abis.json');
 let abis = JSON.parse(fs.readFileSync(ABIS_PATH, 'utf8'));
 abis['saleAgreementAbi'] = getAbi.saleAgreementAbi();
+abis['rentalAgreementAbi'] = getAbi.rentalAgreementAbi();
 abis['OwnershipAbi'] = getAbi.ownershipAbi();
 fs.writeFileSync(ABIS_PATH, JSON.stringify(abis, null, 2));

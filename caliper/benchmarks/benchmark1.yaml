@@ -9,7 +9,7 @@ test:
         opts:
           tps: 30
       workload:
-        module: ./workload/saleAgreementFlow.js
+        module: ./workload/SaleWorkload.js
         arguments:
             assets: 30
 monitors:

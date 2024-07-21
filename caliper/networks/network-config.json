@@ -780,6 +780,314 @@
                     }
                 ]
             },
+            "RentalAgreementFactory": {
+                "gas": {
+                    "createRentalAgreement": 9000000000000000,
+                    "getRentalsOf": 9000000000000000
+                },
+                "address": "0x05d91B9031A655d08E654177336d08543ac4B711",
+                "abi": [
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_cns",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_user",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "addOwnership",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "detailsOf",
+                        "outputs": [
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "string",
+                                        "name": "name",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address",
+                                        "name": "ownership",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "kind",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "district",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "location",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "image",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "totalArea",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "internalType": "struct RealtyFactory.RealtyDetails",
+                                "name": "",
+                                "type": "tuple"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_user",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "getRealtiesOf",
+                        "outputs": [
+                            {
+                                "internalType": "address[]",
+                                "name": "",
+                                "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "kindOf",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "string",
+                                        "name": "name",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address",
+                                        "name": "ownership",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "kind",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "district",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "location",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "image",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "totalArea",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "internalType": "struct RealtyFactory.RealtyDetails",
+                                "name": "_details",
+                                "type": "tuple"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "_owners",
+                                "type": "address[]"
+                            },
+                            {
+                                "internalType": "uint256[]",
+                                "name": "_shares",
+                                "type": "uint256[]"
+                            }
+                        ],
+                        "name": "mint",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "realties",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "ownership",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "kind",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "district",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "location",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "image",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "totalArea",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "realtiesOf",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "registry",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_assetId",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_user",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "removeOwnership",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ]
+            },
             "SaleAgreement": {
                 "gas": {
                     "consent": 9000000000000000,
@@ -878,6 +1186,44 @@
                             }
                         ],
                         "name": "DeedTransfer",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigSubmission",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigTransaction",
                         "type": "event"
                     },
                     {
@@ -1238,24 +1584,6 @@
                     {
                         "inputs": [
                             {
-                                "internalType": "uint256",
-                                "name": "_value",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "bytes",
-                                "name": "_data",
-                                "type": "bytes"
-                            }
-                        ],
-                        "name": "realtyTransaction",
-                        "outputs": [],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
                                 "internalType": "enum Policy",
                                 "name": "_policy",
                                 "type": "uint8"
@@ -1365,6 +1693,1047 @@
                     }
                 ]
             },
+            "RentalAgreement": {
+                "gas": {
+                    "enroll": 9000000000000000,
+                    "payRent": 9000000000000000,
+                    "terminate": 9000000000000000,
+                    "evict": 9000000000000000,
+                    "returnDeposit": 9000000000000000,
+                    "reduceTerm": 9000000000000000,
+                    "renewTerm": 9000000000000000
+                },
+                "address": "0x686AfD6e502A81D2e77f2e038A23C0dEf4949A20",
+                "abi": [
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_cns",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_tenant",
+                                "type": "address"
+                            },
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "address",
+                                        "name": "realtyContract",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "startDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "duration",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "rentValue",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityDeposit",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityReturnDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "paymentDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "latePaymentFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationNotice",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "extra",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address[]",
+                                        "name": "payees",
+                                        "type": "address[]"
+                                    },
+                                    {
+                                        "internalType": "uint256[]",
+                                        "name": "shares",
+                                        "type": "uint256[]"
+                                    }
+                                ],
+                                "internalType": "struct RentalAgreement.RentalTerms",
+                                "name": "_terms",
+                                "type": "tuple"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigSubmission",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigTransaction",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "address",
+                                "name": "from",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "PaymentReceived",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "PaymentReleased",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "RentPayment",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "RentalComplete",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "RentalEnrolled",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "RentalTerminated",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "TermReduced",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "tenant",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "TermRenewed",
+                        "type": "event"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "PERIOD",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "collect",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "confirmTransaction",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "enroll",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "evict",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "executeTransaction",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "getConfirmationCount",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "count",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getMultisigPolicy",
+                        "outputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "",
+                                "type": "uint8"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getMultisignableName",
+                        "outputs": [
+                            {
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getParticipants",
+                        "outputs": [
+                            {
+                                "internalType": "address[]",
+                                "name": "",
+                                "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getPayees",
+                        "outputs": [
+                            {
+                                "internalType": "address[]",
+                                "name": "",
+                                "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getTerms",
+                        "outputs": [
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "address",
+                                        "name": "realtyContract",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "startDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "duration",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "rentValue",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityDeposit",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityReturnDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "paymentDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "latePaymentFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationNotice",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "extra",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address[]",
+                                        "name": "payees",
+                                        "type": "address[]"
+                                    },
+                                    {
+                                        "internalType": "uint256[]",
+                                        "name": "shares",
+                                        "type": "uint256[]"
+                                    }
+                                ],
+                                "internalType": "struct RentalAgreement.RentalTerms",
+                                "name": "",
+                                "type": "tuple"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "getTransaction",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "",
+                                "type": "bytes"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getTransactionCount",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "_participant",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "hasConfirmed",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "isConfirmed",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "_participant",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "participantExists",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "participants",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "pay",
+                        "outputs": [],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "payRent",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "payees",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "paymentCounter",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "paymentDueDate",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "paymentExpiration",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "policy",
+                        "outputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "",
+                                "type": "uint8"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_periods",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "reduceTerm",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_periods",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "renewTerm",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_penalty",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "returnDeposit",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "enum Policy",
+                                "name": "_policy",
+                                "type": "uint8"
+                            }
+                        ],
+                        "name": "setMultisigPolicy",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "shares",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "account",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "sharesOf",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "status",
+                        "outputs": [
+                            {
+                                "internalType": "enum RentalAgreement.RentStatus",
+                                "name": "",
+                                "type": "uint8"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "_value",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "_data",
+                                "type": "bytes"
+                            }
+                        ],
+                        "name": "submitTransaction",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "tenant",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "terminate",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "terms",
+                        "outputs": [
+                            {
+                                "internalType": "address",
+                                "name": "realtyContract",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "startDate",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "duration",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "rentValue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "securityDeposit",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "securityReturnDueDate",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "paymentDueDate",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "latePaymentFee",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "earlyTerminationFee",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "earlyTerminationNotice",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "extra",
+                                "type": "string"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "totalShares",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "transactionCount",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "transactions",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "executed",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    }
+                ]
+            },
             "Ownership": {
                 "gas": {
                     "submitTransaction": 9000000000000000,
@@ -1388,6 +2757,69 @@
                         ],
                         "stateMutability": "nonpayable",
                         "type": "constructor"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigSubmission",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "transactionId",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "destination",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "MultisigTransaction",
+                        "type": "event"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "from",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "OwnershipTransfer",
+                        "type": "event"
                     },
                     {
                         "inputs": [
@@ -1738,7 +3170,7 @@
                         "outputs": [
                             {
                                 "internalType": "uint256",
-                                "name": "transactionId",
+                                "name": "_transactionId",
                                 "type": "uint256"
                             }
                         ],
