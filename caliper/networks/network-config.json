@@ -799,173 +799,117 @@
                         "type": "constructor"
                     },
                     {
+                        "anonymous": false,
                         "inputs": [
                             {
+                                "indexed": true,
                                 "internalType": "address",
-                                "name": "_assetId",
+                                "name": "tenant",
                                 "type": "address"
                             },
                             {
+                                "indexed": true,
                                 "internalType": "address",
-                                "name": "_user",
+                                "name": "landlord",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "realty",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "address",
+                                "name": "agreement",
                                 "type": "address"
                             }
                         ],
-                        "name": "addOwnership",
-                        "outputs": [],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
+                        "name": "NewRentalAgreement",
+                        "type": "event"
                     },
                     {
                         "inputs": [
                             {
                                 "internalType": "address",
-                                "name": "_assetId",
+                                "name": "_tenant",
                                 "type": "address"
-                            }
-                        ],
-                        "name": "detailsOf",
-                        "outputs": [
+                            },
                             {
                                 "components": [
                                     {
-                                        "internalType": "string",
-                                        "name": "name",
-                                        "type": "string"
-                                    },
-                                    {
                                         "internalType": "address",
-                                        "name": "ownership",
+                                        "name": "realtyContract",
                                         "type": "address"
                                     },
                                     {
-                                        "internalType": "string",
-                                        "name": "kind",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "district",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "location",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "image",
-                                        "type": "string"
+                                        "internalType": "uint256",
+                                        "name": "startDate",
+                                        "type": "uint256"
                                     },
                                     {
                                         "internalType": "uint256",
-                                        "name": "totalArea",
+                                        "name": "duration",
                                         "type": "uint256"
-                                    }
-                                ],
-                                "internalType": "struct RealtyFactory.RealtyDetails",
-                                "name": "",
-                                "type": "tuple"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "_user",
-                                "type": "address"
-                            }
-                        ],
-                        "name": "getRealtiesOf",
-                        "outputs": [
-                            {
-                                "internalType": "address[]",
-                                "name": "",
-                                "type": "address[]"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "_assetId",
-                                "type": "address"
-                            }
-                        ],
-                        "name": "kindOf",
-                        "outputs": [
-                            {
-                                "internalType": "string",
-                                "name": "",
-                                "type": "string"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "components": [
-                                    {
-                                        "internalType": "string",
-                                        "name": "name",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "address",
-                                        "name": "ownership",
-                                        "type": "address"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "kind",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "district",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "location",
-                                        "type": "string"
-                                    },
-                                    {
-                                        "internalType": "string",
-                                        "name": "image",
-                                        "type": "string"
                                     },
                                     {
                                         "internalType": "uint256",
-                                        "name": "totalArea",
+                                        "name": "rentValue",
                                         "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityDeposit",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "securityReturnDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "paymentDueDate",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "latePaymentFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationFee",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "earlyTerminationNotice",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "extra",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address[]",
+                                        "name": "payees",
+                                        "type": "address[]"
+                                    },
+                                    {
+                                        "internalType": "uint256[]",
+                                        "name": "shares",
+                                        "type": "uint256[]"
                                     }
                                 ],
-                                "internalType": "struct RealtyFactory.RealtyDetails",
-                                "name": "_details",
+                                "internalType": "struct RentalAgreement.RentalTerms",
+                                "name": "_terms",
                                 "type": "tuple"
-                            },
-                            {
-                                "internalType": "address[]",
-                                "name": "_owners",
-                                "type": "address[]"
-                            },
-                            {
-                                "internalType": "uint256[]",
-                                "name": "_shares",
-                                "type": "uint256[]"
                             }
                         ],
-                        "name": "mint",
+                        "name": "createRentalAgreement",
                         "outputs": [
                             {
                                 "internalType": "address",
@@ -977,49 +921,58 @@
                         "type": "function"
                     },
                     {
-                        "inputs": [
+                        "inputs": [],
+                        "name": "getMultisigPolicy",
+                        "outputs": [
                             {
-                                "internalType": "address",
+                                "internalType": "enum Policy",
                                 "name": "",
-                                "type": "address"
+                                "type": "uint8"
                             }
                         ],
-                        "name": "realties",
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getMultisignableName",
                         "outputs": [
                             {
                                 "internalType": "string",
-                                "name": "name",
+                                "name": "",
                                 "type": "string"
-                            },
+                            }
+                        ],
+                        "stateMutability": "pure",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
                             {
                                 "internalType": "address",
-                                "name": "ownership",
+                                "name": "_account",
                                 "type": "address"
-                            },
+                            }
+                        ],
+                        "name": "getRentalsOf",
+                        "outputs": [
                             {
-                                "internalType": "string",
-                                "name": "kind",
-                                "type": "string"
-                            },
+                                "internalType": "address[]",
+                                "name": "",
+                                "type": "address[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "policy",
+                        "outputs": [
                             {
-                                "internalType": "string",
-                                "name": "district",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "location",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "image",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "totalArea",
-                                "type": "uint256"
+                                "internalType": "enum Policy",
+                                "name": "",
+                                "type": "uint8"
                             }
                         ],
                         "stateMutability": "view",
@@ -1038,7 +991,7 @@
                                 "type": "uint256"
                             }
                         ],
-                        "name": "realtiesOf",
+                        "name": "rentalsOf",
                         "outputs": [
                             {
                                 "internalType": "address",
@@ -1052,36 +1005,12 @@
                     {
                         "inputs": [
                             {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
+                                "internalType": "enum Policy",
+                                "name": "_policy",
+                                "type": "uint8"
                             }
                         ],
-                        "name": "registry",
-                        "outputs": [
-                            {
-                                "internalType": "address",
-                                "name": "",
-                                "type": "address"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "_assetId",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "_user",
-                                "type": "address"
-                            }
-                        ],
-                        "name": "removeOwnership",
+                        "name": "setMultisigPolicy",
                         "outputs": [],
                         "stateMutability": "nonpayable",
                         "type": "function"

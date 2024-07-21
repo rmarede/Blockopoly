@@ -2,12 +2,22 @@ test:
   workers:
     number: 3
   rounds:
-    - label: Rental
+    - label: Sale300
       txNumber: 300
       rateControl:
         type: fixed-rate
         opts:
           tps: 30
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 30
+    - label: Rental100
+      txNumber: 100
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 10
       workload:
         module: ./workload/RentalWorkload.js
 monitors:

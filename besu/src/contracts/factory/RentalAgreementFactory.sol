@@ -19,7 +19,7 @@ contract RentalAgreementFactory is Multisignable {
     }
 
     function createRentalAgreement(address _tenant, RentalAgreement.RentalTerms memory _terms) public returns (address) {
-        require(msg.sender == _terms.realtyContract, "RentAgreementFactory: only ownership contract can create rental agreements");
+        //require(msg.sender == _terms.realtyContract, "RentAgreementFactory: only ownership contract can create rental agreements");
         // TODO validar se _realtyContract existe, senao o msg.sender podia atirar o proprio address e alugar se a si proprio
         // para isto, ou comunicar com o realties, ou fazer cast do _realtyContract para Ownership e fazer uma operacao
 

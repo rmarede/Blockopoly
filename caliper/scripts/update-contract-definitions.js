@@ -16,7 +16,7 @@ network_config.ethereum.contracts.SaleAgreementFactory.address = getAddress.sale
 network_config.ethereum.contracts.SaleAgreementFactory.abi = getAbi.saleFactoryAbi();
 
 network_config.ethereum.contracts.RentalAgreementFactory.address = getAddress.rentalFactoryAddress();
-network_config.ethereum.contracts.RentalAgreementFactory.abi = getAbi.realtyFactoryAbi();
+network_config.ethereum.contracts.RentalAgreementFactory.abi = getAbi.rentalFactoryAbi();
 
 network_config.ethereum.contracts.Ownership.abi = getAbi.ownershipAbi();
 

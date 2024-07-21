@@ -1,4 +1,5 @@
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
+const crypto = require('crypto');
 
 const textEncoder = new TextEncoder();
 const emptyAddr = "0x0000000000000000000000000000000000000000"; 
@@ -28,15 +29,27 @@ class RentalWorkload extends WorkloadModuleBase {
 
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
-
         this.clientAddr = sutContext.fromAddress;
+
+        const request = [{
+            contract: 'Wallet',
+            verb: 'mint',
+            value: 0,
+            args: [this.clientAddr, 900000000]
+        }];
+
+        await this.sutAdapter.sendRequests(request);
     }
 
     async submitTransaction() {
         let txid = this.txCounter++;
 
+        const inputString = this.clientAddr + txid.toString();
+        const hash = crypto.createHash('sha256').update(inputString).digest('hex');
+        const derivedAddress = '0x' + hash.substring(0, 40);
+
         const rentalDetails = {
-            realtyContract: this.clientAddr,
+            realtyContract: derivedAddress,
             startDate: Math.floor(Date.now() / 1000),
             duration: 3, 
             rentValue: 200,
@@ -58,20 +71,32 @@ class RentalWorkload extends WorkloadModuleBase {
             args: [this.clientAddr, rentalDetails]
         }];
 
-        await this.sutAdapter.sendRequests(requestsSettings);
+        const res = await this.sutAdapter.sendRequests(requestsSettings);
+
+        if(res[0].status.status === 'failed') {
+            console.log("CREATION FAILED ", this.workerIndex, " : ", txid);
+            return;
+        }
         
         requestsSettings = [{
             contract: 'RentalAgreementFactory',
             verb: 'getRentalsOf',
             value: 0,
-            args: [this.clientAddr],
+            args: [derivedAddress],
             readOnly: true
         }];
 
         const result = await this.sutAdapter.sendRequests(requestsSettings);
-        const rentalAddr = result[0].GetResult()[txid]; // TODO ou 0?
+        const rentals = result[0].GetResult();
+        const rentalAddr = rentals[rentals.length - 1];
 
         requestsSettings = [{
+            contract: 'Wallet',
+            verb: 'approve',
+            value: 0,
+            args: [rentalAddr, 900000],
+        },
+        {
             contract: 'RentalAgreement',
             verb: 'enroll',
             value: 0,
@@ -92,13 +117,13 @@ class RentalWorkload extends WorkloadModuleBase {
             args: [],
             address: rentalAddr
         },
-        {
+        /*{
             contract: 'RentalAgreement',
             verb: 'returnDeposit',
             value: 0,
             args: [0],
             address: rentalAddr
-        }];
+        }*/];
 
         await this.sutAdapter.sendRequests(requestsSettings);
     }
