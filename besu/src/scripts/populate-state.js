@@ -203,7 +203,7 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
         startDate: timeHelper.toSolidityTime(Date.now()),
         gracePeriod: 10,
         latePaymentFee: 1000,
-        defaultDeadline: 3
+        defaultDeadline: 30
     }
     const details2 = {
         lender: PUBLIC_KEY_1,
@@ -215,7 +215,7 @@ rl.question('Do you want to set the permissioning state? (y/n) ', async (answer)
         startDate: timeHelper.toSolidityTime(Date.now()),
         gracePeriod: 10,
         latePaymentFee: 1000,
-        defaultDeadline: 3
+        defaultDeadline: 30
     }
     
     await MortgageLoanFactory.connect(signer1).createMortgageLoan(details1);

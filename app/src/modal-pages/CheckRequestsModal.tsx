@@ -8,7 +8,7 @@ export default function CheckRequestsModal({ trigger, close, address, recursive 
         <>
             {recursive ? 
                 <Popup trigger={trigger} close={close}>
-                    <RequestsListRecursive of={address}/>
+                    <RequestsList of={address}/>
                 </Popup>
             : 
                 <Popup trigger={trigger} close={close}>

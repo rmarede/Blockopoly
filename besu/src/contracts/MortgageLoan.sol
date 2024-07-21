@@ -70,6 +70,8 @@ contract MortgageLoan is WeightedMultiSig, Context {
         Context(_cns)
     {
         require(_details.defaultDeadline > _details.gracePeriod, "MortgageLoan: Default deadline must be greater than grace period");
+        require(_details.principal > 0 && _details.loanTerm > 0, "MortgageLoan: Invalid input");
+        require(_details.downPayment < _details.principal, "MortgageLoan: Down payment can not be greater than principal");
         details = _details;
         paymentCounter = 0;
         status = Status.TBD; 

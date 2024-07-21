@@ -154,7 +154,7 @@ describe("MortgageLoan + Wallet Integration", function () {
             await expect(mortgageLoan.connect(acc3).secure()).to.be.reverted;
         });
 
-        it("Should not secure if wallet no wallet allowance", async function () {
+        it("Should not secure if no wallet allowance", async function () {
             const { mortgageLoan, wallet } = await loadFixture(deployMortgageLoanFixture);
             const [acc1, acc2, acc3] = await ethers.getSigners();
 

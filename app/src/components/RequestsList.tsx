@@ -83,7 +83,7 @@ export default function RequestsList({of}: {of: string}) {
                             {pageView.map((item) => (
                                 <tr key={item.id}>
                                     <td>{item.id}</td>
-                                    <td>{item.name}</td>*
+                                    <td>{item.name}</td>
                                     <td dangerouslySetInnerHTML={{ __html: printArgs(item.target, item.name, item.args)}}></td>
                                     <td>{item.executed.toString()}</td>
                                     <td><button className="redButton" disabled={item.executed} onClick={() => approve(item.id)}>Approve</button></td>
