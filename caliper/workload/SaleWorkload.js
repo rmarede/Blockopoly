@@ -23,6 +23,7 @@ class SaleWorkload extends WorkloadModuleBase {
     constructor() {
         super();
         this.assetNr = 0;
+        this.txNr = 0;
         this.assets = undefined;
         this.txCounter = 0;
         this.clientAddr = undefined;
@@ -32,6 +33,7 @@ class SaleWorkload extends WorkloadModuleBase {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
         this.assetNr = roundArguments.assets;
+        this.txNr = roundArguments.txNr;
         this.clientAddr = sutContext.fromAddress;
 
         for (let i=0; i<this.assetNr; i++) {
@@ -63,6 +65,38 @@ class SaleWorkload extends WorkloadModuleBase {
         this.assets = result[1].GetResult();
         if (this.assets.length > this.assetNr) {
             this.assets = this.assets.slice(-this.assetNr);
+        }
+
+        for (let i=0; i<this.assets.length; i++) {
+            const saleDetails = {
+                buyer: this.clientAddr,
+                seller: this.clientAddr,
+                realty: this.assets[i],
+                share: 3000,
+                price: 1000,
+                earnest: 100,
+                realtor: acc2,
+                comission: 500,
+                contengencyPeriod: 10,
+                contengencyClauses: textEncoder.encode("foo")
+            }
+
+            let requestsSettings = [{
+                contract: 'SaleAgreementFactory',
+                verb: 'createSaleAgreement',
+                value: 0,
+                args: [saleDetails]
+            }];
+
+            for (let j=0; j<Math.floor(this.txNr/this.assetNr); j++) {
+                requestsSettings.push({
+                    contract: 'SaleAgreementFactory',
+                    verb: 'createSaleAgreement',
+                    value: 0,
+                    args: [saleDetails]
+                });
+            }
+            await this.sutAdapter.sendRequests(requestsSettings);
         }
     }
 
@@ -103,6 +137,8 @@ class SaleWorkload extends WorkloadModuleBase {
 
         const result = await this.sutAdapter.sendRequests(requestsSettings);
         const saleAddr = result[0].GetResult()[Math.floor(txid / this.assetNr)];
+
+        console.log(assetAddr, " | SALE ADDRESS [", Math.floor(txid / this.assetNr), "] ON ", this.workerIndex, ":", txid, " -> ", saleAddr);
 
         requestsSettings = [{
             contract: 'Ownership',

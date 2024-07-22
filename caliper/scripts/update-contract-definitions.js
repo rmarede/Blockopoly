@@ -12,15 +12,14 @@ network_config.ethereum.contracts.RealtyFactory.abi = getAbi.realtyFactoryAbi();
 network_config.ethereum.contracts.Wallet.address = getAddress.walletAddress();
 network_config.ethereum.contracts.Wallet.abi = getAbi.walletAbi();
 
+network_config.ethereum.contracts.Ownership.abi = getAbi.ownershipAbi();
+
 network_config.ethereum.contracts.SaleAgreementFactory.address = getAddress.saleFactoryAddress();
 network_config.ethereum.contracts.SaleAgreementFactory.abi = getAbi.saleFactoryAbi();
+network_config.ethereum.contracts.SaleAgreement.abi = getAbi.saleAgreementAbi();
 
 network_config.ethereum.contracts.RentalAgreementFactory.address = getAddress.rentalFactoryAddress();
 network_config.ethereum.contracts.RentalAgreementFactory.abi = getAbi.rentalFactoryAbi();
-
-network_config.ethereum.contracts.Ownership.abi = getAbi.ownershipAbi();
-
-network_config.ethereum.contracts.SaleAgreement.abi = getAbi.saleAgreementAbi();
 network_config.ethereum.contracts.RentalAgreement.abi = getAbi.rentalAgreementAbi();
 
 fs.writeFileSync(NETWORK_CONFIG_PATH, JSON.stringify(network_config, null, 4));

@@ -2,22 +2,80 @@ test:
   workers:
     number: 3
   rounds:
-    - label: Sale300
-      txNumber: 300
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 30
-      workload:
-        module: ./workload/SaleWorkload.js
-        arguments:
-            assets: 30
-    - label: Rental100
+    - label: Sale10
       txNumber: 100
       rateControl:
         type: fixed-rate
         opts:
           tps: 10
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 10
+            txNr: 100
+    - label: Sale20
+      txNumber: 200
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 20
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 20
+            txNr: 200
+    - label: Sale35
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 35
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 35
+            txNr: 300
+    - label: Sale50
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 50
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 50
+            txNr: 300
+    - label: Rental10
+      txNumber: 100
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 10
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental20
+      txNumber: 200
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 20
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental35
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 35
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental50
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 50
       workload:
         module: ./workload/RentalWorkload.js
 monitors:

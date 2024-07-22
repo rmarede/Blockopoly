@@ -8,7 +8,7 @@ services:
         #command: launch manager
         environment:
         - CALIPER_BIND_SUT=besu:1.4
-        - CALIPER_BENCHCONFIG=benchmarks/benchmark1.yaml
+        - CALIPER_BENCHCONFIG=benchmarks/all.yaml
         - CALIPER_NETWORKCONFIG=networks/network-config.json
         volumes:
         - ../:/hyperledger/caliper/workspace
