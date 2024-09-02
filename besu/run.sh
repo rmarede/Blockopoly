@@ -25,6 +25,16 @@ case $1 in
         cd scripts
         . clean.sh
         . cryptogen.sh
+        . create.sh
+        cd ..
+        ;;
+    "down")
+        cd scripts
+        . down.sh
+        cd ..
+        ;;
+    "up")
+        cd scripts
         . up.sh
         cd ..
         ;;
@@ -32,7 +42,7 @@ case $1 in
         cd scripts
         . clean.sh
         . cryptogen.sh
-        . up.sh
+        . create.sh
         . deploy.sh
         cd ../src/scripts
         echo 'n' | node populate-cns.js
@@ -42,7 +52,7 @@ case $1 in
         cd scripts
         . clean.sh
         . cryptogen.sh
-        . up.sh
+        . create.sh
         . deploy.sh
         cd ../src/scripts
         echo 'n' | node populate-cns.js
@@ -53,7 +63,7 @@ case $1 in
         cd scripts
         . clean.sh
         . cryptogen.sh
-        . up.sh
+        . create.sh
         . deploy.sh --deploy-permissioning
         cd ../src/scripts
         echo 'y' | node populate-cns.js
