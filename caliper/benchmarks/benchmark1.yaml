@@ -2,14 +2,14 @@ test:
   workers:
     number: 3
   rounds:
-    - label: Rental
-      txNumber: 300
+    - label: basic100
+      txDuration: 20
       rateControl:
         type: fixed-rate
         opts:
-          tps: 30
+          tps: 100
       workload:
-        module: ./workload/RentalWorkload.js
+        module: ./workload/basic.js
 monitors:
   transaction:
   - module: prometheus

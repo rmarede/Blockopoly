@@ -20,7 +20,7 @@ To deploy the network you will need the following technologies:
 2. **Git** - To manage versions and clone the repository; 
 3. **Docker** - Ensure [WSL2.0 engine support](https://docs.docker.com/desktop/wsl/) is enabled if using WSL;
 4. **Curl** - Check curl documentation [here](https://curl.se/download.html) or run `sudo apt install curl`
-5. **JQ** - Run `sudo apt install jq`
+5. **JQ** - Run `sudo apt install jq` or `wget https://github.com/jqlang/jq/releases/download/jq-1.7/jq-1.7.tar.gz` and then `tar -xvf jq-1.7.tar.gz`;
 6. **Node** - Check ... run `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash` and `nvm install node`
 7. **JDK 17+** - Check ... run `sudo apt install openjdk-17-jdk -y`
 8. **Besu Binaries** - Run `wget https://github.com/hyperledger/besu/releases/download/24.3.0/besu-24.3.0.tar.gz` and then `tar -xvf besu-24.3.0.tar.gz`. This will extract the binaries to the current directory.
@@ -29,6 +29,8 @@ To deploy the network you will need the following technologies:
 Add the following lines to your `.bashrc` or `.bash_profile` file, replacing `yourusername` with your actual username:
 
 ```
+export PATH=$PATH:~/jq-1.7
+
 export NVM_DIR="/home/yourusername/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -67,6 +69,11 @@ Blockopoly is an Hardhat project, thus it makes use of the Hardhat testing frame
 
 Hyperledger Caliper is a benchmarking tool that allows performance testing of blockchain networks. Inside *Blockopoly/caliper* you will find the necessary files to run the benchmarking tests. It is a requirement that the network is effectively deployed and the smart contracts are instantiated before runing the caliper benchamrks. A user guide and a detailed explanation of the directory structure can be found in the README.md file at *Blockopoly/caliper*. 
   
+---
+
+  ## 6. DI-Cluster Configs
+
+
 ---
 
 

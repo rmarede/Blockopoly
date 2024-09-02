@@ -43,6 +43,7 @@ class RentalWorkload extends WorkloadModuleBase {
 
     async submitTransaction() {
         let txid = this.txCounter++;
+        console.log("NUMBER ", txid)
 
         const inputString = this.clientAddr + txid.toString();
         const hash = crypto.createHash('sha256').update(inputString).digest('hex');
@@ -125,7 +126,7 @@ class RentalWorkload extends WorkloadModuleBase {
             address: rentalAddr
         }*/];
 
-        await this.sutAdapter.sendRequests(requestsSettings);
+        return this.sutAdapter.sendRequests(requestsSettings);
     }
 
 }
