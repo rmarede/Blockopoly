@@ -1,0 +1,71 @@
+test:
+  workers:
+    number: 3
+  rounds:
+    - label: Rental15
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 15
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental30
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 30
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental50
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 50
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental75
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 75
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental100
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 100
+      workload:
+        module: ./workload/RentalWorkload.js
+    - label: Rental150
+      txDuration: 10
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 150
+      workload:
+        module: ./workload/RentalWorkload.js
+monitors:
+  transaction:
+  - module: prometheus
+  resource:
+  - module: docker
+    options:
+      interval: 1
+      containers: ['all']
+  - module: prometheus
+    options:
+      url: "http://prometheus:9090"
+      metrics:
+        include: [dev-.*, couch, peer, orderer]
+        queries:
+        - name: Endorse Time (s)
+          query: rate(endorser_propsal_duration_sum{chaincode="marbles:v0"}[5m])/rate(endorser_propsal_duration_count{chaincode="marbles:v0"}[5m])
+          step: 1
+          label: instance
+          statistic: avg

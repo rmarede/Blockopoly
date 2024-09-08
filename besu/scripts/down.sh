@@ -8,7 +8,7 @@ docker-compose -f ../compose/docker-compose-bootnode.yml stop
 
 NODE_COUNT=$(jq '.blockchain.nodes.count' ../config/ibftConfigFile.json)
 
-for (( i=0; i<$NODE_COUNT; i++ )); do
+for (( i=1; i<$NODE_COUNT; i++ )); do
   docker-compose -f ../compose/docker-compose-node-$i.yml stop
 done
 

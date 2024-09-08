@@ -19,10 +19,10 @@ To deploy the network you will need the following technologies:
 1. **Unix-based Operating system** or [WSL2.0](https://learn.microsoft.com/en-us/windows/wsl/install) if you are using Windows;
 2. **Git** - To manage versions and clone the repository; 
 3. **Docker** - Ensure [WSL2.0 engine support](https://docs.docker.com/desktop/wsl/) is enabled if using WSL;
-4. **Curl** - Check curl documentation [here](https://curl.se/download.html) or run `sudo apt install curl`
+4. **Curl** - Run `sudo apt install curl`
 5. **JQ** - Run `sudo apt install jq` or `wget https://github.com/jqlang/jq/releases/download/jq-1.7/jq-1.7.tar.gz` and then `tar -xvf jq-1.7.tar.gz`;
-6. **Node** - Check ... run `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash` and `nvm install node`
-7. **JDK 17+** - Check ... run `sudo apt install openjdk-17-jdk -y`
+6. **Node** - Run `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash` and `nvm install node`
+7. **JDK 17+** - Run `sudo apt install openjdk-17-jdk -y`
 8. **Besu Binaries** - Run `wget https://github.com/hyperledger/besu/releases/download/24.3.0/besu-24.3.0.tar.gz` and then `tar -xvf besu-24.3.0.tar.gz`. This will extract the binaries to the current directory.
 9. **Tessera Binaries** - Run `wget https://s01.oss.sonatype.org/service/local/repositories/releases/content/net/consensys/quorum/tessera/tessera-dist/24.4.1/tessera-dist-24.4.1.tar` and then `tar -xvf tessera-dist-24.4.1.tar`. This will extract the binaries to the current directory.
 

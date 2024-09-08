@@ -1,0 +1,79 @@
+test:
+  workers:
+    number: 3
+  rounds:
+    - label: basic50
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 50
+      workload:
+        module: ./workload/basic.js
+    - label: basic100
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 100
+      workload:
+        module: ./workload/basic.js
+    - label: basic150
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 150
+      workload:
+        module: ./workload/basic.js
+    - label: basic200
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 200
+      workload:
+        module: ./workload/basic.js
+    - label: basic250
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 250
+      workload:
+        module: ./workload/basic.js
+    - label: basic300
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 300
+      workload:
+        module: ./workload/basic.js
+    - label: basic400
+      txDuration: 20
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 400
+      workload:
+        module: ./workload/basic.js
+monitors:
+  transaction:
+  - module: prometheus
+  resource:
+  - module: docker
+    options:
+      interval: 1
+      containers: ['all']
+  - module: prometheus
+    options:
+      url: "http://prometheus:9090"
+      metrics:
+        include: [dev-.*, couch, peer, orderer]
+        queries:
+        - name: Endorse Time (s)
+          query: rate(endorser_propsal_duration_sum{chaincode="marbles:v0"}[5m])/rate(endorser_propsal_duration_count{chaincode="marbles:v0"}[5m])
+          step: 1
+          label: instance
+          statistic: avg

@@ -21,6 +21,8 @@ After deploying the network, two additional folders will be created:
 ---
 
   ## 2. Deploying the network
+
+> **Important:** Before proceeding, be sure to run `npm install` at *Blockopoly/besu/src* to install all necessary dependencies.
 	
 Deploying the network with the preconfigured settings for the proposed work is a seamless process, as all necessary commands are encapsulated within scripts provided in the repository. Start by opening a terminal at *Blockopoly/besu*. Before running any script, ensure it is executable by modifying its permissions with the *chmod* command, in this case: `chmod +x run.sh`
 
