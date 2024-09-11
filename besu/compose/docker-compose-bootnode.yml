@@ -4,7 +4,7 @@ services:
 
   besu-node-0:
     container_name: besu-node-0
-    image: hyperledger/besu:latest
+    image: hyperledger/besu:24.8.0
     user: root
     environment:
       BESU_DATA_PATH: /var/lib/besu/data

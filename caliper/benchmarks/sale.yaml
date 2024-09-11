@@ -42,7 +42,26 @@ test:
         module: ./workload/SaleWorkload.js
         arguments:
             assets: 50
-            txNr: 300
+    - label: Sale75
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 75
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 75
+    - label: Sale100
+      txNumber: 300
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 100
+      workload:
+        module: ./workload/SaleWorkload.js
+        arguments:
+            assets: 100
 monitors:
   transaction:
   - module: prometheus
