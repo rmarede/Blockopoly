@@ -59,7 +59,7 @@ Deploying the network with the preconfigured settings for the proposed work is a
 
   ## 3. Testing the Network
 
-Blockopoly is an Hardhat project, thus it makes use of the Hardhat testing framework to test the smart contracts. A total of _ unit and integration tests were developed to ensure the correctness of the proposed solution.  
+Blockopoly is an Hardhat project, thus it makes use of the Hardhat testing framework to test the smart contracts. A total of 188 unit and integration tests were developed to ensure the correctness of the proposed solution.  
 
 ---
 
