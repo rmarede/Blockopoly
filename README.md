@@ -57,55 +57,14 @@ Deploying the network with the preconfigured settings for the proposed work is a
 
 ---
 
-  ## 3. Permissioning stuff ...
-
-
-  ## 4. Testing the Network
+  ## 3. Testing the Network
 
 Blockopoly is an Hardhat project, thus it makes use of the Hardhat testing framework to test the smart contracts. A total of _ unit and integration tests were developed to ensure the correctness of the proposed solution.  
 
+---
 
-  ## 5. Benchmarking
+  ## 4. Benchmarking
 
 Hyperledger Caliper is a benchmarking tool that allows performance testing of blockchain networks. Inside *Blockopoly/caliper* you will find the necessary files to run the benchmarking tests. It is a requirement that the network is effectively deployed and the smart contracts are instantiated before runing the caliper benchamrks. A user guide and a detailed explanation of the directory structure can be found in the README.md file at *Blockopoly/caliper*. 
   
 ---
-
-  ## 6. DI-Cluster Configs
-
-
----
-
-
-<details>
-
-<summary>stuff</summary>
-
-## Ignore the following content, it is just a placeholder for now.
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
-```
-
-And this will produce a flow chart:
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
-</details>
