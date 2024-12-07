@@ -8,7 +8,7 @@ struct ContractInstance {
     }
 
 interface IContractNameService {
-    //event ...
+    event ContractRegistration(string indexed name, address addr, uint version);
     function getContractAddress(string calldata _name) external view returns (address);
     function getContractVersion(string calldata _name) external view returns (uint);
     function setContractAddress(string memory _name, address _address) external;

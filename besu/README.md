@@ -32,9 +32,9 @@ Then, booting the network is as simple as running the command `./run.sh <option>
 |----------------|-------------------------------|
 |clean| Cleans the network, removing all containers, volumes, and files generated. |
 |boot| Boots the network, generating the cryptographic material, creating the genesis block, and launching the Docker containers for each peer. |
-|deloy| Boots the network and deploys the smart contracts. |
+|deploy| Boots the network and deploys the smart contracts. |
 |populate| Boots the network, deploys the smart contracts and populate them with some initial data. |
-|permissions| ... |
+|prod| Boots the network with permissioning activated, deploys the smart contracts and populate them with some initial data.  |
 
 The default network configuration is set to run with 3 nodes, using *IBFT* as the consensus algorithm. This can be modified by changing the *ibftConfigFile.json* file at *Blockopoly/besu/config*.
 

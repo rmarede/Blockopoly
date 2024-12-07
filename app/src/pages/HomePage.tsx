@@ -33,11 +33,6 @@ export default function HomePage() {
                             <li>You can now use the application and switch between accounts seemlessly with Metamask. Reload the window every time you switch accounts.</li>
                         </ul>
                     </div>
-                    <div className="usageGuide">
-                        <h2>Usage Guide</h2>
-                        <p>Blockopoly is a blockchain-based real estate platform that allows users to buy, sell, rent, and mortgage properties.</p>
-                        <p>Start by ...</p>
-                    </div>
                 </div>
             </div>
         </div>
